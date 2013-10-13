@@ -1,4 +1,2 @@
-fcdw_data
-=========
-
-FUNcube Warehouse Data Storage and Processing
+G4DPZ-Play
+==========
