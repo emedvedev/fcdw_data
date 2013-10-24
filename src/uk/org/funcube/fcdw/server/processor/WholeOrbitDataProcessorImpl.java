@@ -18,10 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.org.funcube.fcdw.dao.HexFrameDao;
+import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.WholeOrbitDataDao;
 import uk.org.funcube.fcdw.domain.ClydeSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.GomSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
+import uk.org.funcube.fcdw.domain.MinMaxEntity;
+import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.domain.WholeOrbitDataEntity;
 
 
@@ -34,6 +37,9 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 	
 	@Autowired
 	WholeOrbitDataDao wholeOrbitDataDao;
+
+	@Autowired
+	MinMaxDao minMaxDao;
 
 	@Override
 	@Transactional(readOnly=false)
@@ -130,6 +136,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 				}
 
 				if (wod != null) {
+					checkMinMax(satelliteId, wod);
 					wholeOrbitDataDao.save(wod);
 				}
 
@@ -154,5 +161,84 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 	}
 	
 	private static final SimpleTimeZone TZ = new SimpleTimeZone(0, "UTC");
+
+	/**
+	 * @param wodEntity
+	 */
+	private void checkMinMax(long satelliteId, WholeOrbitDataEntity wodEntity) {
+
+		for (int channel = 1; channel <= 6; channel++) {
+			List<MinMaxEntity> channels = minMaxDao
+					.findBySatelliteIdAndChannel(satelliteId, channel);
+			if (channels.isEmpty()) {
+				break;
+			}
+			MinMaxEntity minMaxEntity = channels.get(0);
+			switch (channel) {
+			case 1:
+				if (wodEntity.getC9() == 0) {
+					break;
+				}
+				if (wodEntity.getC9() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC9());
+				} else if (wodEntity.getC9() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC9());
+				}
+				break;
+			case 2:
+				if (wodEntity.getC10() == 0) {
+					break;
+				}
+				if (wodEntity.getC10() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC10());
+				} else if (wodEntity.getC10() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC10());
+				}
+				break;
+			case 3:
+				if (wodEntity.getC11() == 0) {
+					break;
+				}
+				if (wodEntity.getC11() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC11());
+				} else if (wodEntity.getC11() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC11());
+				}
+				break;
+			case 4:
+				if (wodEntity.getC12() == 0) {
+					break;
+				}
+				if (wodEntity.getC12() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC12());
+				} else if (wodEntity.getC12() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC12());
+				}
+				break;
+			case 5:
+				if (wodEntity.getC13() == 0) {
+					break;
+				}
+				if (wodEntity.getC13() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC13());
+				} else if (wodEntity.getC13() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC13());
+				}
+				break;
+			case 6:
+				if (wodEntity.getC14() == 0) {
+					break;
+				}
+				if (wodEntity.getC14() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC14());
+				} else if (wodEntity.getC14() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC14());
+				}
+				break;
+			}
+			minMaxDao.save(minMaxEntity);
+		}
+
+	}
 
 }

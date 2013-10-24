@@ -18,4 +18,7 @@ public interface MinMaxDao extends CrudRepository<MinMaxEntity, Long> {
 
 	@Query
 	List<MinMaxEntity> findBySatelliteId(long satelliteId);
+	
+	@Query
+	List<MinMaxEntity> findBySatelliteIdAndChannel(long satelliteId, long channel);
 }
