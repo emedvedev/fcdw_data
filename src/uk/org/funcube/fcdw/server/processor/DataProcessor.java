@@ -245,40 +245,174 @@ public class DataProcessor {
 				}
 				break;
 			case 7:
+				if (realTimeEntity.getC9() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC9() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC9());
+				} else if (realTimeEntity.getC9() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC9());
+				}
 				break;
 			case 8:
+				if (realTimeEntity.getC10() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC10() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC10());
+				} else if (realTimeEntity.getC10() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC10());
+				}
 				break;
 			case 9:
+				if (realTimeEntity.getC11() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC11() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC11());
+				} else if (realTimeEntity.getC11() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC11());
+				}
 				break;
 			case 10:
+				if (realTimeEntity.getC12() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC12() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC12());
+				} else if (realTimeEntity.getC12() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC12());
+				}
 				break;
 			case 11:
+				if (realTimeEntity.getC20() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC20() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC20());
+				} else if (realTimeEntity.getC20() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC20());
+				}
 				break;
 			case 12:
+				if (realTimeEntity.getC21() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC21() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC21());
+				} else if (realTimeEntity.getC21() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC21());
+				}
 				break;
 			case 13:
+				if (realTimeEntity.getC22() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC22() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC22());
+				} else if (realTimeEntity.getC22() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC22());
+				}
 				break;
 			case 14:
+				if (realTimeEntity.getC23() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC23() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC23());
+				} else if (realTimeEntity.getC23() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC23());
+				}
 				break;
 			case 15:
+				if (realTimeEntity.getC24() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC24() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC24());
+				} else if (realTimeEntity.getC24() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC24());
+				}
 				break;
 			case 16:
+				if (realTimeEntity.getC25() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC25() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC25());
+				} else if (realTimeEntity.getC25() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC25());
+				}
 				break;
 			case 17:
+				if (realTimeEntity.getC26() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC26() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC26());
+				} else if (realTimeEntity.getC26() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC26());
+				}
 				break;
 			case 18:
+				if (realTimeEntity.getC29() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC29() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC29());
+				} else if (realTimeEntity.getC29() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC29());
+				}
 				break;
 			case 19:
+				if (realTimeEntity.getC30() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC30() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC30());
+				} else if (realTimeEntity.getC30() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC30());
+				}
 				break;
 			case 20:
+				if (realTimeEntity.getC31() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC31() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC31());
+				} else if (realTimeEntity.getC31() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC31());
+				}
 				break;
 			case 21:
+				if (realTimeEntity.getC32() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC32() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC32());
+				} else if (realTimeEntity.getC32() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC32());
+				}
 				break;
 			case 22:
+				if (realTimeEntity.getC35() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC35() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC35());
+				} else if (realTimeEntity.getC35() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC35());
+				}
 				break;
 			case 23:
-				break;
-			case 24:
+				if (realTimeEntity.getC36() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC36() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC36());
+				} else if (realTimeEntity.getC36() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC36());
+				}
 				break;
 			}
 			minMaxDao.save(minMaxEntity);
