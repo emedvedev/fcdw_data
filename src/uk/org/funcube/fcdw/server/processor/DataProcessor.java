@@ -355,7 +355,7 @@ public class DataProcessor {
 				}
 				break;
 			case 18:
-				if (realTimeEntity.getC29() == 0) {
+				if (realTimeEntity.getC29() == null || realTimeEntity.getC29() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC29() < minMaxEntity.getMinimum()) {
@@ -365,7 +365,7 @@ public class DataProcessor {
 				}
 				break;
 			case 19:
-				if (realTimeEntity.getC30() == 0) {
+				if (realTimeEntity.getC30() == null || realTimeEntity.getC30() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC30() < minMaxEntity.getMinimum()) {
@@ -375,7 +375,7 @@ public class DataProcessor {
 				}
 				break;
 			case 20:
-				if (realTimeEntity.getC31() == 0) {
+				if (realTimeEntity.getC31() == null || realTimeEntity.getC31() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC31() < minMaxEntity.getMinimum()) {
@@ -385,7 +385,7 @@ public class DataProcessor {
 				}
 				break;
 			case 21:
-				if (realTimeEntity.getC32() == 0) {
+				if (realTimeEntity.getC32() == null || realTimeEntity.getC32() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC32() < minMaxEntity.getMinimum()) {
@@ -395,7 +395,7 @@ public class DataProcessor {
 				}
 				break;
 			case 22:
-				if (realTimeEntity.getC35() == 0) {
+				if (realTimeEntity.getC35() == null || realTimeEntity.getC35() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC35() < minMaxEntity.getMinimum()) {
@@ -405,7 +405,7 @@ public class DataProcessor {
 				}
 				break;
 			case 23:
-				if (realTimeEntity.getC36() == 0) {
+				if (realTimeEntity.getC36() == null || realTimeEntity.getC36() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC36() < minMaxEntity.getMinimum()) {

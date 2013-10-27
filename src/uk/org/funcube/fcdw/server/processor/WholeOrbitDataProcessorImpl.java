@@ -27,14 +27,14 @@ import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.domain.WholeOrbitDataEntity;
 
-
 public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
-	
-	private static Logger LOG = Logger.getLogger(HighResolutionProcessorImpl.class.getName());
-	
+
+	private static Logger LOG = Logger
+			.getLogger(HighResolutionProcessorImpl.class.getName());
+
 	@Autowired
 	HexFrameDao hexFrameDao;
-	
+
 	@Autowired
 	WholeOrbitDataDao wholeOrbitDataDao;
 
@@ -42,12 +42,13 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 	MinMaxDao minMaxDao;
 
 	@Override
-	@Transactional(readOnly=false)
+	@Transactional(readOnly = false)
 	public void process(long satelliteId) {
 		Calendar cal = Calendar.getInstance(TZ);
 		cal.add(Calendar.HOUR, -24);
 
-		final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(satelliteId, cal.getTime());
+		final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(
+				satelliteId, cal.getTime());
 
 		LOG.debug("Found: " + wodList.size() + " unprocessed wod frames");
 
@@ -73,8 +74,9 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 						cal.set(Calendar.MILLISECOND, 0);
 						receivedDate = cal.getTime();
 
-						extractAndSaveWod(satelliteId, oldSeqNo, frames, receivedDate);
-						
+						extractAndSaveWod(satelliteId, oldSeqNo, frames,
+								receivedDate);
+
 						for (HexFrameEntity hfe : processedHexFrames) {
 							hfe.setHighPrecisionProcessed(true);
 							hexFrameDao.save(hfe);
@@ -82,22 +84,26 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 					}
 					frames = new ArrayList<String>();
 					processedHexFrames = new ArrayList<HexFrameEntity>();
-					frames.add(wodFrame.getHexString().substring(106, wodFrame.getHexString().length()));
+					frames.add(wodFrame.getHexString().substring(106,
+							wodFrame.getHexString().length()));
 					processedHexFrames.add(wodFrame);
 				}
 
 				oldSeqNo = wodFrame.getSequenceNumber();
 			} else {
-				frames.add(wodFrame.getHexString().substring(106, wodFrame.getHexString().length()));
+				frames.add(wodFrame.getHexString().substring(106,
+						wodFrame.getHexString().length()));
 				processedHexFrames.add(wodFrame);
 			}
 		}
 
 	}
 
-	private void extractAndSaveWod(final Long satelliteId, final long seqNo, final List<String> frames, final Date receivedDate) {
+	private void extractAndSaveWod(final Long satelliteId, final long seqNo,
+			final List<String> frames, final Date receivedDate) {
 
-		final Date frameTime = new Date(receivedDate.getTime() - 104 * 60 * 1000);
+		final Date frameTime = new Date(
+				receivedDate.getTime() - 104 * 60 * 1000);
 
 		final StringBuffer sb = new StringBuffer();
 
@@ -112,23 +118,34 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 			final long frameNumber = seqNo * 2 + i;
 
-			if (wholeOrbitDataDao
-					.findBySatelliteIdAndFrameNumber(
-							satelliteId, frameNumber).size() == 0) {
+			if (wholeOrbitDataDao.findBySatelliteIdAndFrameNumber(satelliteId,
+					frameNumber).size() == 0) {
 
 				WholeOrbitDataEntity wod = null;
 
 				switch (satelliteId.intValue()) {
 				case 0:
-					wod = new GomSpaceWODEntity(satelliteId, seqNo, frameNumber, convertHexBytePairToBinary(sb.substring(start, end)),
+					wod = new GomSpaceWODEntity(
+							satelliteId,
+							seqNo,
+							frameNumber,
+							convertHexBytePairToBinary(sb.substring(start, end)),
 							frameTime);
 					break;
 				case 1:
-					wod = new ClydeSpaceWODEntity(satelliteId, seqNo, frameNumber, convertHexBytePairToBinary(sb.substring(start, end)),
+					wod = new ClydeSpaceWODEntity(
+							satelliteId,
+							seqNo,
+							frameNumber,
+							convertHexBytePairToBinary(sb.substring(start, end)),
 							frameTime);
 					break;
 				case 2:
-					wod = new GomSpaceWODEntity(satelliteId, seqNo, frameNumber, convertHexBytePairToBinary(sb.substring(start, end)),
+					wod = new GomSpaceWODEntity(
+							satelliteId,
+							seqNo,
+							frameNumber,
+							convertHexBytePairToBinary(sb.substring(start, end)),
 							frameTime);
 					break;
 				default:
@@ -155,11 +172,12 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 		for (int i = 0; i < hexString.length(); i += 2) {
 			final String hexByte = hexString.substring(i, i + 2);
 			final int hexValue = Integer.parseInt(hexByte, 16);
-			sb.append(StringUtils.leftPad(Integer.toBinaryString(hexValue), 8, "0"));
+			sb.append(StringUtils.leftPad(Integer.toBinaryString(hexValue), 8,
+					"0"));
 		}
 		return sb.toString();
 	}
-	
+
 	private static final SimpleTimeZone TZ = new SimpleTimeZone(0, "UTC");
 
 	/**
@@ -167,7 +185,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 	 */
 	private void checkMinMax(long satelliteId, WholeOrbitDataEntity wodEntity) {
 
-		for (int channel = 1; channel <= 6; channel++) {
+		for (int channel = 1; channel <= 14; channel++) {
 			List<MinMaxEntity> channels = minMaxDao
 					.findBySatelliteIdAndChannel(satelliteId, channel);
 			if (channels.isEmpty()) {
@@ -233,6 +251,46 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 					minMaxEntity.setMinimum(wodEntity.getC14());
 				} else if (wodEntity.getC14() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC14());
+				}
+				break;
+			case 11:
+				if (wodEntity.getC5() == 0) {
+					break;
+				}
+				if (wodEntity.getC5() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC5());
+				} else if (wodEntity.getC5() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC5());
+				}
+				break;
+			case 12:
+				if (wodEntity.getC6() == 0) {
+					break;
+				}
+				if (wodEntity.getC6() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC6());
+				} else if (wodEntity.getC6() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC6());
+				}
+				break;
+			case 13:
+				if (wodEntity.getC7() == 0) {
+					break;
+				}
+				if (wodEntity.getC7() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC7());
+				} else if (wodEntity.getC7() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC7());
+				}
+				break;
+			case 14:
+				if (wodEntity.getC8() == 0) {
+					break;
+				}
+				if (wodEntity.getC8() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(wodEntity.getC8());
+				} else if (wodEntity.getC8() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(wodEntity.getC8());
 				}
 				break;
 			}
