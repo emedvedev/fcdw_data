@@ -24,13 +24,12 @@ import uk.org.funcube.fcdw.domain.ClydeSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.GomSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
-import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.domain.WholeOrbitDataEntity;
 
 public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 	private static Logger LOG = Logger
-			.getLogger(HighResolutionProcessorImpl.class.getName());
+			.getLogger(WholeOrbitDataProcessorImpl.class.getName());
 
 	@Autowired
 	HexFrameDao hexFrameDao;
