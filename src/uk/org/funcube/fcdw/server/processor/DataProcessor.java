@@ -185,6 +185,7 @@ public class DataProcessor {
 			MinMaxEntity minMaxEntity = channels.get(0);
 			switch (channel) {
 			case 1:
+				// Solar Panel Voltage 1
 				if (realTimeEntity.getC1() == 0) {
 					break;
 				}
@@ -195,6 +196,7 @@ public class DataProcessor {
 				}
 				break;
 			case 2:
+				// Solar Panel Voltage 2
 				if (realTimeEntity.getC2() == 0) {
 					break;
 				}
@@ -205,6 +207,7 @@ public class DataProcessor {
 				}
 				break;
 			case 3:
+				// Solar Panel Voltage 3
 				if (realTimeEntity.getC3() == 0) {
 					break;
 				}
@@ -215,6 +218,7 @@ public class DataProcessor {
 				}
 				break;
 			case 4:
+				// Total Photo current
 				if (realTimeEntity.getC4() == 0) {
 					break;
 				}
@@ -225,6 +229,7 @@ public class DataProcessor {
 				}
 				break;
 			case 5:
+				// Battery voltage
 				if (realTimeEntity.getC5() == 0) {
 					break;
 				}
@@ -235,6 +240,7 @@ public class DataProcessor {
 				}
 				break;
 			case 6:
+				// Total system current
 				if (realTimeEntity.getC6() == 0) {
 					break;
 				}
@@ -245,6 +251,7 @@ public class DataProcessor {
 				}
 				break;
 			case 7:
+				// Boost converter temp 1
 				if (realTimeEntity.getC9() == 0) {
 					break;
 				}
@@ -255,6 +262,7 @@ public class DataProcessor {
 				}
 				break;
 			case 8:
+				// Boost converter temp 2
 				if (realTimeEntity.getC10() == 0) {
 					break;
 				}
@@ -265,6 +273,7 @@ public class DataProcessor {
 				}
 				break;
 			case 9:
+				// Boost converter temp 3
 				if (realTimeEntity.getC11() == 0) {
 					break;
 				}
@@ -275,6 +284,7 @@ public class DataProcessor {
 				}
 				break;
 			case 10:
+				// Battery temp
 				if (realTimeEntity.getC12() == 0) {
 					break;
 				}
@@ -285,6 +295,7 @@ public class DataProcessor {
 				}
 				break;
 			case 11:
+				// Solar panel temp X+
 				if (realTimeEntity.getC20() == 0) {
 					break;
 				}
@@ -295,6 +306,7 @@ public class DataProcessor {
 				}
 				break;
 			case 12:
+				// Solar panel temp X-
 				if (realTimeEntity.getC21() == 0) {
 					break;
 				}
@@ -305,6 +317,7 @@ public class DataProcessor {
 				}
 				break;
 			case 13:
+				// Solar panel temp Y+
 				if (realTimeEntity.getC22() == 0) {
 					break;
 				}
@@ -315,6 +328,7 @@ public class DataProcessor {
 				}
 				break;
 			case 14:
+				// Solar panel temp Y-
 				if (realTimeEntity.getC23() == 0) {
 					break;
 				}
@@ -325,6 +339,7 @@ public class DataProcessor {
 				}
 				break;
 			case 15:
+				// 3.3 bus voltage
 				if (realTimeEntity.getC24() == 0) {
 					break;
 				}
@@ -335,6 +350,7 @@ public class DataProcessor {
 				}
 				break;
 			case 16:
+				// 3.3 bus current
 				if (realTimeEntity.getC25() == 0) {
 					break;
 				}
@@ -345,6 +361,7 @@ public class DataProcessor {
 				}
 				break;
 			case 17:
+				// 5.0 bus voltage
 				if (realTimeEntity.getC26() == 0) {
 					break;
 				}
@@ -355,36 +372,7 @@ public class DataProcessor {
 				}
 				break;
 			case 18:
-				if (realTimeEntity.getC29() == null || realTimeEntity.getC29() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC29() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC29());
-				} else if (realTimeEntity.getC29() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC29());
-				}
-				break;
-			case 19:
-				if (realTimeEntity.getC30() == null || realTimeEntity.getC30() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC30() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC30());
-				} else if (realTimeEntity.getC30() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC30());
-				}
-				break;
-			case 20:
-				if (realTimeEntity.getC31() == null || realTimeEntity.getC31() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC31() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC31());
-				} else if (realTimeEntity.getC31() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC31());
-				}
-				break;
-			case 21:
+				// Receive temperature
 				if (realTimeEntity.getC32() == null || realTimeEntity.getC32() == 0) {
 					break;
 				}
@@ -394,7 +382,41 @@ public class DataProcessor {
 					minMaxEntity.setMaximum(realTimeEntity.getC32());
 				}
 				break;
+			case 19:
+				// Receive current
+				if (realTimeEntity.getC33() == null || realTimeEntity.getC33() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC33() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC33());
+				} else if (realTimeEntity.getC33() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC33());
+				}
+				break;
+			case 20:
+				// Transmit current 3.3V bus
+				if (realTimeEntity.getC34() == null || realTimeEntity.getC34() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC34() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC34());
+				} else if (realTimeEntity.getC34() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC34());
+				}
+				break;
+			case 21:
+				// Transmit current 5V bus
+				if (realTimeEntity.getC35() == null || realTimeEntity.getC35() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC35() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC35());
+				} else if (realTimeEntity.getC35() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC35());
+				}
+				break;
 			case 22:
+				// PA Board temperature
 				if (realTimeEntity.getC35() == null || realTimeEntity.getC35() == 0) {
 					break;
 				}
@@ -405,13 +427,14 @@ public class DataProcessor {
 				}
 				break;
 			case 23:
-				if (realTimeEntity.getC36() == null || realTimeEntity.getC36() == 0) {
+				// PA Board current
+				if (realTimeEntity.getC39() == null || realTimeEntity.getC39() == 0) {
 					break;
 				}
-				if (realTimeEntity.getC36() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC36());
-				} else if (realTimeEntity.getC36() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC36());
+				if (realTimeEntity.getC39() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC39());
+				} else if (realTimeEntity.getC39() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC39());
 				}
 				break;
 			}
