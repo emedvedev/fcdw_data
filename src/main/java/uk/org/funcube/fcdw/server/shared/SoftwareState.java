@@ -298,4 +298,95 @@ public class SoftwareState {
 		return null;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (c1 ? 1231 : 1237);
+		result = prime * result + (c10 ? 1231 : 1237);
+		result = prime * result + (c11 ? 1231 : 1237);
+		result = prime * result + (c12 ? 1231 : 1237);
+		result = prime * result + (c13 ? 1231 : 1237);
+		result = prime * result + (c14 ? 1231 : 1237);
+		result = prime * result + (c15 ? 1231 : 1237);
+		result = prime * result + (c16 ? 1231 : 1237);
+		result = prime * result + (c17 ? 1231 : 1237);
+		result = prime * result + (c18 ? 1231 : 1237);
+		result = prime * result + (c19 ? 1231 : 1237);
+		result = prime * result + (c2 ? 1231 : 1237);
+		result = prime * result + (c20 ? 1231 : 1237);
+		result = prime * result + (c21 ? 1231 : 1237);
+		result = prime * result + (c22 ? 1231 : 1237);
+		result = prime * result + (c23 ? 1231 : 1237);
+		result = prime * result + (c24 ? 1231 : 1237);
+		result = prime * result + (c3 ? 1231 : 1237);
+		result = prime * result + (c4 ? 1231 : 1237);
+		result = prime * result + (c5 ? 1231 : 1237);
+		result = prime * result + (c6 ? 1231 : 1237);
+		result = prime * result + (c7 ? 1231 : 1237);
+		result = prime * result + (c8 ? 1231 : 1237);
+		result = prime * result + (c9 ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SoftwareState other = (SoftwareState) obj;
+		if (c1 != other.c1)
+			return false;
+		if (c10 != other.c10)
+			return false;
+		if (c11 != other.c11)
+			return false;
+		if (c12 != other.c12)
+			return false;
+		if (c13 != other.c13)
+			return false;
+		if (c14 != other.c14)
+			return false;
+		if (c15 != other.c15)
+			return false;
+		if (c16 != other.c16)
+			return false;
+		if (c17 != other.c17)
+			return false;
+		if (c18 != other.c18)
+			return false;
+		if (c19 != other.c19)
+			return false;
+		if (c2 != other.c2)
+			return false;
+		if (c20 != other.c20)
+			return false;
+		if (c21 != other.c21)
+			return false;
+		if (c22 != other.c22)
+			return false;
+		if (c23 != other.c23)
+			return false;
+		if (c24 != other.c24)
+			return false;
+		if (c3 != other.c3)
+			return false;
+		if (c4 != other.c4)
+			return false;
+		if (c5 != other.c5)
+			return false;
+		if (c6 != other.c6)
+			return false;
+		if (c7 != other.c7)
+			return false;
+		if (c8 != other.c8)
+			return false;
+		if (c9 != other.c9)
+			return false;
+		return true;
+	}
+
 }

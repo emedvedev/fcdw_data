@@ -172,14 +172,91 @@ public class RF {
 	public final void setC10(Long c10) {
 		this.c10 = c10;
 	}
-	
-	public String toString() {
-		return "EPS: \n"
-				+ String.format("%d %d %d %d %d %d %d %d %d %d %d\n", sensorId,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10);
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((c1 == null) ? 0 : c1.hashCode());
+		result = prime * result + ((c10 == null) ? 0 : c10.hashCode());
+		result = prime * result + ((c2 == null) ? 0 : c2.hashCode());
+		result = prime * result + ((c3 == null) ? 0 : c3.hashCode());
+		result = prime * result + ((c4 == null) ? 0 : c4.hashCode());
+		result = prime * result + ((c5 == null) ? 0 : c5.hashCode());
+		result = prime * result + ((c6 == null) ? 0 : c6.hashCode());
+		result = prime * result + ((c7 == null) ? 0 : c7.hashCode());
+		result = prime * result + ((c8 == null) ? 0 : c8.hashCode());
+		result = prime * result + ((c9 == null) ? 0 : c9.hashCode());
+		result = prime * result
+				+ ((sensorId == null) ? 0 : sensorId.hashCode());
+		return result;
 	}
 
-	public String toBinaryString() {
-		return null;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RF other = (RF) obj;
+		if (c1 == null) {
+			if (other.c1 != null)
+				return false;
+		} else if (!c1.equals(other.c1))
+			return false;
+		if (c10 == null) {
+			if (other.c10 != null)
+				return false;
+		} else if (!c10.equals(other.c10))
+			return false;
+		if (c2 == null) {
+			if (other.c2 != null)
+				return false;
+		} else if (!c2.equals(other.c2))
+			return false;
+		if (c3 == null) {
+			if (other.c3 != null)
+				return false;
+		} else if (!c3.equals(other.c3))
+			return false;
+		if (c4 == null) {
+			if (other.c4 != null)
+				return false;
+		} else if (!c4.equals(other.c4))
+			return false;
+		if (c5 == null) {
+			if (other.c5 != null)
+				return false;
+		} else if (!c5.equals(other.c5))
+			return false;
+		if (c6 == null) {
+			if (other.c6 != null)
+				return false;
+		} else if (!c6.equals(other.c6))
+			return false;
+		if (c7 == null) {
+			if (other.c7 != null)
+				return false;
+		} else if (!c7.equals(other.c7))
+			return false;
+		if (c8 == null) {
+			if (other.c8 != null)
+				return false;
+		} else if (!c8.equals(other.c8))
+			return false;
+		if (c9 == null) {
+			if (other.c9 != null)
+				return false;
+		} else if (!c9.equals(other.c9))
+			return false;
+		if (sensorId == null) {
+			if (other.sensorId != null)
+				return false;
+		} else if (!sensorId.equals(other.sensorId))
+			return false;
+		return true;
 	}
 
 }

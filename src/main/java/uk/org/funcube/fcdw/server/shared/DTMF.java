@@ -11,6 +11,12 @@ public class DTMF {
 	private long commandCount;
 	private long lastCommand;
 
+	public DTMF(long commandCount, long lastCommand) {
+		super();
+		this.commandCount = commandCount;
+		this.lastCommand = lastCommand;
+	}
+
 	public DTMF(String binaryString) {
 		
 		commandCount = Long.parseLong(binaryString.substring(0, 6), 2);
@@ -23,6 +29,31 @@ public class DTMF {
 
 	public final long getLastCommand() {
 		return lastCommand;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (commandCount ^ (commandCount >>> 32));
+		result = prime * result + (int) (lastCommand ^ (lastCommand >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DTMF other = (DTMF) obj;
+		if (commandCount != other.commandCount)
+			return false;
+		if (lastCommand != other.lastCommand)
+			return false;
+		return true;
 	}
 
 }

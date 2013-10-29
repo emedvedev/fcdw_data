@@ -4,8 +4,23 @@
 // To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter
 // to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-package uk.org.funcube.fcdw.service.rest;
+package uk.org.funcube.fcdw.server.shared;
 
-public interface RealTimeServiceRest extends AbstractServiceRest {
+import junit.framework.Assert;
+
+import org.junit.Test;
+
+/**
+ * @author g4dpz
+ *
+ */
+public class NameValuePairTest {
+
+	@Test
+	public void testConstruction() {
+		NameValuePair pair = new NameValuePair("Name", "1.001");
+		Assert.assertEquals("Name", pair.getName());
+		Assert.assertEquals("1.001", pair.getValue());
+	}
 
 }

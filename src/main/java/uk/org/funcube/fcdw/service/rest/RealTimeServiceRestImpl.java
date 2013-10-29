@@ -7,23 +7,26 @@
 package uk.org.funcube.fcdw.service.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.org.funcube.fcdw.dao.RealTimeDao;
-import uk.org.funcube.fcdw.dao.RealTimeMinMaxDao;
-import uk.org.funcube.fcdw.service.rest.model.JsonOutput;
+import uk.org.funcube.fcdw.server.shared.RealTime;
 
 
+@Controller
+@RequestMapping(value = "data/realtime")
 public class RealTimeServiceRestImpl implements RealTimeServiceRest {
 	
 	@Autowired
 	RealTimeDao realTimeDao;
 	
-	@Autowired
-	RealTimeMinMaxDao realTimeMinMaxDao;
-
-	@Override
-	public JsonOutput getLatest(Long satelliteId) {
-		// TODO Auto-generated method stub
+	@RequestMapping(value = "/{satelliteId}", method = RequestMethod.GET)
+	@ResponseBody
+	public RealTime get(@PathVariable Long satelliteId) {
 		return null;
 	}
 

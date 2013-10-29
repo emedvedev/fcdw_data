@@ -6,15 +6,8 @@
 
 package uk.org.funcube.fcdw.server.shared;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class Antenna {
-	
-	private static final String ONE = "1";
-	private static final String ZERO = "0";
-	private static final int TEMPERATURE_BINARY_STRING_LENGTH = 16;
-	private static final int DEPLOYMENT_BINARY_STRING_LENGTH = 4;
-	public static final int BINARY_STRING_LENGTH = TEMPERATURE_BINARY_STRING_LENGTH + DEPLOYMENT_BINARY_STRING_LENGTH;
 	
 	private Long antennaTemp0;
     private Long antennaTemp1;
@@ -45,51 +38,6 @@ public class Antenna {
 		this.antennaDeployment1 = antennaDeployment1;
 		this.antennaDeployment2 = antennaDeployment2;
 		this.antennaDeployment3 = antennaDeployment3;
-	}
-
-	public Antenna(final String binaryDataString) {
-		
-		int pos;
-		
-		for (pos = 0; pos < TEMPERATURE_BINARY_STRING_LENGTH; pos += 8) {
-			final long temperature = Long.parseLong(binaryDataString.substring(pos, pos + 8), 2);
-			if (0 == pos / 8) {
-				antennaTemp0 = temperature;
-			} 
-			else {
-				antennaTemp1 = temperature;
-			}
-		}
-		
-		// we do not reset pos before the loop
-		for (; pos < TEMPERATURE_BINARY_STRING_LENGTH + DEPLOYMENT_BINARY_STRING_LENGTH ; pos += 1) {
-			final boolean deployed = binaryDataString.substring(pos, pos + 1).equals(ONE);
-			switch(pos - 16) {
-				case 0:
-					antennaDeployment0 = deployed;
-					break;
-				case 1:
-					antennaDeployment1 = deployed;
-					break;
-				case 2:
-					antennaDeployment2 = deployed;
-					break;
-				case 3:
-					antennaDeployment3 = deployed;
-					break;
-			}
-		}
-	}
-
-	public final String toBinaryString() {
-		final StringBuffer sb = new StringBuffer();
-		sb.append(StringUtils.leftPad(Long.toString(antennaTemp0, 2), 8, ZERO));
-		sb.append(StringUtils.leftPad(Long.toString(antennaTemp1, 2), 8, ZERO));
-		sb.append(antennaDeployment0 ? ONE : ZERO);
-		sb.append(antennaDeployment1 ? ONE : ZERO);
-		sb.append(antennaDeployment2 ? ONE : ZERO);
-		sb.append(antennaDeployment3 ? ONE : ZERO);
-		return sb.toString();
 	}
 
 	/**
@@ -132,6 +80,51 @@ public class Antenna {
 	 */
 	public final boolean isAntennaDeployment3() {
 		return antennaDeployment3;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (antennaDeployment0 ? 1231 : 1237);
+		result = prime * result + (antennaDeployment1 ? 1231 : 1237);
+		result = prime * result + (antennaDeployment2 ? 1231 : 1237);
+		result = prime * result + (antennaDeployment3 ? 1231 : 1237);
+		result = prime * result
+				+ ((antennaTemp0 == null) ? 0 : antennaTemp0.hashCode());
+		result = prime * result
+				+ ((antennaTemp1 == null) ? 0 : antennaTemp1.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Antenna other = (Antenna) obj;
+		if (antennaDeployment0 != other.antennaDeployment0)
+			return false;
+		if (antennaDeployment1 != other.antennaDeployment1)
+			return false;
+		if (antennaDeployment2 != other.antennaDeployment2)
+			return false;
+		if (antennaDeployment3 != other.antennaDeployment3)
+			return false;
+		if (antennaTemp0 == null) {
+			if (other.antennaTemp0 != null)
+				return false;
+		} else if (!antennaTemp0.equals(other.antennaTemp0))
+			return false;
+		if (antennaTemp1 == null) {
+			if (other.antennaTemp1 != null)
+				return false;
+		} else if (!antennaTemp1.equals(other.antennaTemp1))
+			return false;
+		return true;
 	}
 	
 

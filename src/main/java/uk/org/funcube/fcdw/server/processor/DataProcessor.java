@@ -417,13 +417,13 @@ public class DataProcessor {
 				break;
 			case 22:
 				// PA Board temperature
-				if (realTimeEntity.getC35() == null || realTimeEntity.getC35() == 0) {
+				if (realTimeEntity.getC38() == null || realTimeEntity.getC38() == 0) {
 					break;
 				}
-				if (realTimeEntity.getC35() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC35());
-				} else if (realTimeEntity.getC35() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC35());
+				if (realTimeEntity.getC38() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC38());
+				} else if (realTimeEntity.getC38() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC38());
 				}
 				break;
 			case 23:

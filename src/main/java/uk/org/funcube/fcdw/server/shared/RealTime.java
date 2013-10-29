@@ -10,6 +10,8 @@ import java.util.Date;
 
 import org.jboss.logging.Logger;
 
+import uk.org.funcube.fcdw.domain.RealTimeEntity;
+
 public class RealTime {
 
 	private static final Logger LOGGER = Logger.getLogger(RealTime.class
@@ -17,7 +19,7 @@ public class RealTime {
 
 	private Date createdDate;
 
-	private int satelliteId;
+	private long satelliteId;
 	private long sequenceNumber;
 
 	private EPS eps;
@@ -30,9 +32,13 @@ public class RealTime {
 	
 	private DTMF dtmf;
 
-	private int frameType;
+	private long frameType;
 
-	private int sensorId;
+	private long sensorId;
+
+	private long commandCount;
+
+	private long lastCommand;
 
 	public RealTime() {
 
@@ -62,11 +68,11 @@ public class RealTime {
 		this.createdDate = createdDate;
 	}
 
-	public final int getSatelliteId() {
+	public final long getSatelliteId() {
 		return satelliteId;
 	}
 
-	public final void setSatelliteId(int satelliteId) {
+	public final void setSatelliteId(long satelliteId) {
 		this.satelliteId = satelliteId;
 	}
 
@@ -118,11 +124,11 @@ public class RealTime {
 		this.dtmf = dtmf;
 	}
 
-	public final int getFrameType() {
+	public final long getFrameType() {
 		return frameType;
 	}
 
-	public final void setFrameType(int frameType) {
+	public final void setFrameType(long frameType) {
 		this.frameType = frameType;
 	}
 
@@ -215,7 +221,7 @@ public class RealTime {
 
 		DTMF dtmf = null;
 
-		switch (satelliteId) {
+		switch ((int)satelliteId) {
 		case 0: {
 			dtmf = new DTMF(
 					binaryString.substring(416, 427));
@@ -245,7 +251,7 @@ public class RealTime {
 
 		SoftwareState softwareState = null;
 
-		switch (satelliteId) {
+		switch ((int)satelliteId) {
 		case 0: {
 			softwareState = new GomSpaceSoftwareState(
 					binaryString.substring(427, binaryString.length()));
@@ -275,7 +281,7 @@ public class RealTime {
 		int pos = 0;
 		int start = 0;
 
-		switch (satelliteId) {
+		switch ((int)satelliteId) {
 		case 0: {
 			start = 372;
 			break;
@@ -342,12 +348,26 @@ public class RealTime {
 		return dtmf;
 	}
 
-	public final int getSensorId() {
+	public final long getSensorId() {
 		return sensorId;
 	}
 
-	public final void setSensorId(int sensorId) {
+	public final void setSensorId(long sensorId) {
 		this.sensorId = sensorId;
+	}
+
+	/**
+	 * @return
+	 */
+	public long getCommandCount() {
+		return commandCount;
+	}
+
+	/**
+	 * @return
+	 */
+	public long getLastCommand() {
+		return lastCommand;
 	}
 
 }

@@ -477,12 +477,210 @@ public class EPS {
 	public final void setC31(Long c31) {
 		this.c31 = c31;
 	}
-	
-	public String toString() {
-		return "EPS: \n"
-				+ String.format("%d %d %d %d %d %d %d %d %d %d\n", c1,c2,c3,c4,c5,c6,c7,c8,c9,c10)
-				+ String.format("%d %d %d %d %d %d %d %d %d %d\n", c11,c12,c13,c14,c15,c16,c17,c18,c19,c20)
-				+ String.format("%d %d %d %d %d %d %d %d %d %d %d\n", c21,c22,c23,c24,c25,c26,c27,c28,c29,c30,31);
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((c1 == null) ? 0 : c1.hashCode());
+		result = prime * result + ((c10 == null) ? 0 : c10.hashCode());
+		result = prime * result + ((c11 == null) ? 0 : c11.hashCode());
+		result = prime * result + ((c12 == null) ? 0 : c12.hashCode());
+		result = prime * result + ((c13 == null) ? 0 : c13.hashCode());
+		result = prime * result + ((c14 == null) ? 0 : c14.hashCode());
+		result = prime * result + ((c15 == null) ? 0 : c15.hashCode());
+		result = prime * result + ((c16 == null) ? 0 : c16.hashCode());
+		result = prime * result + ((c17 == null) ? 0 : c17.hashCode());
+		result = prime * result + ((c18 == null) ? 0 : c18.hashCode());
+		result = prime * result + ((c19 == null) ? 0 : c19.hashCode());
+		result = prime * result + ((c2 == null) ? 0 : c2.hashCode());
+		result = prime * result + ((c20 == null) ? 0 : c20.hashCode());
+		result = prime * result + ((c21 == null) ? 0 : c21.hashCode());
+		result = prime * result + ((c22 == null) ? 0 : c22.hashCode());
+		result = prime * result + ((c23 == null) ? 0 : c23.hashCode());
+		result = prime * result + ((c24 == null) ? 0 : c24.hashCode());
+		result = prime * result + ((c25 == null) ? 0 : c25.hashCode());
+		result = prime * result + ((c26 == null) ? 0 : c26.hashCode());
+		result = prime * result + ((c27 == null) ? 0 : c27.hashCode());
+		result = prime * result + ((c28 == null) ? 0 : c28.hashCode());
+		result = prime * result + ((c29 == null) ? 0 : c29.hashCode());
+		result = prime * result + ((c3 == null) ? 0 : c3.hashCode());
+		result = prime * result + ((c30 == null) ? 0 : c30.hashCode());
+		result = prime * result + ((c31 == null) ? 0 : c31.hashCode());
+		result = prime * result + ((c4 == null) ? 0 : c4.hashCode());
+		result = prime * result + ((c5 == null) ? 0 : c5.hashCode());
+		result = prime * result + ((c6 == null) ? 0 : c6.hashCode());
+		result = prime * result + ((c7 == null) ? 0 : c7.hashCode());
+		result = prime * result + ((c8 == null) ? 0 : c8.hashCode());
+		result = prime * result + ((c9 == null) ? 0 : c9.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EPS other = (EPS) obj;
+		if (c1 == null) {
+			if (other.c1 != null)
+				return false;
+		} else if (!c1.equals(other.c1))
+			return false;
+		if (c10 == null) {
+			if (other.c10 != null)
+				return false;
+		} else if (!c10.equals(other.c10))
+			return false;
+		if (c11 == null) {
+			if (other.c11 != null)
+				return false;
+		} else if (!c11.equals(other.c11))
+			return false;
+		if (c12 == null) {
+			if (other.c12 != null)
+				return false;
+		} else if (!c12.equals(other.c12))
+			return false;
+		if (c13 == null) {
+			if (other.c13 != null)
+				return false;
+		} else if (!c13.equals(other.c13))
+			return false;
+		if (c14 == null) {
+			if (other.c14 != null)
+				return false;
+		} else if (!c14.equals(other.c14))
+			return false;
+		if (c15 == null) {
+			if (other.c15 != null)
+				return false;
+		} else if (!c15.equals(other.c15))
+			return false;
+		if (c16 == null) {
+			if (other.c16 != null)
+				return false;
+		} else if (!c16.equals(other.c16))
+			return false;
+		if (c17 == null) {
+			if (other.c17 != null)
+				return false;
+		} else if (!c17.equals(other.c17))
+			return false;
+		if (c18 == null) {
+			if (other.c18 != null)
+				return false;
+		} else if (!c18.equals(other.c18))
+			return false;
+		if (c19 == null) {
+			if (other.c19 != null)
+				return false;
+		} else if (!c19.equals(other.c19))
+			return false;
+		if (c2 == null) {
+			if (other.c2 != null)
+				return false;
+		} else if (!c2.equals(other.c2))
+			return false;
+		if (c20 == null) {
+			if (other.c20 != null)
+				return false;
+		} else if (!c20.equals(other.c20))
+			return false;
+		if (c21 == null) {
+			if (other.c21 != null)
+				return false;
+		} else if (!c21.equals(other.c21))
+			return false;
+		if (c22 == null) {
+			if (other.c22 != null)
+				return false;
+		} else if (!c22.equals(other.c22))
+			return false;
+		if (c23 == null) {
+			if (other.c23 != null)
+				return false;
+		} else if (!c23.equals(other.c23))
+			return false;
+		if (c24 == null) {
+			if (other.c24 != null)
+				return false;
+		} else if (!c24.equals(other.c24))
+			return false;
+		if (c25 == null) {
+			if (other.c25 != null)
+				return false;
+		} else if (!c25.equals(other.c25))
+			return false;
+		if (c26 == null) {
+			if (other.c26 != null)
+				return false;
+		} else if (!c26.equals(other.c26))
+			return false;
+		if (c27 == null) {
+			if (other.c27 != null)
+				return false;
+		} else if (!c27.equals(other.c27))
+			return false;
+		if (c28 == null) {
+			if (other.c28 != null)
+				return false;
+		} else if (!c28.equals(other.c28))
+			return false;
+		if (c29 == null) {
+			if (other.c29 != null)
+				return false;
+		} else if (!c29.equals(other.c29))
+			return false;
+		if (c3 == null) {
+			if (other.c3 != null)
+				return false;
+		} else if (!c3.equals(other.c3))
+			return false;
+		if (c30 == null) {
+			if (other.c30 != null)
+				return false;
+		} else if (!c30.equals(other.c30))
+			return false;
+		if (c31 == null) {
+			if (other.c31 != null)
+				return false;
+		} else if (!c31.equals(other.c31))
+			return false;
+		if (c4 == null) {
+			if (other.c4 != null)
+				return false;
+		} else if (!c4.equals(other.c4))
+			return false;
+		if (c5 == null) {
+			if (other.c5 != null)
+				return false;
+		} else if (!c5.equals(other.c5))
+			return false;
+		if (c6 == null) {
+			if (other.c6 != null)
+				return false;
+		} else if (!c6.equals(other.c6))
+			return false;
+		if (c7 == null) {
+			if (other.c7 != null)
+				return false;
+		} else if (!c7.equals(other.c7))
+			return false;
+		if (c8 == null) {
+			if (other.c8 != null)
+				return false;
+		} else if (!c8.equals(other.c8))
+			return false;
+		if (c9 == null) {
+			if (other.c9 != null)
+				return false;
+		} else if (!c9.equals(other.c9))
+			return false;
+		return true;
 	}
 
 }
