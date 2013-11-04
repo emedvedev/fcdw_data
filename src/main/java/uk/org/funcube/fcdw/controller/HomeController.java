@@ -24,16 +24,5 @@ public class HomeController extends DaoAwarController {
     	model.addAttribute("satelliteId", "2");
         return "home";
     }
-    
-    @RequestMapping(value = "{satelliteId}", method = RequestMethod.GET)
-    public String show(@PathVariable("satelliteId") Long satelliteId, Model model) {
-    	model.addAttribute("satelliteId", satelliteId);
-        return "home";
-    }
-    
-    @RequestMapping(value = "/accessDenied")
-    public String accessDenied() {
-        return "accessDenied";
-    }
         
 }

@@ -16,23 +16,18 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping(value = "/wod")
 public class WodController extends DaoAwarController {
 	
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(value = "")
     public ModelAndView getFuncube() {
     	ModelAndView model = new ModelAndView("wod");
     	model.addObject("satelliteId", "2");
         return model;
     }
     
-    @RequestMapping(value = "/{satelliteId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{satelliteId}")
     public ModelAndView getSatellite(@PathVariable("satelliteId") Long satelliteId) {
     	ModelAndView model = new ModelAndView("wod");
     	model.addObject("satelliteId", satelliteId.toString());
         return model;
-    }
-    
-    @RequestMapping(value = "/accessDenied")
-    public String accessDenied() {
-        return "accessDenied";
     }
         
 }
