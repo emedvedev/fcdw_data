@@ -1,133 +1,54 @@
-create view MinMaxRealTime as (
-select satelliteId,
-min(c1) as minC1,
-max(c1) as maxC1,
-min(c2) as minC2,
-max(c2) as maxC2,
-min(c3) as minC3,
-max(c3) as maxC3,
-min(c4) as minC4,
-max(c4) as maxC4,
-min(c5) as minC5,
-max(c5) as maxC5,
-min(c6) as minC6,
-max(c6) as maxC6,
-min(c7) as minC7,
-max(c7) as maxC7,
-min(c8) as minC8,
-max(c8) as maxC8,
-min(c9) as minC9,
-max(c9) as maxC9,
-min(c10) as minC10,
-max(c10) as maxC10,
-min(c11) as minC11,
-max(c11) as maxC11,
-min(c12) as minC12,
-max(c12) as maxC12,
-min(c13) as minC13,
-max(c13) as maxC13,
-min(c14) as minC14,
-max(c14) as maxC14,
-min(c15) as minC15,
-max(c15) as maxC15,
-min(c16) as minC16,
-max(c16) as maxC16,
-min(c17) as minC17,
-max(c17) as maxC17,
-min(c18) as minC18,
-max(c18) as maxC18,
-min(c19) as minC19,
-max(c19) as maxC19,
-min(c20) as minC20,
-max(c20) as maxC20,
-min(c21) as minC21,
-max(c21) as maxC21,
-min(c22) as minC22,
-max(c22) as maxC22,
-min(c23) as minC23,
-max(c23) as maxC23,
-min(c24) as minC24,
-max(c24) as maxC24,
-min(c25) as minC25,
-max(c25) as maxC25,
-min(c26) as minC26,
-max(c26) as maxC26,
-min(c27) as minC27,
-max(c27) as maxC27,
-min(c28) as minC28,
-max(c28) as maxC28,
-min(c29) as minC29,
-max(c29) as maxC29,
-min(c30) as minC30,
-max(c30) as maxC30,
-min(c31) as minC31,
-max(c31) as maxC31,
-min(c32) as minC32,
-max(c32) as maxC32,
-min(c33) as minC33,
-max(c33) as maxC33,
-min(c34) as minC34,
-max(c34) as maxC34,
-min(c35) as minC35,
-max(c35) as maxC35,
-min(c36) as minC36,
-max(c36) as maxC36,
-min(c37) as minC37,
-max(c37) as maxC37,
-min(c38) as minC38,
-max(c38) as maxC38,
-min(c39) as minC39,
-max(c39) as maxC39,
-min(c40) as minC40,
-max(c40) as maxC40,
-min(c41) as minC41,
-max(c41) as maxC41,
-min(c42) as minC42,
-max(c42) as maxC42,
-min(c43) as minC43,
-max(c43) as maxC43,
-min(c44) as minC44,
-max(c44) as maxC44,
-min(c45) as minC45,
-max(c45) as maxC45,
-min(c46) as minC46,
-max(c46) as maxC46,
-min(c47) as minC47,
-max(c47) as maxC47,
-min(c48) as minC48,
-max(c48) as maxC48,
-min(c49) as minC49,
-max(c49) as maxC49,
-min(c50) as minC50,
-max(c50) as maxC50,
-min(c51) as minC51,
-max(c51) as maxC51,
-min(c52) as minC52,
-max(c52) as maxC52,
-min(c53) as minC53,
-max(c53) as maxC53,
-min(c54) as minC54,
-max(c54) as maxC54,
-min(c55) as minC55,
-max(c55) as maxC55,
-min(c56) as minC56,
-max(c56) as maxC56,
-min(c57) as minC57,
-max(c57) as maxC57,
-min(c58) as minC58,
-max(c58) as maxC58,
-min(c59) as minC59,
-max(c59) as maxC59,
-min(c60) as minC60,
-max(c60) as maxC60,
-min(c61) as minC61,
-max(c61) as maxC61,
-min(c62) as minC62,
-max(c62) as maxC62,
-min(c63) as minC63,
-max(c63) as maxC63,
-min(c64) as minC64,
-max(c64) as maxC64,
-min(c65) as minC65,
-max(c65) as maxC65 
-from Realtime group by satelliteId);
+-- MySQL dump 10.13  Distrib 5.6.10, for Win64 (x86_64)
+--
+-- Host: localhost    Database: funcube
+-- ------------------------------------------------------
+-- Server version	5.6.10
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `minmax`
+--
+
+DROP TABLE IF EXISTS `minmax`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `minmax` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `satelliteId` bigint(20) DEFAULT NULL,
+  `channel` bigint(20) DEFAULT NULL,
+  `minimum` bigint(20) DEFAULT NULL,
+  `maximum` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=171 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `minmax`
+--
+
+LOCK TABLES `minmax` WRITE;
+/*!40000 ALTER TABLE `minmax` DISABLE KEYS */;
+INSERT INTO `minmax` VALUES (66,0,1,99999,-99999),(67,0,2,99999,-99999),(68,0,3,4292,4375),(69,0,4,184,212),(70,0,5,8286,8296),(71,0,6,190,208),(72,0,7,24,24),(73,0,8,25,25),(74,0,9,25,26),(75,0,10,25,25),(76,0,11,99999,-99999),(77,0,12,99999,-99999),(78,0,13,710,711),(79,0,14,373,376),(80,0,15,828,829),(81,0,16,137,165),(82,0,17,825,826),(83,0,18,173,181),(84,0,19,255,255),(85,0,20,213,215),(86,0,21,41,41),(87,0,22,41,41),(88,0,24,99999,-99999),(89,0,25,99999,-99999),(90,0,26,99999,-99999),(91,0,27,99999,-99999),(92,0,28,99999,-99999),(93,0,29,99999,-99999),(94,0,30,99999,-99999),(95,0,31,99999,-99999),(96,0,32,99999,-99999),(97,0,33,99999,-99999),(98,0,34,99999,-99999),(99,0,35,99999,-99999),(100,0,23,186,201),(101,2,1,1492,1688),(102,2,2,1458,2017),(103,2,3,1581,3633),(104,2,4,345,350),(105,2,5,7480,7815),(106,2,6,45,128),(107,2,7,24,25),(108,2,8,24,25),(109,2,9,24,26),(110,2,10,24,26),(111,2,11,650,667),(112,2,12,650,666),(113,2,13,649,665),(114,2,14,650,666),(115,2,15,820,820),(116,2,16,106,121),(117,2,17,826,826),(118,2,18,129,167),(119,2,19,182,183),(120,2,20,196,198),(121,2,21,41,41),(122,2,22,41,41),(123,2,23,10,36),(124,2,24,99999,-99999),(125,2,25,99999,-99999),(126,2,26,99999,-99999),(127,2,27,99999,-99999),(128,2,28,99999,-99999),(129,2,29,99999,-99999),(130,2,30,99999,-99999),(131,2,31,99999,-99999),(132,2,32,99999,-99999),(133,2,33,99999,-99999),(134,2,34,99999,-99999),(135,2,35,99999,-99999),(136,3,1,99999,-99999),(137,3,2,99999,-99999),(138,3,3,99999,-99999),(139,3,4,99999,-99999),(140,3,5,99999,-99999),(141,3,6,99999,-99999),(142,3,7,99999,-99999),(143,3,8,99999,-99999),(144,3,9,99999,-99999),(145,3,10,99999,-99999),(146,3,11,99999,-99999),(147,3,12,99999,-99999),(148,3,13,99999,-99999),(149,3,14,99999,-99999),(150,3,15,99999,-99999),(151,3,16,99999,-99999),(152,3,17,99999,-99999),(153,3,18,99999,-99999),(154,3,19,99999,-99999),(155,3,20,99999,-99999),(156,3,21,99999,-99999),(157,3,22,99999,-99999),(158,3,23,99999,-99999),(159,3,24,99999,-99999),(160,3,25,99999,-99999),(161,3,26,99999,-99999),(162,3,27,99999,-99999),(163,3,28,99999,-99999),(164,3,29,99999,-99999),(165,3,30,99999,-99999),(166,3,31,99999,-99999),(167,3,32,99999,-99999),(168,3,33,99999,-99999),(169,3,34,99999,-99999),(170,3,35,99999,-99999);
+/*!40000 ALTER TABLE `minmax` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2013-10-27 18:18:59

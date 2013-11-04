@@ -7,47 +7,52 @@
 package uk.org.funcube.fcdw.server.shared;
 
 public class RealTimeSummary {
-
-	private String photoVoltsXPlus = "0.0";
-	private String photoVoltsXMinus = "0.0";
-	private String photoVoltsYPlus = "0.0";
-	private String photoVoltsYMinus = "0.0";
 	
-	public RealTimeSummary() {
+	private EpsSummary epsSummary;
+	private AsibSummary asibSummary;
+	private RfSummary rfSummary;
+	private PaSummary paSummary;
+	private AntsSummary antsSummary;
+	private SoftwareSummary softwareSummary;
+
+	public RealTimeSummary(EpsSummary epsSummary, AsibSummary asibSummary, 
+			RfSummary rfSummary, PaSummary paSummary, 
+			AntsSummary antsSummary, SoftwareSummary softwareSummary) {
+		super();
+		this.epsSummary = epsSummary;
+		this.asibSummary = asibSummary;
+		this.rfSummary = rfSummary;
+		this.paSummary = paSummary;
+		this.antsSummary = antsSummary;
+		this.softwareSummary = softwareSummary;
 	}
 
-	public String getPhotoVoltsXPlus() {
-		return photoVoltsXPlus;
+	public final EpsSummary getEpsSummary() {
+		return epsSummary;
 	}
 
-	public void setPhotoVoltsXPlus(String photoVoltsXPlus) {
-		this.photoVoltsXPlus = photoVoltsXPlus;
+	public final AsibSummary getAsibSummary() {
+		return asibSummary;
 	}
 
-	public String getPhotoVoltsXMinus() {
-		return photoVoltsXMinus;
+	public final RfSummary getRfSummary() {
+		return rfSummary;
 	}
 
-	public void setPhotoVoltsXMinus(String photoVoltsXMinus) {
-		this.photoVoltsXMinus = photoVoltsXMinus;
+	public final PaSummary getPaSummary() {
+		return paSummary;
 	}
 
-	public String getPhotoVoltsYPlus() {
-		return photoVoltsYPlus;
+	public final AntsSummary getAntsSummary() {
+		return antsSummary;
 	}
 
-	public void setPhotoVoltsYPlus(String photoVoltsYPlus) {
-		this.photoVoltsYPlus = photoVoltsYPlus;
-	}
-
-	public String getPhotoVoltsYMinus() {
-		return photoVoltsYMinus;
-	}
-
-	public void setPhotoVoltsYMinus(String photoVoltsYMinus) {
-		this.photoVoltsYMinus = photoVoltsYMinus;
+	public final SoftwareSummary getSoftwareSummary() {
+		return softwareSummary;
 	}
 	
 	
 
 }
+	
+
