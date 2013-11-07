@@ -8,7 +8,6 @@ package uk.org.funcube.fcdw.dao;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -18,5 +17,8 @@ import uk.org.funcube.fcdw.domain.RealTimeEntity;
 public interface RealTimeDao extends CrudRepository<RealTimeEntity, Long> {
 
 	@Query
-	List<RealTimeEntity> findBySatelliteId(long satelliteId);
+	List<RealTimeEntity> findById(long id);
+	
+	@Query("select max(rt.id) from RealTimeEntity rt where rt.satelliteId = ?1")
+	Long findMaxId(Long satelliteId);
 }

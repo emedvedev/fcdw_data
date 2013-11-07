@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,13 +26,14 @@ import uk.org.funcube.fcdw.server.shared.MinMax;
 public class MinMaxServiceRestImpl implements MinMaxServiceRest {
 	
 	@Autowired
-	MinMaxDao realTimeDao;
+	MinMaxDao minMaxTimeDao;
 	
+	//@Transactional(readOnly = true)
 	@RequestMapping(value = "/{satelliteId}", method = RequestMethod.GET)
-	@ResponseBody
+	@ResponseBody	
 	public List<MinMax> get(@PathVariable Long satelliteId) {
 		List<MinMax> minMaxValues = new ArrayList<MinMax>();
-		List<MinMaxEntity> minMaxEntities = realTimeDao.findBySatelliteId(satelliteId);
+		List<MinMaxEntity> minMaxEntities = minMaxTimeDao.findBySatelliteId(satelliteId);
 		for (MinMaxEntity minMaxEntity : minMaxEntities) {
 			minMaxValues.add(new MinMax(minMaxEntity));
 		}
