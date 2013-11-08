@@ -59,7 +59,7 @@ public class RealTimeServiceRestImpl implements RealTimeServiceRest {
 	RealTimeDao realTimeDao;
 	
 	//@Transactional(readOnly = true)
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String get(@RequestParam(value = "callback") String callback) {
 		
@@ -98,7 +98,7 @@ public class RealTimeServiceRestImpl implements RealTimeServiceRest {
 	}
 	
 	//@Transactional(readOnly = true)
-	@RequestMapping(value = "/{satelliteId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{satelliteId}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String get(@PathVariable Long satelliteId, @RequestParam(value = "callback") String callback) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -149,7 +149,6 @@ public class RealTimeServiceRestImpl implements RealTimeServiceRest {
 						(realTimeEntity.getC47()) ? DEPLOYED : UNDEPLOYED),
     		    new SoftwareSummary(
     		    		Long.toString(realTimeEntity.getSequenceNumber()),
-    		    		realTimeEntity.getC48().toString(), 
     		    		realTimeEntity.getC49().toString(), 
     		    		realTimeEntity.getC50().toString(), 
     		    		realTimeEntity.getC51().toString(), 
@@ -157,7 +156,8 @@ public class RealTimeServiceRestImpl implements RealTimeServiceRest {
     		    		realTimeEntity.getC53().toString(), 
     		    		realTimeEntity.getC54().toString(), 
     		    		realTimeEntity.getC55().toString(), 
-    		    		realTimeEntity.getC56().toString())
+    		    		realTimeEntity.getC56().toString(), 
+    		    		realTimeEntity.getC57().toString())
     		    
     		    ));
 	    try {

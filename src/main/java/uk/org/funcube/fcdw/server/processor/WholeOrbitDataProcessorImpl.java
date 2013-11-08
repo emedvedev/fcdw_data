@@ -77,7 +77,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 								receivedDate);
 
 						for (HexFrameEntity hfe : processedHexFrames) {
-							hfe.setHighPrecisionProcessed(true);
+							hfe.setWodProcessed(true);
 							hexFrameDao.save(hfe);
 						}
 					}
