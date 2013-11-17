@@ -37,7 +37,7 @@ import uk.org.funcube.fcdw.server.shared.SoftwareSummary;
 
 @Controller
 @RequestMapping(value = "data/realtime")
-public class RealTimeServiceRestImpl implements RealTimeServiceRest {
+public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements RealTimeServiceRest {
 	
 	private static final String PA_MILLI_WATT_FORMAT = "%4.1f";
 	private static final String MILLI_VOLT_FORMAT = "%4d";
@@ -171,12 +171,6 @@ public class RealTimeServiceRestImpl implements RealTimeServiceRest {
 		}
 	    
 	    
-	}
-	
-
-
-	private static double scaleAndOffset(final long value, final double multiplier, final double offset) {
-		return (value * multiplier) + offset;
 	}
 
 	private static double getPaPower(final Long value) {

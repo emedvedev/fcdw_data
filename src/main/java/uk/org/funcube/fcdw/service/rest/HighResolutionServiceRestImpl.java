@@ -6,14 +6,44 @@
 
 package uk.org.funcube.fcdw.service.rest;
 
-import uk.org.funcube.fcdw.service.rest.model.JsonOutput;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import uk.org.funcube.fcdw.dao.HighResolutionDao;
+import uk.org.funcube.fcdw.domain.HighResolutionEntity;
+
+@Controller
+@RequestMapping(value = "data/highres")
 public class HighResolutionServiceRestImpl implements HighResolutionServiceRest {
 
-	@Override
-	public JsonOutput getLatest(Long satelliteId) {
-		// TODO Auto-generated method stub
-		return null;
+
+	
+	@Autowired
+	HighResolutionDao highResolutionDao;
+	
+	// get all data for one orbit for a given satellite
+	@RequestMapping(value = "/{satelliteId}", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public List<List<String>> getAllHighResForSatellite(
+			@PathVariable(value = "satelliteId") Long satelliteId) {
+		
+		Long maxId = highResolutionDao.findMaxId(satelliteId);
+		
+		// as we process set of High Resolution data for a satellite all at once. We won't
+		// get interleaved with other satellite WOD
+		Long firstItem = maxId - 60;
+		
+		List<HighResolutionEntity> oneHourHighRes = highResolutionDao.getLastHour(satelliteId, firstItem);
+		List<List<String>> channelList = new ArrayList<List<String>>();
+		
+		return channelList;
 	}
 
 }

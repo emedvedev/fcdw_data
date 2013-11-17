@@ -6,6 +6,22 @@
 
 package uk.org.funcube.fcdw.service.rest;
 
-public interface WholeOrbitDataServiceRest {
+/**
+ * @author g4dpz
+ *
+ */
+public class AbstractServiceRestImpl {
+
+	protected static double scaleAndOffset(final long value, final double multiplier,
+			final double offset) {
+				return (value * multiplier) + offset;
+			}
+
+	/**
+	 * 
+	 */
+	public AbstractServiceRestImpl() {
+		super();
+	}
 
 }
