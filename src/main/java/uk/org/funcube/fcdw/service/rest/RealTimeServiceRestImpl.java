@@ -66,8 +66,9 @@ public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements 
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String, Object> map = new HashMap<String, Object>();
 		
-		Long maxId = realTimeDao.findMaxId(2L);
-		List<RealTimeEntity> entities = realTimeDao.findById(maxId);
+		Long maxSequenceNumber = realTimeDao.findMaxSequenceNumber(2L);
+		Long maxFrameType = realTimeDao.findMaxFrameType(2L, maxSequenceNumber);
+		List<RealTimeEntity> entities = realTimeDao.findBySequenceNumberAndFrameType(maxSequenceNumber, maxFrameType);
 		
 		if (entities.isEmpty()) {
 			return callback + "([error:" + "No data found" + "]);";
@@ -104,8 +105,9 @@ public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements 
 		ObjectMapper objectMapper = new ObjectMapper();
 	    Map<String, Object> map = new HashMap<String, Object>();
 		
-		Long maxId = realTimeDao.findMaxId(satelliteId);
-		List<RealTimeEntity> entities = realTimeDao.findById(maxId);
+		Long maxSequenceNumber = realTimeDao.findMaxSequenceNumber(satelliteId);
+		Long maxFrameType = realTimeDao.findMaxFrameType(satelliteId, maxSequenceNumber);
+		List<RealTimeEntity> entities = realTimeDao.findBySequenceNumberAndFrameType(maxSequenceNumber, maxFrameType);
 		
 		if (entities.isEmpty()) {
 			return callback + "([error:" + "No data found" + "]);";

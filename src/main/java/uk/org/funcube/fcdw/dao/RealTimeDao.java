@@ -21,4 +21,14 @@ public interface RealTimeDao extends CrudRepository<RealTimeEntity, Long> {
 	
 	@Query("select max(rt.id) from RealTimeEntity rt where rt.satelliteId = ?1")
 	Long findMaxId(Long satelliteId);
+	
+	@Query("select max(sequenceNumber) from RealTimeEntity rt where rt.satelliteId = ?1")
+	Long findMaxSequenceNumber(Long satelliteId);
+	
+	@Query("select max(frameType) from RealTimeEntity rt where rt.satelliteId = ?1 and rt.sequenceNumber = ?2")
+	Long findMaxFrameType(Long satelliteId, Long sequenceNumber);
+
+	@Query
+	List<RealTimeEntity> findBySequenceNumberAndFrameType(
+			Long maxSequenceNumber, Long maxFrameType);
 }
