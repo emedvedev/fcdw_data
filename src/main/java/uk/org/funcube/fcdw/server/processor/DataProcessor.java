@@ -9,6 +9,7 @@ package uk.org.funcube.fcdw.server.processor;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
@@ -170,6 +172,71 @@ public class DataProcessor {
 		}
 
 	}
+	
+
+	
+	//@Transactional(readOnly = false)
+	@RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", 
+		method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public List<String> hexStrings(
+			@PathVariable(value = "siteId") String siteId, 
+			@PathVariable(value = "satelliteId") long satelliteId, 
+			@PathVariable(value = "startSequenceNumber") long startSequenceNumber, 
+			@PathVariable(value = "endSequenceNumber") long endSequenceNumber,
+			@RequestParam(value = "digest") String digest) {
+		
+		List<String> hexStrings = new ArrayList<String>();
+		
+		// get the user from the repository
+		List<UserEntity> users = userDao.findBySiteId(siteId);
+
+		if (users.size() != 0) {
+			
+			UserEntity user = users.get(0);
+
+			String authKey = userAuthKeys.get(siteId);
+			users.get(0).getAuthKey();
+			
+			if (authKey == null) {
+				if (user != null) {
+					authKey = user.getAuthKey();
+					userAuthKeys.put(siteId, authKey);
+					
+					Long value = satelliteId * startSequenceNumber * endSequenceNumber;
+					
+					try {
+					
+						final String calculatedDigest = calculateDigest(value.toString(),
+								authKey, null);
+						final String calculatedDigestUTF8 = calculateDigest(value.toString(),
+								authKey, new Integer(8));
+						final String calculatedDigestUTF16 = calculateDigest(value.toString(),
+								authKey, new Integer(16));
+
+						if (null != digest
+								&& (digest.equals(calculatedDigest) || digest
+										.equals(calculatedDigestUTF8))
+								|| digest.equals(calculatedDigestUTF16)) {
+							return hexFrameDao.getHexStringBetweenSequenceNumbers(satelliteId, startSequenceNumber, endSequenceNumber);
+						} else {
+							return hexStrings;
+						}
+					}
+					catch (NoSuchAlgorithmException nsae) {
+						return hexStrings;
+					}
+					
+				} else {
+					return hexStrings;
+				}
+			} else {
+				return hexStrings;
+			}
+		} else {
+			return hexStrings;
+		}
+	}
 
 	/**
 	 * @param realTimeEntity
@@ -183,6 +250,10 @@ public class DataProcessor {
 				break;
 			}
 			MinMaxEntity minMaxEntity = channels.get(0);
+			Long c9 = realTimeEntity.getC9();
+			Long c10 = realTimeEntity.getC10();
+			Long c11 = realTimeEntity.getC11();
+			Long c12 = realTimeEntity.getC12();
 			switch (channel) {
 			case 1:
 				// Solar Panel Voltage 1
@@ -252,46 +323,58 @@ public class DataProcessor {
 				break;
 			case 7:
 				// Boost converter temp 1
-				if (realTimeEntity.getC9() == 0) {
+				if (c9 == 0) {
 					break;
 				}
-				if (realTimeEntity.getC9() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC9());
-				} else if (realTimeEntity.getC9() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC9());
+				if (c9 > 250) {
+					c9 = c9 - 255;
+				}
+				if (c9 < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(c9);
+				} else if (c9 > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(c9);
 				}
 				break;
 			case 8:
 				// Boost converter temp 2
-				if (realTimeEntity.getC10() == 0) {
+				if (c10 == 0) {
 					break;
 				}
-				if (realTimeEntity.getC10() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC10());
-				} else if (realTimeEntity.getC10() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC10());
+				if (c10 > 250) {
+					c10 = c10 - 255;
+				}
+				if (c10 < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(c10);
+				} else if (c10 > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(c10);
 				}
 				break;
 			case 9:
 				// Boost converter temp 3
-				if (realTimeEntity.getC11() == 0) {
+				if (c11 == 0) {
 					break;
 				}
-				if (realTimeEntity.getC11() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC11());
-				} else if (realTimeEntity.getC11() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC11());
+				if (c11 > 250) {
+					c11 = c11 - 255;
+				}
+				if (c11 < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(c11);
+				} else if (c11 > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(c11);
 				}
 				break;
 			case 10:
 				// Battery temp
-				if (realTimeEntity.getC12() == 0) {
+				if (c12 == 0) {
 					break;
 				}
-				if (realTimeEntity.getC12() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC12());
-				} else if (realTimeEntity.getC12() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC12());
+				if (c12 > 250) {
+					c12 = c12 - 255;
+				}
+				if (c12 < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(c12);
+				} else if (c12 > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(c12);
 				}
 				break;
 			case 11:

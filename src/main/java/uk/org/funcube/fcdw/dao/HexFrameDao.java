@@ -41,5 +41,8 @@ public interface HexFrameDao extends CrudRepository<HexFrameEntity, Long> {
 			+ "order by hf.sequenceNumber,hf.frameType")
 	List<HexFrameEntity> findUnprocessedFitter(long satelliteId, Date time);
 	
+	@Query("SELECT hexString from HexFrameEntity where satelliteId = ?1 and sequenceNumber >= ?2 and sequenceNumber <= ?3")
+	List<String> getHexStringBetweenSequenceNumbers(long satelliteId, long startSequenceNumber, long endSequenceNumber);
+	
 
 }
