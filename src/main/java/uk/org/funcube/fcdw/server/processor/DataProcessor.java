@@ -243,7 +243,7 @@ public class DataProcessor {
 	 */
 	private void checkMinMax(long satelliteId, RealTimeEntity realTimeEntity) {
 
-		for (int channel = 1; channel <= 24; channel++) {
+		for (int channel = 1; channel <= 26; channel++) {
 			List<MinMaxEntity> channels = minMaxDao
 					.findBySatelliteIdAndChannel(satelliteId, channel);
 			if (channels.isEmpty()) {
@@ -518,6 +518,28 @@ public class DataProcessor {
 					minMaxEntity.setMinimum(realTimeEntity.getC39());
 				} else if (realTimeEntity.getC39() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(realTimeEntity.getC39());
+				}
+				break;
+			case 24:
+				// ANTS Temp 0
+				if (realTimeEntity.getC42() == null || realTimeEntity.getC42() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC42() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC42());
+				} else if (realTimeEntity.getC42() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC42());
+				}
+				break;
+			case 25:
+				// ANTS Temp 1
+				if (realTimeEntity.getC43() == null || realTimeEntity.getC43() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC43() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC43());
+				} else if (realTimeEntity.getC43() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC43());
 				}
 				break;
 			}
