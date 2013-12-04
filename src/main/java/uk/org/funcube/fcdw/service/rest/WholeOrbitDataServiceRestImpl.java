@@ -38,7 +38,7 @@ public class WholeOrbitDataServiceRestImpl extends AbstractServiceRestImpl imple
 		// get interleaved with other satellite WOD
 		Long firstItem = maxId - 104;
 		
-		List<WholeOrbitDataEntity> oneHourWod = wholeOrbitDataDao.getLastHour(satelliteId, firstItem);
+		List<WholeOrbitDataEntity> oneHourWod = wholeOrbitDataDao.getSinceId(satelliteId, firstItem);
 		List<List<String>> channelList = new ArrayList<List<String>>();
 		
 		List<String> c1Values = new ArrayList<String>();

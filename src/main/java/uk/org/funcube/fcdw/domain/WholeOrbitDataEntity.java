@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.domain;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.DiscriminatorColumn;
@@ -33,6 +34,7 @@ public class WholeOrbitDataEntity {
 	private long sequenceNumber;
 	private long frameNumber;
 	private Date createdDate;
+	private Timestamp satelliteTime;
 
 	private long c1;
 	private long c2;
@@ -310,5 +312,13 @@ public class WholeOrbitDataEntity {
 
 	public void setSequenceNumber(long sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
+	}
+
+	public final Timestamp getSatelliteTime() {
+		return satelliteTime;
+	}
+
+	public final void setSatelliteTime(Timestamp satelliteTime) {
+		this.satelliteTime = satelliteTime;
 	}
 }

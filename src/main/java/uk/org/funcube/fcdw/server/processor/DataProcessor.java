@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -132,15 +133,26 @@ public class DataProcessor {
 									hexString, now, true);
 
 							hexFrame.getUsers().add(user);
-
-							hexFrameDao.save(hexFrame);
-
+							
 							RealTimeEntity realTimeEntity = new RealTimeEntity(
 									realTime);
+							
+							try {
 
-							checkMinMax(satelliteId, realTimeEntity);
+								hexFrameDao.save(hexFrame);
+							}
+							catch (final ConstraintViolationException cve) {
+								LOG.error(String.format("Duplicate record for satelliteId %d, sequenceNmber %d, frameType %d",
+										satelliteId, sequenceNumber, frameType));
+								return new ResponseEntity<String>("CONFLICT",
+										HttpStatus.CONFLICT);
 
+							}
+							
 							realTimeDao.save(realTimeEntity);
+							
+							checkMinMax(satelliteId, realTimeEntity);
+	
 
 						} else {
 							hexFrame = frames.get(0);

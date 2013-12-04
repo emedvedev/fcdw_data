@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -17,12 +18,15 @@ import uk.org.funcube.fcdw.domain.WholeOrbitDataEntity;
 public interface WholeOrbitDataDao extends CrudRepository<WholeOrbitDataEntity, Long> {
 
 	@Query
+	List<WholeOrbitDataEntity> findBySatelliteIdAndSatelliteTime(long satelliteId, Date satelliteTime);
+	
+	@Query
 	List<WholeOrbitDataEntity> findBySatelliteIdAndFrameNumber(long satelliteId, long frameNumber);
 	
 	@Query("select max(wod.id) from WholeOrbitDataEntity wod where wod.satelliteId = ?1")
 	Long findMaxId(Long satelliteId);
 
-	@Query("select wod from WholeOrbitDataEntity wod where satelliteId = ?1 and id > ?2 order by id desc")
-	List<WholeOrbitDataEntity> getLastHour(Long satelliteId, Long id);
+	@Query("select wod from WholeOrbitDataEntity wod where satelliteId = ?1 and wod.id < ?2")
+	List<WholeOrbitDataEntity> getSinceId(Long satelliteId, Long id);
 
 }

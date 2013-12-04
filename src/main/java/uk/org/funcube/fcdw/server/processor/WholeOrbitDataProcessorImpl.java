@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.server.processor;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,10 +18,12 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.WholeOrbitDataDao;
 import uk.org.funcube.fcdw.domain.ClydeSpaceWODEntity;
+import uk.org.funcube.fcdw.domain.EpochEntity;
 import uk.org.funcube.fcdw.domain.GomSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
@@ -36,18 +39,29 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 	@Autowired
 	WholeOrbitDataDao wholeOrbitDataDao;
+	
+	@Autowired
+	EpochDao epochDao;
 
 	@Autowired
 	MinMaxDao minMaxDao;
 
 	@Override
-	@Transactional(readOnly = false)
 	public void process(long satelliteId) {
+		
+		List<EpochEntity> epochList = getEpoch(satelliteId);
+		
+		if (epochList.isEmpty()) {
+			LOG.error("Did not find epoch for satellite id: " + satelliteId);
+			return;
+		}
+		
+		EpochEntity epoch = epochList.get(0);
+		
 		Calendar cal = Calendar.getInstance(TZ);
 		cal.add(Calendar.HOUR, -24);
 
-		final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(
-				satelliteId, cal.getTime());
+		final List<HexFrameEntity> wodList = getUnprocessedWod(satelliteId, cal);
 
 		LOG.debug("Found: " + wodList.size() + " unprocessed wod frames");
 
@@ -58,14 +72,29 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 		List<HexFrameEntity> processedHexFrames = new ArrayList<HexFrameEntity>();
 
 		Date receivedDate = null;
+		
+		boolean firstSeqNoSet = false;
+		long firstSeqNo = 0;
 
 		for (final HexFrameEntity wodFrame : wodList) {
+			
+			long epochTime = epoch.getReferenceTime().getTime();
+			long epochSequenceNumber = epoch.getSequenceNumber();
+
+			Long sequenceNumber = wodFrame.getSequenceNumber();
+			long timeOffset = (sequenceNumber - epochSequenceNumber) * 120 * 1000;
+			long baseSatelliteTime = epochTime + timeOffset;
+			
 			if (wodFrame.getFrameType() == 11) {
 				receivedDate = wodFrame.getCreatedDate();
 			}
-			if (wodFrame.getSequenceNumber() != oldSeqNo) {
+			if (sequenceNumber != oldSeqNo) {
 				if (oldSeqNo != -1) {
 					if (frames.size() == 12) {
+						if (!firstSeqNoSet) {
+							firstSeqNo = oldSeqNo;
+							firstSeqNoSet = true;
+						}
 
 						cal = Calendar.getInstance(TZ);
 						cal.setTime(receivedDate);
@@ -73,13 +102,9 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 						cal.set(Calendar.MILLISECOND, 0);
 						receivedDate = cal.getTime();
 
-						extractAndSaveWod(satelliteId, oldSeqNo, frames,
-								receivedDate);
-
-						for (HexFrameEntity hfe : processedHexFrames) {
-							hfe.setWodProcessed(true);
-							hexFrameDao.save(hfe);
-						}
+						saveWod(satelliteId, oldSeqNo, frames,
+								processedHexFrames, receivedDate,
+								baseSatelliteTime, 50);
 					}
 					frames = new ArrayList<String>();
 					processedHexFrames = new ArrayList<HexFrameEntity>();
@@ -98,8 +123,36 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 	}
 
+	@Transactional(readOnly = false)
+	private void saveWod(long satelliteId, long oldSeqNo, List<String> frames,
+			List<HexFrameEntity> processedHexFrames, Date receivedDate,
+			long baseSatelliteTime, long iterations) {
+		extractAndSaveWod(satelliteId, oldSeqNo, frames,
+				receivedDate, baseSatelliteTime, iterations);
+
+		for (HexFrameEntity hfe : processedHexFrames) {
+			hfe.setWodProcessed(true);
+			hexFrameDao.save(hfe);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	private List<HexFrameEntity> getUnprocessedWod(long satelliteId,
+			Calendar cal) {
+		final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(
+				satelliteId, cal.getTime());
+		return wodList;
+	}
+
+	@Transactional(readOnly = true)
+	private List<EpochEntity> getEpoch(long satelliteId) {
+		List<EpochEntity> epochList = epochDao.findBySatelliteId(satelliteId);
+		return epochList;
+	}
+
 	private void extractAndSaveWod(final Long satelliteId, final long seqNo,
-			final List<String> frames, final Date receivedDate) {
+			final List<String> frames, final Date receivedDate, long baseSatelliteTime,
+			long iterations) {
 
 		final Date frameTime = new Date(
 				receivedDate.getTime() - 104 * 60 * 1000);
@@ -115,10 +168,25 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 		for (int i = 0; i < 104; i++) {
 
-			final long frameNumber = seqNo * 2 + i;
+			final long frameNumber = (seqNo * 104) + i;
+			
+			long satelliteTime = baseSatelliteTime + (i * 60 * 1000);
+			
+			LOG.debug("Finding: " + seqNo + ", " + i + ", " + frameNumber);
+			
+			boolean foundEntry = false;
+			
+			for (int entryCount = 0; entryCount < iterations; entryCount++) {
+				if (wholeOrbitDataDao.findBySatelliteIdAndFrameNumber(satelliteId,
+						frameNumber - 106 - (entryCount * 104)).size() > 0) {
+					foundEntry = true;
+					break;
+				}
+			}
 
-			if (wholeOrbitDataDao.findBySatelliteIdAndFrameNumber(satelliteId,
-					frameNumber).size() == 0) {
+			if (!foundEntry) {
+				
+				LOG.debug("Not Found");
 
 				WholeOrbitDataEntity wod = null;
 
@@ -152,12 +220,16 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 				}
 
 				if (wod != null) {
-					checkMinMax(satelliteId, wod);
+					//checkMinMax(satelliteId, wod);
+					wod.setSatelliteTime(new Timestamp(satelliteTime));
+					LOG.debug("Saving WOD with sequenceNumber, frameNumber: " + wod.getSequenceNumber() + ", " + wod.getFrameNumber());
 					wholeOrbitDataDao.save(wod);
 				}
 
 				start += 46;
 				end += 46;
+			} else {
+				LOG.debug("Found");
 			}
 
 			// move the frame time forward a minute
