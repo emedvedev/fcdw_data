@@ -63,7 +63,9 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 		final List<HexFrameEntity> wodList = getUnprocessedWod(satelliteId, cal);
 
-		LOG.debug("Found: " + wodList.size() + " unprocessed wod frames");
+		int size = wodList.size();
+		
+		LOG.debug("Found: " + size + " unprocessed wod frames");
 
 		long oldSeqNo = -1;
 
@@ -73,17 +75,11 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 		Date receivedDate = null;
 		
-		boolean firstSeqNoSet = false;
-		long firstSeqNo = 0;
-
-		for (final HexFrameEntity wodFrame : wodList) {
+		for (int index = 0; index < (size - 1); index++) {
 			
-			long epochTime = epoch.getReferenceTime().getTime();
-			long epochSequenceNumber = epoch.getSequenceNumber();
+			HexFrameEntity wodFrame = wodList.get(index);
 
 			Long sequenceNumber = wodFrame.getSequenceNumber();
-			long timeOffset = (sequenceNumber - epochSequenceNumber) * 120 * 1000;
-			long baseSatelliteTime = epochTime + timeOffset;
 			
 			if (wodFrame.getFrameType() == 11) {
 				receivedDate = wodFrame.getCreatedDate();
@@ -91,10 +87,6 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 			if (sequenceNumber != oldSeqNo) {
 				if (oldSeqNo != -1) {
 					if (frames.size() == 12) {
-						if (!firstSeqNoSet) {
-							firstSeqNo = oldSeqNo;
-							firstSeqNoSet = true;
-						}
 
 						cal = Calendar.getInstance(TZ);
 						cal.setTime(receivedDate);
@@ -104,7 +96,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 						saveWod(satelliteId, oldSeqNo, frames,
 								processedHexFrames, receivedDate,
-								baseSatelliteTime, 50);
+								epoch);
 					}
 					frames = new ArrayList<String>();
 					processedHexFrames = new ArrayList<HexFrameEntity>();
@@ -126,9 +118,9 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 	@Transactional(readOnly = false)
 	private void saveWod(long satelliteId, long oldSeqNo, List<String> frames,
 			List<HexFrameEntity> processedHexFrames, Date receivedDate,
-			long baseSatelliteTime, long iterations) {
+			EpochEntity epoch) {
 		extractAndSaveWod(satelliteId, oldSeqNo, frames,
-				receivedDate, baseSatelliteTime, iterations);
+				receivedDate, epoch);
 
 		for (HexFrameEntity hfe : processedHexFrames) {
 			hfe.setWodProcessed(true);
@@ -151,8 +143,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 	}
 
 	private void extractAndSaveWod(final Long satelliteId, final long seqNo,
-			final List<String> frames, final Date receivedDate, long baseSatelliteTime,
-			long iterations) {
+			final List<String> frames, final Date receivedDate, EpochEntity epoch) {
 
 		final Date frameTime = new Date(
 				receivedDate.getTime() - 104 * 60 * 1000);
@@ -165,71 +156,83 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 		int start = 0;
 		int end = 46;
+		
+		// get the epoch sequence number
+		Long epochSequenceNumber = epoch.getSequenceNumber();
+		// get the epoch satelliteTime
+		Long epochTimeLong = epoch.getReferenceTime().getTime();
+		// get current time
+		Long currentSequenceTimeLong = ((seqNo - epochSequenceNumber) * 2 * 60 * 1000) + epochTimeLong;
 
 		for (int i = 0; i < 104; i++) {
 
-			final long frameNumber = (seqNo * 104) + i;
+			final long frameNumber = (seqNo * 2) + i;
 			
-			long satelliteTime = baseSatelliteTime + (i * 60 * 1000);
-			
-			LOG.debug("Finding: " + seqNo + ", " + i + ", " + frameNumber);
-			
-			boolean foundEntry = false;
-			
-			for (int entryCount = 0; entryCount < iterations; entryCount++) {
-				if (wholeOrbitDataDao.findBySatelliteIdAndFrameNumber(satelliteId,
-						frameNumber - 106 - (entryCount * 104)).size() > 0) {
-					foundEntry = true;
-					break;
-				}
+			Timestamp satelliteTime = new Timestamp(currentSequenceTimeLong + (i * 60 * 1000));
+
+			WholeOrbitDataEntity wod = null;
+
+			switch (satelliteId.intValue()) {
+			case 0:
+				wod = new GomSpaceWODEntity(
+						satelliteId,
+						seqNo,
+						frameNumber,
+						convertHexBytePairToBinary(sb.substring(start, end)),
+						frameTime);
+				break;
+			case 1:
+				wod = new ClydeSpaceWODEntity(
+						satelliteId,
+						seqNo,
+						frameNumber,
+						convertHexBytePairToBinary(sb.substring(start, end)),
+						frameTime);
+				break;
+			case 2:
+				wod = new GomSpaceWODEntity(
+						satelliteId,
+						seqNo,
+						frameNumber,
+						convertHexBytePairToBinary(sb.substring(start, end)),
+						frameTime);
+				break;
+			default:
+				break;
 			}
-
-			if (!foundEntry) {
 				
-				LOG.debug("Not Found");
-
-				WholeOrbitDataEntity wod = null;
-
-				switch (satelliteId.intValue()) {
-				case 0:
-					wod = new GomSpaceWODEntity(
-							satelliteId,
-							seqNo,
-							frameNumber,
-							convertHexBytePairToBinary(sb.substring(start, end)),
-							frameTime);
-					break;
-				case 1:
-					wod = new ClydeSpaceWODEntity(
-							satelliteId,
-							seqNo,
-							frameNumber,
-							convertHexBytePairToBinary(sb.substring(start, end)),
-							frameTime);
-					break;
-				case 2:
-					wod = new GomSpaceWODEntity(
-							satelliteId,
-							seqNo,
-							frameNumber,
-							convertHexBytePairToBinary(sb.substring(start, end)),
-							frameTime);
-					break;
-				default:
-					break;
-				}
-
-				if (wod != null) {
+				
+			if (wod != null) {
+				
+				//LOG.debug("Finding: " + seqNo + ", " + i + ", " + frameNumber + ", " + satelliteTime);
+				
+				if (wholeOrbitDataDao.findBySatelliteIdAndC1AndC2AndC3AndC4AndC5AndC6AndC7AndC8AndC9AndC10AndC11(
+						satelliteId, 
+						wod.getC1(),
+						wod.getC2(),
+						wod.getC3(),
+						wod.getC4(),
+						wod.getC5(),
+						wod.getC6(),
+						wod.getC7(),
+						wod.getC8(),
+						wod.getC9(),
+						wod.getC10(),
+						wod.getC11()
+						).size() == 0) {
+					
+					//LOG.debug("Not Found");
+	
 					//checkMinMax(satelliteId, wod);
-					wod.setSatelliteTime(new Timestamp(satelliteTime));
-					LOG.debug("Saving WOD with sequenceNumber, frameNumber: " + wod.getSequenceNumber() + ", " + wod.getFrameNumber());
+					wod.setSatelliteTime(satelliteTime);
+					//LOG.debug("Saving WOD with sequenceNumber, frameNumber: " + wod.getSequenceNumber() + ", " + wod.getFrameNumber());
 					wholeOrbitDataDao.save(wod);
+	
+					start += 46;
+					end += 46;
+				} else {
+					//LOG.debug("Found");
 				}
-
-				start += 46;
-				end += 46;
-			} else {
-				LOG.debug("Found");
 			}
 
 			// move the frame time forward a minute
