@@ -41,6 +41,10 @@ public class WodCsvExtractor {
 		
 		List<WholeOrbitDataEntity> wod24 = wholeOrbitDataDao.getSinceSatelliteTime(satelliteId, since);
 		
+		if (wod24.size() == 0) {
+			return;
+		}
+		
 		File fileLocation = new File(System.getProperty("csv.wod"));
 		
 		if (fileLocation.exists()) {
@@ -69,11 +73,73 @@ public class WodCsvExtractor {
 			csvOutput.write("Total System Current");
 			csvOutput.endRecord();
 			
+			for (WholeOrbitDataEntity entity : wod24) {
+				for (int i = 0; i < 15; i++) {
+					
+					switch (i) {
+					case 0: 
+						csvOutput.write(entity.getSatelliteTime().toString());
+						break;
+					case 1: 
+						csvOutput.write(scale(entity.getC1(), -0.024, 75.244));
+						break;
+					case 2: 
+						csvOutput.write(scale(entity.getC2(), -0.024, 74.750));
+						break;
+					case 3: 
+						csvOutput.write(scale(entity.getC3(), -0.024, 75.039));
+						break;
+					case 4: 
+						csvOutput.write(scale(entity.getC4(), -0.024, 75.987));
+						break;
+					case 5: 
+						csvOutput.write(scale(entity.getC5(), -0.2073, 158.239));
+						break;
+					case 6: 
+						csvOutput.write(scale(entity.getC6(), -0.2083, 159.227));
+						break;
+					case 7: 
+						csvOutput.write(scale(entity.getC7(), -0.2076, 158.656));
+						break;
+					case 8: 
+						csvOutput.write(scale(entity.getC8(), -0.2087, 159.045));
+						break;
+					case 9: 
+						csvOutput.write(scale(entity.getC9(), 0.001, 0.0));
+						break;
+					case 10: 
+						csvOutput.write(scale(entity.getC10(), 0.001, 0.0));
+						break;
+					case 11: 
+						csvOutput.write(scale(entity.getC11(), 0.001, 0.0));
+						break;
+					case 12: 
+						csvOutput.write(scale(entity.getC12(), 0.01, 0.0));
+						break;
+					case 13: 
+						csvOutput.write(scale(entity.getC13(), 0.001, 0.0));
+						break;
+					case 14: 
+						csvOutput.write(scale(entity.getC14(), 0.01, 0.0));
+						break;
+					}
+					
+				}
+
+				csvOutput.endRecord();
+			}
+			
 			csvOutput.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
+	}
+
+
+	private String scale(Long adc, Double multiplier, Double offset) {
+		double value = (adc * multiplier) + offset;
+		return String.format("%6.2f", value);
 	}
 
 }

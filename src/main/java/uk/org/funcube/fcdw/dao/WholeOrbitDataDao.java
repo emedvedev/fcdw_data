@@ -47,7 +47,7 @@ public interface WholeOrbitDataDao extends CrudRepository<WholeOrbitDataEntity, 
 	@Query("select max(satelliteTime) from WholeOrbitDataEntity where satelliteId = ?1")
 	Timestamp getLatestSatelliteTime(long satelliteId);
 	
-	@Query("select wod from WholeOrbitDataEntity wod where satelliteId = ?1 and satelliteTime > ?2")
+	@Query("select wod from WholeOrbitDataEntity wod where satelliteId = ?1 and satelliteTime > ?2 order by satelliteTime asc")
 	List<WholeOrbitDataEntity> getSinceSatelliteTime(long satelliteId, Timestamp satelliteTime);
 		
 
