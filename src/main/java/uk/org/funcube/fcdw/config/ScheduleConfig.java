@@ -57,7 +57,7 @@ public class ScheduleConfig {
 		fitterMessageProcessor.process(3L);
 	}
 	
-	@Scheduled(cron="0 * * * * *")
+	@Scheduled(cron="0 0 0 * * ?")
 	public void wodCsvExtractorTask() {
 		wodCsvExtractor.extract(2L);
 	}

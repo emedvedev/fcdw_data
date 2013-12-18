@@ -59,7 +59,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 		EpochEntity epoch = epochList.get(0);
 		
 		Calendar cal = Calendar.getInstance(TZ);
-		cal.add(Calendar.HOUR, -24);
+		cal.add(Calendar.HOUR, -48);
 
 		final List<HexFrameEntity> wodList = getUnprocessedWod(satelliteId, cal);
 

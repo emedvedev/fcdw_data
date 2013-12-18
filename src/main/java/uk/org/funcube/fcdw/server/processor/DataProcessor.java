@@ -255,7 +255,7 @@ public class DataProcessor {
 	 */
 	private void checkMinMax(long satelliteId, RealTimeEntity realTimeEntity) {
 
-		for (int channel = 1; channel <= 26; channel++) {
+		for (int channel = 1; channel <= 27; channel++) {
 			List<MinMaxEntity> channels = minMaxDao
 					.findBySatelliteIdAndChannel(satelliteId, channel);
 			if (channels.isEmpty()) {
@@ -468,28 +468,6 @@ public class DataProcessor {
 				break;
 			case 18:
 				// Receive temperature
-				if (realTimeEntity.getC32() == null || realTimeEntity.getC32() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC32() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC32());
-				} else if (realTimeEntity.getC32() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC32());
-				}
-				break;
-			case 19:
-				// Receive current
-				if (realTimeEntity.getC33() == null || realTimeEntity.getC33() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC33() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC33());
-				} else if (realTimeEntity.getC33() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC33());
-				}
-				break;
-			case 20:
-				// Transmit current 3.3V bus
 				if (realTimeEntity.getC34() == null || realTimeEntity.getC34() == 0) {
 					break;
 				}
@@ -499,8 +477,8 @@ public class DataProcessor {
 					minMaxEntity.setMaximum(realTimeEntity.getC34());
 				}
 				break;
-			case 21:
-				// Transmit current 5V bus
+			case 19:
+				// Receive current
 				if (realTimeEntity.getC35() == null || realTimeEntity.getC35() == 0) {
 					break;
 				}
@@ -510,8 +488,30 @@ public class DataProcessor {
 					minMaxEntity.setMaximum(realTimeEntity.getC35());
 				}
 				break;
+			case 20:
+				// Transmit current 3.3V bus
+				if (realTimeEntity.getC36() == null || realTimeEntity.getC36() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC36() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC36());
+				} else if (realTimeEntity.getC36() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC36());
+				}
+				break;
+			case 21:
+				// Transmit current 5V bus
+				if (realTimeEntity.getC37() == null || realTimeEntity.getC37() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC37() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC37());
+				} else if (realTimeEntity.getC37() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC37());
+				}
+				break;
 			case 22:
-				// PA Board temperature
+				// Forward Power
 				if (realTimeEntity.getC38() == null || realTimeEntity.getC38() == 0) {
 					break;
 				}
@@ -522,7 +522,7 @@ public class DataProcessor {
 				}
 				break;
 			case 23:
-				// PA Board current
+				// Reflected Power
 				if (realTimeEntity.getC39() == null || realTimeEntity.getC39() == 0) {
 					break;
 				}
@@ -533,6 +533,28 @@ public class DataProcessor {
 				}
 				break;
 			case 24:
+				// PA Board temperature
+				if (realTimeEntity.getC40() == null || realTimeEntity.getC40() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC40() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC40());
+				} else if (realTimeEntity.getC40() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC40());
+				}
+				break;
+			case 25:
+				// PA Board current
+				if (realTimeEntity.getC39() == null || realTimeEntity.getC39() == 0) {
+					break;
+				}
+				if (realTimeEntity.getC39() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC39());
+				} else if (realTimeEntity.getC39() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC39());
+				}
+				break;
+			case 26:
 				// ANTS Temp 0
 				if (realTimeEntity.getC42() == null || realTimeEntity.getC42() == 0) {
 					break;
@@ -543,7 +565,7 @@ public class DataProcessor {
 					minMaxEntity.setMaximum(realTimeEntity.getC42());
 				}
 				break;
-			case 25:
+			case 27:
 				// ANTS Temp 1
 				if (realTimeEntity.getC43() == null || realTimeEntity.getC43() == 0) {
 					break;

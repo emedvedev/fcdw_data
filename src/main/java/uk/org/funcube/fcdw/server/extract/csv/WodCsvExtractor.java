@@ -56,77 +56,95 @@ public class WodCsvExtractor {
 			CsvWriter csvOutput = new CsvWriter(new FileWriter(fileLocation, true), ',');
 			
 			// write out the headers
-			csvOutput.write("Satellite Time");
-			csvOutput.write("Black Chassis");
-			csvOutput.write("Silver Chasis");
-			csvOutput.write("Black Panel");
-			csvOutput.write("Silver Panel");
-			csvOutput.write("Solar Panel +X");
-			csvOutput.write("Solar Panel -X");
-			csvOutput.write("Solar Panel +Y");
-			csvOutput.write("Solar Panel -Y");
-			csvOutput.write("Solar Panel Voltage X");
-			csvOutput.write("Solar Panel Voltage Y");
-			csvOutput.write("Solar Panel Voltage Z");
-			csvOutput.write("Total Photo Current");
-			csvOutput.write("Battery Voltage");
-			csvOutput.write("Total System Current");
+			csvOutput.write("Satellite Date/Time UTC");
+			csvOutput.write("Black Chassis deg. C");
+			csvOutput.write("Silver Chassis deg. C");
+			csvOutput.write("Black Panel deg. C");
+			csvOutput.write("Silver Panel deg. C");
+			csvOutput.write("Solar Panel +X deg. C");
+			csvOutput.write("Solar Panel -X deg. C");
+			csvOutput.write("Solar Panel +Y deg. C");
+			csvOutput.write("Solar Panel -Y deg. C");
+			csvOutput.write("Solar Panel X mV");
+			csvOutput.write("Solar Panel Y mV");
+			csvOutput.write("Solar Panel Z mV");
+			csvOutput.write("Tot. Photo Curr. mA ");
+			csvOutput.write("Battery mV");
+			csvOutput.write("Tot. System Curr. mA");
 			csvOutput.endRecord();
 			
+			long tsLong = 0;
+			String c1 = "";
+			String c2 = "";
+			String c3 = "";
+			String c4 = "";
+			String c5 = "";
+			String c6 = "";
+			String c7 = "";
+			String c8 = "";
+			String c9 = "";
+			String c10 = "";
+			String c11 = "";
+			String c12 = "";
+			String c13 = "";
+			String c14 = "";
+			
 			for (WholeOrbitDataEntity entity : wod24) {
-				for (int i = 0; i < 15; i++) {
+				
+				Timestamp satelliteTime = entity.getSatelliteTime();
+				
+				if (tsLong == 0) {
+					tsLong = satelliteTime.getTime();
+					c1 = scale(entity.getC1(), -0.024, 75.244);
+					c2 = scale(entity.getC2(), -0.024, 74.750);
+					c3 = scale(entity.getC3(), -0.024, 75.039);
+					c4 = scale(entity.getC4(), -0.024, 75.987);
+					c5 = scale(entity.getC5(), -0.2073, 158.239);
+					c6 = scale(entity.getC6(), -0.2083, 159.227);
+					c7 = scale(entity.getC7(), -0.2076, 158.656);
+					c8 = scale(entity.getC8(), -0.2087, 159.045);
+					c9 = String.format("%4d", entity.getC9());
+					c10 = String.format("%4d", entity.getC10());
+					c11 = String.format("%4d", entity.getC11());
+					c12 = String.format("%4d", entity.getC12());
+					c13 = String.format("%4d", entity.getC13());
+					c14 = String.format("%4d", entity.getC14());
 					
-					switch (i) {
-					case 0: 
-						csvOutput.write(entity.getSatelliteTime().toString());
-						break;
-					case 1: 
-						csvOutput.write(scale(entity.getC1(), -0.024, 75.244));
-						break;
-					case 2: 
-						csvOutput.write(scale(entity.getC2(), -0.024, 74.750));
-						break;
-					case 3: 
-						csvOutput.write(scale(entity.getC3(), -0.024, 75.039));
-						break;
-					case 4: 
-						csvOutput.write(scale(entity.getC4(), -0.024, 75.987));
-						break;
-					case 5: 
-						csvOutput.write(scale(entity.getC5(), -0.2073, 158.239));
-						break;
-					case 6: 
-						csvOutput.write(scale(entity.getC6(), -0.2083, 159.227));
-						break;
-					case 7: 
-						csvOutput.write(scale(entity.getC7(), -0.2076, 158.656));
-						break;
-					case 8: 
-						csvOutput.write(scale(entity.getC8(), -0.2087, 159.045));
-						break;
-					case 9: 
-						csvOutput.write(scale(entity.getC9(), 0.001, 0.0));
-						break;
-					case 10: 
-						csvOutput.write(scale(entity.getC10(), 0.001, 0.0));
-						break;
-					case 11: 
-						csvOutput.write(scale(entity.getC11(), 0.001, 0.0));
-						break;
-					case 12: 
-						csvOutput.write(scale(entity.getC12(), 0.01, 0.0));
-						break;
-					case 13: 
-						csvOutput.write(scale(entity.getC13(), 0.001, 0.0));
-						break;
-					case 14: 
-						csvOutput.write(scale(entity.getC14(), 0.01, 0.0));
-						break;
+					writeRecord(csvOutput, satelliteTime, c1, c2, c3, c4, c5, c6,
+							c7, c8, c9, c10, c11, c12, c13, c14);
+				} else {
+
+					final long timeDiff = satelliteTime.getTime() - tsLong;
+					if (timeDiff > 60000) {
+						// fill in the gaps
+						long gaps = (timeDiff / 60000);
+						for (long i = 1; i < gaps; i++) {
+							Timestamp intervalTime = new Timestamp(tsLong + (60000 * i));
+							writeRecord(csvOutput, intervalTime, c1, c2, c3, c4, c5, c6,
+									c7, c8, c9, c10, c11, c12, c13, c14);
+						}
 					}
 					
+					c1 = scale(entity.getC1(), -0.024, 75.244);
+					c2 = scale(entity.getC2(), -0.024, 74.750);
+					c3 = scale(entity.getC3(), -0.024, 75.039);
+					c4 = scale(entity.getC4(), -0.024, 75.987);
+					c5 = scale(entity.getC5(), -0.2073, 158.239);
+					c6 = scale(entity.getC6(), -0.2083, 159.227);
+					c7 = scale(entity.getC7(), -0.2076, 158.656);
+					c8 = scale(entity.getC8(), -0.2087, 159.045);
+					c9 = String.format("%4d", entity.getC9());
+					c10 = String.format("%4d", entity.getC10());
+					c11 = String.format("%4d", entity.getC11());
+					c12 = String.format("%4d", entity.getC12());
+					c13 = String.format("%4d", entity.getC13());
+					c14 = String.format("%4d", entity.getC14());
+					
+					writeRecord(csvOutput, satelliteTime, c1, c2, c3, c4, c5, c6,
+							c7, c8, c9, c10, c11, c12, c13, c14);
+					
+					tsLong = satelliteTime.getTime();
 				}
-
-				csvOutput.endRecord();
 			}
 			
 			csvOutput.close();
@@ -134,6 +152,66 @@ public class WodCsvExtractor {
 			e.printStackTrace();
 		}
 		
+	}
+
+
+	private void writeRecord(CsvWriter csvOutput, Timestamp satelliteTime,
+			String c1, String c2, String c3, String c4, String c5, String c6,
+			String c7, String c8, String c9, String c10, String c11,
+			String c12, String c13, String c14) throws IOException {
+		for (int i = 0; i < 15; i++) {
+
+			switch (i) {
+			case 0: 
+				csvOutput.write(satelliteTime.toString());
+				break;
+			case 1:
+				csvOutput.write(c1);
+				break;
+			case 2: 
+				csvOutput.write(c2);
+				break;
+			case 3: 
+				csvOutput.write(c3);
+				break;
+			case 4: 
+				csvOutput.write(c4);
+				break;
+			case 5: 
+				csvOutput.write(c5);
+				break;
+			case 6: 
+				csvOutput.write(c6);
+				break;
+			case 7: 
+				csvOutput.write(c7);
+				break;
+			case 8: 
+				csvOutput.write(c8);
+				break;
+			case 9: 
+				csvOutput.write(c9);
+				break;
+			case 10: 
+				csvOutput.write(c10);
+				break;
+			case 11: 
+				csvOutput.write(c11);
+				break;
+			case 12: 
+				csvOutput.write(c12);
+				break;
+			case 13: 
+				csvOutput.write(c13);
+				break;
+			case 14: 
+				csvOutput.write(c14);
+				break;
+			}
+			
+		}
+
+		csvOutput.endRecord();
 	}
 
 
