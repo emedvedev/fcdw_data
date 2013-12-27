@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.SimpleTimeZone;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,8 +95,15 @@ public class HighResolutionProcessorImpl implements HighResolutionProcessor {
 	private void saveHighPrecision(final int satelliteId, final long sequenceNumber, final List<String> frames, final Date receivedDate) {
 
 		HighResolutionEntity hrEntity = null;
+		
+		StringBuffer sb = new StringBuffer();
+		
+		for (int i = 0; i < 3; i++) {
+			sb.append(StringUtils.right(frames.get(i), 400));
+		}
+		
+		final String binaryString = DataProcessor.convertHexBytePairToBinary(sb.toString());
 
-		final String binaryString = DataProcessor.convertHexBytePairToBinary(frames.get(0) + frames.get(1) + frames.get(2));
 		for (int i = 0; i < 60; i++) {
 			switch (satelliteId) {
 			case 0:

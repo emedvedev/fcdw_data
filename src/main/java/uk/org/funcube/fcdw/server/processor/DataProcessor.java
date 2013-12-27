@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityExistsException;
+
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,8 @@ import uk.org.funcube.fcdw.server.util.UTCClock;
 @Service
 @RequestMapping("/api/data/hex")
 public class DataProcessor {
+	
+	long TWO_DAYS_SEQ_COUNT = 1440;
 
 	@Autowired
 	UserDao userDao;
@@ -101,9 +104,9 @@ public class DataProcessor {
 						authKey, new Integer(16));
 
 				if (null != digest
-						&& (digest.equals(calculatedDigest) || digest
-								.equals(calculatedDigestUTF8))
-						|| digest.equals(calculatedDigestUTF16)) {
+						&& (digest.equals(calculatedDigest)
+								|| digest.equals(calculatedDigestUTF8) || digest
+									.equals(calculatedDigestUTF16))) {
 
 					hexString = StringUtils.deleteWhitespace(hexString);
 
@@ -120,46 +123,60 @@ public class DataProcessor {
 					final long sequenceNumber = realTime.getSequenceNumber();
 
 					if (sequenceNumber != -1) {
-
+						
+						long maxSequenceNumber = hexFrameDao.getMaxSequenceNumber(satelliteId);
+						
+						
+						if (Math.abs(sequenceNumber - maxSequenceNumber) > TWO_DAYS_SEQ_COUNT) {
+							LOG.error(String
+									.format("Sequence number %d is out of bounds for satelliteId %d",
+											sequenceNumber, satelliteId));
+							return new ResponseEntity<String>(
+									"BAD_REQUEST", HttpStatus.BAD_REQUEST);
+						}
+						
 						final List<HexFrameEntity> frames = hexFrameDao
 								.findBySatelliteIdAndSequenceNumberAndFrameType(
 										satelliteId, sequenceNumber, frameType);
 
 						HexFrameEntity hexFrame = null;
 
-						if (frames != null && frames.size() == 0) {
-							hexFrame = new HexFrameEntity((long) satelliteId,
-									(long) frameType, sequenceNumber,
-									hexString, now, true);
+						if (frames != null) {
+							if (frames.size() == 0) {
 
-							hexFrame.getUsers().add(user);
-							
-							RealTimeEntity realTimeEntity = new RealTimeEntity(
-									realTime);
-							
-							try {
+								hexFrame = new HexFrameEntity(
+										(long) satelliteId, (long) frameType,
+										sequenceNumber, hexString, now, true);
+
+								hexFrame.getUsers().add(user);
+
+								RealTimeEntity realTimeEntity = new RealTimeEntity(
+										realTime);
+
+								try {
+
+									hexFrameDao.save(hexFrame);
+								} catch (final EntityExistsException cve) {
+									LOG.error(String
+											.format("Duplicate record for satelliteId %d, sequenceNmber %d, frameType %d",
+													satelliteId,
+													sequenceNumber, frameType));
+									return new ResponseEntity<String>(
+											"CONFLICT", HttpStatus.CONFLICT);
+
+								}
+
+								realTimeDao.save(realTimeEntity);
+
+								checkMinMax(satelliteId, realTimeEntity);
+
+							} else {
+								hexFrame = frames.get(0);
+
+								hexFrame.getUsers().add(user);
 
 								hexFrameDao.save(hexFrame);
 							}
-							catch (final ConstraintViolationException cve) {
-								LOG.error(String.format("Duplicate record for satelliteId %d, sequenceNmber %d, frameType %d",
-										satelliteId, sequenceNumber, frameType));
-								return new ResponseEntity<String>("CONFLICT",
-										HttpStatus.CONFLICT);
-
-							}
-							
-							realTimeDao.save(realTimeEntity);
-							
-							checkMinMax(satelliteId, realTimeEntity);
-	
-
-						} else {
-							hexFrame = frames.get(0);
-
-							hexFrame.getUsers().add(user);
-
-							hexFrameDao.save(hexFrame);
 						}
 					}
 
@@ -184,61 +201,61 @@ public class DataProcessor {
 		}
 
 	}
-	
 
-	
-	//@Transactional(readOnly = false)
-	@RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", 
-		method = RequestMethod.GET, produces = "application/json")
+	// @Transactional(readOnly = false)
+	@RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public List<String> hexStrings(
-			@PathVariable(value = "siteId") String siteId, 
-			@PathVariable(value = "satelliteId") long satelliteId, 
-			@PathVariable(value = "startSequenceNumber") long startSequenceNumber, 
+			@PathVariable(value = "siteId") String siteId,
+			@PathVariable(value = "satelliteId") long satelliteId,
+			@PathVariable(value = "startSequenceNumber") long startSequenceNumber,
 			@PathVariable(value = "endSequenceNumber") long endSequenceNumber,
 			@RequestParam(value = "digest") String digest) {
-		
+
 		List<String> hexStrings = new ArrayList<String>();
-		
+
 		// get the user from the repository
 		List<UserEntity> users = userDao.findBySiteId(siteId);
 
 		if (users.size() != 0) {
-			
+
 			UserEntity user = users.get(0);
 
 			String authKey = userAuthKeys.get(siteId);
 			users.get(0).getAuthKey();
-			
+
 			if (authKey == null) {
 				if (user != null) {
 					authKey = user.getAuthKey();
 					userAuthKeys.put(siteId, authKey);
-					
-					Long value = satelliteId * startSequenceNumber * endSequenceNumber;
-					
+
+					Long value = satelliteId * startSequenceNumber
+							* endSequenceNumber;
+
 					try {
-					
-						final String calculatedDigest = calculateDigest(value.toString(),
-								authKey, null);
-						final String calculatedDigestUTF8 = calculateDigest(value.toString(),
-								authKey, new Integer(8));
-						final String calculatedDigestUTF16 = calculateDigest(value.toString(),
-								authKey, new Integer(16));
+
+						final String calculatedDigest = calculateDigest(
+								value.toString(), authKey, null);
+						final String calculatedDigestUTF8 = calculateDigest(
+								value.toString(), authKey, new Integer(8));
+						final String calculatedDigestUTF16 = calculateDigest(
+								value.toString(), authKey, new Integer(16));
 
 						if (null != digest
-								&& (digest.equals(calculatedDigest) || digest
-										.equals(calculatedDigestUTF8))
-								|| digest.equals(calculatedDigestUTF16)) {
-							return hexFrameDao.getHexStringBetweenSequenceNumbers(satelliteId, startSequenceNumber, endSequenceNumber);
+								&& (digest.equals(calculatedDigest)
+										|| digest.equals(calculatedDigestUTF8) || digest
+											.equals(calculatedDigestUTF16))) {
+							return hexFrameDao
+									.getHexStringBetweenSequenceNumbers(
+											satelliteId, startSequenceNumber,
+											endSequenceNumber);
 						} else {
 							return hexStrings;
 						}
-					}
-					catch (NoSuchAlgorithmException nsae) {
+					} catch (NoSuchAlgorithmException nsae) {
 						return hexStrings;
 					}
-					
+
 				} else {
 					return hexStrings;
 				}
@@ -468,7 +485,8 @@ public class DataProcessor {
 				break;
 			case 18:
 				// Receive temperature
-				if (realTimeEntity.getC34() == null || realTimeEntity.getC34() == 0) {
+				if (realTimeEntity.getC34() == null
+						|| realTimeEntity.getC34() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC34() < minMaxEntity.getMinimum()) {
@@ -479,7 +497,8 @@ public class DataProcessor {
 				break;
 			case 19:
 				// Receive current
-				if (realTimeEntity.getC35() == null || realTimeEntity.getC35() == 0) {
+				if (realTimeEntity.getC35() == null
+						|| realTimeEntity.getC35() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC35() < minMaxEntity.getMinimum()) {
@@ -490,7 +509,8 @@ public class DataProcessor {
 				break;
 			case 20:
 				// Transmit current 3.3V bus
-				if (realTimeEntity.getC36() == null || realTimeEntity.getC36() == 0) {
+				if (realTimeEntity.getC36() == null
+						|| realTimeEntity.getC36() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC36() < minMaxEntity.getMinimum()) {
@@ -501,7 +521,8 @@ public class DataProcessor {
 				break;
 			case 21:
 				// Transmit current 5V bus
-				if (realTimeEntity.getC37() == null || realTimeEntity.getC37() == 0) {
+				if (realTimeEntity.getC37() == null
+						|| realTimeEntity.getC37() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC37() < minMaxEntity.getMinimum()) {
@@ -512,7 +533,8 @@ public class DataProcessor {
 				break;
 			case 22:
 				// Forward Power
-				if (realTimeEntity.getC38() == null || realTimeEntity.getC38() == 0) {
+				if (realTimeEntity.getC38() == null
+						|| realTimeEntity.getC38() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC38() < minMaxEntity.getMinimum()) {
@@ -523,7 +545,8 @@ public class DataProcessor {
 				break;
 			case 23:
 				// Reflected Power
-				if (realTimeEntity.getC39() == null || realTimeEntity.getC39() == 0) {
+				if (realTimeEntity.getC39() == null
+						|| realTimeEntity.getC39() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC39() < minMaxEntity.getMinimum()) {
@@ -534,7 +557,8 @@ public class DataProcessor {
 				break;
 			case 24:
 				// PA Board temperature
-				if (realTimeEntity.getC40() == null || realTimeEntity.getC40() == 0) {
+				if (realTimeEntity.getC40() == null
+						|| realTimeEntity.getC40() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC40() < minMaxEntity.getMinimum()) {
@@ -545,18 +569,20 @@ public class DataProcessor {
 				break;
 			case 25:
 				// PA Board current
-				if (realTimeEntity.getC39() == null || realTimeEntity.getC39() == 0) {
+				if (realTimeEntity.getC41() == null
+						|| realTimeEntity.getC39() == 0) {
 					break;
 				}
-				if (realTimeEntity.getC39() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC39());
-				} else if (realTimeEntity.getC39() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC39());
+				if (realTimeEntity.getC41() < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(realTimeEntity.getC41());
+				} else if (realTimeEntity.getC41() > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(realTimeEntity.getC41());
 				}
 				break;
 			case 26:
 				// ANTS Temp 0
-				if (realTimeEntity.getC42() == null || realTimeEntity.getC42() == 0) {
+				if (realTimeEntity.getC42() == null
+						|| realTimeEntity.getC42() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC42() < minMaxEntity.getMinimum()) {
@@ -567,7 +593,8 @@ public class DataProcessor {
 				break;
 			case 27:
 				// ANTS Temp 1
-				if (realTimeEntity.getC43() == null || realTimeEntity.getC43() == 0) {
+				if (realTimeEntity.getC43() == null
+						|| realTimeEntity.getC43() == 0) {
 					break;
 				}
 				if (realTimeEntity.getC43() < minMaxEntity.getMinimum()) {

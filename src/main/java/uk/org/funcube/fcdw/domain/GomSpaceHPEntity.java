@@ -11,9 +11,15 @@ import java.util.Date;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
+import org.jboss.logging.Logger;
+
+import uk.org.funcube.fcdw.server.processor.DataProcessor;
+
 @Entity
 @DiscriminatorValue("gomSpace")
 public class GomSpaceHPEntity extends HighResolutionEntity {
+	
+	private static Logger LOG = Logger.getLogger(GomSpaceHPEntity.class.getName());
 
 	public GomSpaceHPEntity() {
 		super();
@@ -27,8 +33,9 @@ public class GomSpaceHPEntity extends HighResolutionEntity {
 		int pos = 0;
 
 		for (; pos < 50; pos += 10) {
+			final String substring = binaryDataString.substring(pos, pos + 10);
 			final long value = Long.parseLong(
-					binaryDataString.substring(pos, pos + 10), 2);
+					substring, 2);
 			switch (pos / 10) {
 			case 0:
 				setC1(value);
@@ -51,8 +58,9 @@ public class GomSpaceHPEntity extends HighResolutionEntity {
 		int start = pos;
 
 		for (; pos < 80; pos += 15) {
+			final String substring = binaryDataString.substring(pos, pos + 15);
 			final long value = Long.parseLong(
-					binaryDataString.substring(pos, pos + 15), 2);
+					substring, 2);
 			switch ((pos - start) / 15) {
 			case 0:
 				setC6(value);

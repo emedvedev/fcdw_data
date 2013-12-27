@@ -43,6 +43,13 @@ public interface HexFrameDao extends CrudRepository<HexFrameEntity, Long> {
 	
 	@Query("SELECT hexString from HexFrameEntity where satelliteId = ?1 and sequenceNumber >= ?2 and sequenceNumber <= ?3")
 	List<String> getHexStringBetweenSequenceNumbers(long satelliteId, long startSequenceNumber, long endSequenceNumber);
+
+	/**
+	 * @param satelliteId
+	 * @return
+	 */
+	@Query("SELECT max(sequenceNumber) from HexFrameEntity where satelliteId = ?1")
+	Long getMaxSequenceNumber(long satelliteId);
 	
 
 }
