@@ -210,4 +210,107 @@ public class UserEntity implements UserDetails, User {
 		this.hexFrames = frames;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (admin ? 1231 : 1237);
+		result = prime * result + ((authKey == null) ? 0 : authKey.hashCode());
+		result = prime * result + (credentialsExpired ? 1231 : 1237);
+		result = prime * result + (enabled ? 1231 : 1237);
+		result = prime * result + (expired ? 1231 : 1237);
+		result = prime * result
+				+ ((hexFrames == null) ? 0 : hexFrames.hashCode());
+		result = prime * result
+				+ ((latitude == null) ? 0 : latitude.hashCode());
+		result = prime * result + (locked ? 1231 : 1237);
+		result = prime * result
+				+ ((longitude == null) ? 0 : longitude.hashCode());
+		result = prime * result
+				+ ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((siteId == null) ? 0 : siteId.hashCode());
+		result = prime * result
+				+ ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof UserEntity)) {
+			return false;
+		}
+		UserEntity other = (UserEntity) obj;
+		if (admin != other.admin) {
+			return false;
+		}
+		if (authKey == null) {
+			if (other.authKey != null) {
+				return false;
+			}
+		} else if (!authKey.equals(other.authKey)) {
+			return false;
+		}
+		if (credentialsExpired != other.credentialsExpired) {
+			return false;
+		}
+		if (enabled != other.enabled) {
+			return false;
+		}
+		if (expired != other.expired) {
+			return false;
+		}
+		if (hexFrames == null) {
+			if (other.hexFrames != null) {
+				return false;
+			}
+		} else if (!hexFrames.equals(other.hexFrames)) {
+			return false;
+		}
+		if (latitude == null) {
+			if (other.latitude != null) {
+				return false;
+			}
+		} else if (!latitude.equals(other.latitude)) {
+			return false;
+		}
+		if (locked != other.locked) {
+			return false;
+		}
+		if (longitude == null) {
+			if (other.longitude != null) {
+				return false;
+			}
+		} else if (!longitude.equals(other.longitude)) {
+			return false;
+		}
+		if (password == null) {
+			if (other.password != null) {
+				return false;
+			}
+		} else if (!password.equals(other.password)) {
+			return false;
+		}
+		if (siteId == null) {
+			if (other.siteId != null) {
+				return false;
+			}
+		} else if (!siteId.equals(other.siteId)) {
+			return false;
+		}
+		if (username == null) {
+			if (other.username != null) {
+				return false;
+			}
+		} else if (!username.equals(other.username)) {
+			return false;
+		}
+		return true;
+	}
+
 }

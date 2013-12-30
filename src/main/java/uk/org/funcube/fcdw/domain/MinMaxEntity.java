@@ -88,7 +88,6 @@ public class MinMaxEntity {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((channel == null) ? 0 : channel.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((maximum == null) ? 0 : maximum.hashCode());
 		result = prime * result + ((minimum == null) ? 0 : minimum.hashCode());
 		result = prime * result
@@ -98,38 +97,44 @@ public class MinMaxEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof MinMaxEntity)) {
 			return false;
+		}
 		MinMaxEntity other = (MinMaxEntity) obj;
 		if (channel == null) {
-			if (other.channel != null)
+			if (other.channel != null) {
 				return false;
-		} else if (!channel.equals(other.channel))
+			}
+		} else if (!channel.equals(other.channel)) {
 			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
+		}
 		if (maximum == null) {
-			if (other.maximum != null)
+			if (other.maximum != null) {
 				return false;
-		} else if (!maximum.equals(other.maximum))
+			}
+		} else if (!maximum.equals(other.maximum)) {
 			return false;
+		}
 		if (minimum == null) {
-			if (other.minimum != null)
+			if (other.minimum != null) {
 				return false;
-		} else if (!minimum.equals(other.minimum))
+			}
+		} else if (!minimum.equals(other.minimum)) {
 			return false;
+		}
 		if (satelliteId == null) {
-			if (other.satelliteId != null)
+			if (other.satelliteId != null) {
 				return false;
-		} else if (!satelliteId.equals(other.satelliteId))
+			}
+		} else if (!satelliteId.equals(other.satelliteId)) {
 			return false;
+		}
 		return true;
 	}
 	

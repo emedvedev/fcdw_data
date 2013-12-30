@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.org.funcube.fcdw.dao.WholeOrbitDataDao;
@@ -30,7 +31,7 @@ public class WodCsvExtractor {
 	@Autowired
 	WholeOrbitDataDao wholeOrbitDataDao;
 	
-	@Transactional(readOnly=true)
+	@Transactional(readOnly=true, propagation = Propagation.REQUIRED)
 	public void extract(long satelliteId) {
 		
 		Date currentDate = clock.currentDate();

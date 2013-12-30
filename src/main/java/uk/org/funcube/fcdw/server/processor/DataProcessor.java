@@ -11,16 +11,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
-import javax.persistence.EntityExistsException;
-
+import org.apache.commons.collections.Buffer;
+import org.apache.commons.collections.BufferUtils;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +41,6 @@ import uk.org.funcube.fcdw.dao.UserDao;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
-import uk.org.funcube.fcdw.domain.User;
 import uk.org.funcube.fcdw.domain.UserEntity;
 import uk.org.funcube.fcdw.server.shared.RealTime;
 import uk.org.funcube.fcdw.server.util.Cache;
@@ -47,7 +51,9 @@ import uk.org.funcube.fcdw.server.util.UTCClock;
 @RequestMapping("/api/data/hex")
 public class DataProcessor {
 	
-	long TWO_DAYS_SEQ_COUNT = 1440;
+	private static final Buffer FIFO = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(1000));
+	
+	long TWO_DAYS_SEQ_COUNT = 14400;
 
 	@Autowired
 	UserDao userDao;
@@ -66,12 +72,18 @@ public class DataProcessor {
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
-	@Transactional(readOnly = false)
 	@RequestMapping(value = "/{siteId}/", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadData(@PathVariable String siteId,
 			@RequestParam(value = "digest") String digest,
 			@RequestBody String body) {
 
+		return bufferData(siteId, digest, body);
+
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+	private ResponseEntity<String> bufferData(String siteId, String digest,
+			String body) {
 		// get the user from the repository
 		List<UserEntity> users = userDao.findBySiteId(siteId);
 
@@ -109,76 +121,13 @@ public class DataProcessor {
 									.equals(calculatedDigestUTF16))) {
 
 					hexString = StringUtils.deleteWhitespace(hexString);
-
-					final int frameId = Integer.parseInt(
-							hexString.substring(0, 2), 16);
-					final int frameType = frameId & 63;
-					final int satelliteId = (frameId & (128 + 64)) >> 6;
-					final int sensorId = frameId % 2;
-					final String binaryString = convertHexBytePairToBinary(hexString
-							.substring(2, hexString.length()));
+					
 					final Date now = clock.currentDate();
-					final RealTime realTime = new RealTime(satelliteId,
-							frameType, sensorId, now, binaryString);
-					final long sequenceNumber = realTime.getSequenceNumber();
+					
+					FIFO.add(new UserHexString(user, StringUtils.deleteWhitespace(hexString), now));
+					//LOG.debug("Writing fifo, size:" + FIFO.size() + " , element count: " + FIFO.toArray().length);
 
-					if (sequenceNumber != -1) {
-						
-						long maxSequenceNumber = hexFrameDao.getMaxSequenceNumber(satelliteId);
-						
-						
-						if (Math.abs(sequenceNumber - maxSequenceNumber) > TWO_DAYS_SEQ_COUNT) {
-							LOG.error(String
-									.format("Sequence number %d is out of bounds for satelliteId %d",
-											sequenceNumber, satelliteId));
-							return new ResponseEntity<String>(
-									"BAD_REQUEST", HttpStatus.BAD_REQUEST);
-						}
-						
-						final List<HexFrameEntity> frames = hexFrameDao
-								.findBySatelliteIdAndSequenceNumberAndFrameType(
-										satelliteId, sequenceNumber, frameType);
 
-						HexFrameEntity hexFrame = null;
-
-						if (frames != null) {
-							if (frames.size() == 0) {
-
-								hexFrame = new HexFrameEntity(
-										(long) satelliteId, (long) frameType,
-										sequenceNumber, hexString, now, true);
-
-								hexFrame.getUsers().add(user);
-
-								RealTimeEntity realTimeEntity = new RealTimeEntity(
-										realTime);
-
-								try {
-
-									hexFrameDao.save(hexFrame);
-								} catch (final EntityExistsException cve) {
-									LOG.error(String
-											.format("Duplicate record for satelliteId %d, sequenceNmber %d, frameType %d",
-													satelliteId,
-													sequenceNumber, frameType));
-									return new ResponseEntity<String>(
-											"CONFLICT", HttpStatus.CONFLICT);
-
-								}
-
-								realTimeDao.save(realTimeEntity);
-
-								checkMinMax(satelliteId, realTimeEntity);
-
-							} else {
-								hexFrame = frames.get(0);
-
-								hexFrame.getUsers().add(user);
-
-								hexFrameDao.save(hexFrame);
-							}
-						}
-					}
 
 					return new ResponseEntity<String>("OK", HttpStatus.OK);
 				} else {
@@ -199,10 +148,101 @@ public class DataProcessor {
 			return new ResponseEntity<String>("UNAUTHORIZED",
 					HttpStatus.UNAUTHORIZED);
 		}
-
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void processHexFrame() {
+		//LOG.debug("Reading fifo, size:" + FIFO.size() + " , element count: " + FIFO.toArray().length);
+		if (!FIFO.isEmpty()) {
+			final Iterator<UserHexString> iter = FIFO.iterator();
+			while (iter.hasNext()){
+				final UserHexString userHexString = (UserHexString)iter.next();
+				iter.remove();
+				
+				final String hexString = userHexString.getHexString();
+				final UserEntity user = userHexString.getUser();
+				final Date createdDate = userHexString.getCreatedDate();
+				
+				final int frameId = Integer.parseInt(
+				hexString.substring(0, 2), 16);
+				
+				final int frameType = frameId & 63;
+				final int satelliteId = (frameId & (128 + 64)) >> 6;
+				final int sensorId = frameId % 2;
+				final String binaryString = convertHexBytePairToBinary(hexString
+						.substring(2, hexString.length()));
+				final Date now = clock.currentDate();
+				final RealTime realTime = new RealTime(satelliteId,
+						frameType, sensorId, now, binaryString);
+				final long sequenceNumber = realTime.getSequenceNumber();
+		
+				if (sequenceNumber != -1) {
+					
+					Long maxSequenceNumber = hexFrameDao.getMaxSequenceNumber(satelliteId);
+					
+					
+					if (maxSequenceNumber != null && Math.abs(sequenceNumber - maxSequenceNumber) > TWO_DAYS_SEQ_COUNT) {
+						LOG.error(String
+								.format("Sequence number %d is out of bounds for satelliteId %d",
+										sequenceNumber, satelliteId));
+						return;
+					}
+					
+					final List<HexFrameEntity> frames = hexFrameDao
+							.findBySatelliteIdAndSequenceNumberAndFrameType(
+									satelliteId, sequenceNumber, frameType);
+		
+					HexFrameEntity hexFrame = null;
+					
+					Set<UserEntity> users = new HashSet<UserEntity>();
+		
+					if (frames != null) {
+						saveUpdateHexFrame(hexString, user, frameType,
+								satelliteId, now, realTime, sequenceNumber,
+								frames);
+					}
+				}
+			}
+		}
 	}
 
-	// @Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	private void saveUpdateHexFrame(final String hexString,
+			final UserEntity user, final int frameType, final int satelliteId,
+			final Date now, final RealTime realTime, final long sequenceNumber,
+			final List<HexFrameEntity> frames) {
+		HexFrameEntity hexFrame;
+		Set<UserEntity> users;
+		if (frames.size() == 0) {
+
+			hexFrame = new HexFrameEntity(
+					(long) satelliteId, (long) frameType,
+					sequenceNumber, hexString, now, true);
+			
+			users = hexFrame.getUsers();
+
+			users.add(user);
+
+			RealTimeEntity realTimeEntity = new RealTimeEntity(
+					realTime);
+
+			hexFrameDao.save(hexFrame);
+
+			realTimeDao.save(realTimeEntity);
+
+			checkMinMax(satelliteId, realTimeEntity);
+
+		} else {
+			hexFrame = frames.get(0);
+			
+			users = hexFrame.getUsers();
+
+			users.add(user);
+
+			hexFrameDao.save(hexFrame);
+		}
+	}
+
 	@RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public List<String> hexStrings(
@@ -214,6 +254,14 @@ public class DataProcessor {
 
 		List<String> hexStrings = new ArrayList<String>();
 
+		return getHexStrings(siteId, satelliteId, startSequenceNumber,
+				endSequenceNumber, digest, hexStrings);
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	private List<String> getHexStrings(String siteId, long satelliteId,
+			long startSequenceNumber, long endSequenceNumber, String digest,
+			List<String> hexStrings) {
 		// get the user from the repository
 		List<UserEntity> users = userDao.findBySiteId(siteId);
 
@@ -267,9 +315,7 @@ public class DataProcessor {
 		}
 	}
 
-	/**
-	 * @param realTimeEntity
-	 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	private void checkMinMax(long satelliteId, RealTimeEntity realTimeEntity) {
 
 		for (int channel = 1; channel <= 27; channel++) {
@@ -668,11 +714,11 @@ public class DataProcessor {
 
 	class UserHexString {
 
-		private final User user;
+		private final UserEntity user;
 		private final String hexString;
 		private final Date createdDate;
 
-		public UserHexString(final User user, final String hexString,
+		public UserHexString(final UserEntity user, final String hexString,
 				final Date createdDate) {
 			this.user = user;
 			this.hexString = hexString;
@@ -690,7 +736,7 @@ public class DataProcessor {
 			return hexString;
 		}
 
-		public final User getUser() {
+		public final UserEntity getUser() {
 			return user;
 		}
 

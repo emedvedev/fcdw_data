@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,7 +27,7 @@ public class HexFrameEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToMany(cascade={CascadeType.MERGE})
+	@ManyToMany
 	@JoinTable(name="HexFrameUser", 
 			joinColumns=@JoinColumn(name="hexFrameId"),
 			inverseJoinColumns=@JoinColumn(name="userId"))  
@@ -144,6 +143,97 @@ public class HexFrameEntity {
 
 	public void setHighPrecisionProcessed(boolean highPrecisionProcessed) {
 		this.highPrecisionProcessed = highPrecisionProcessed;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((createdDate == null) ? 0 : createdDate.hashCode());
+		result = prime * result + (fitterProcessed ? 1231 : 1237);
+		result = prime * result
+				+ ((frameType == null) ? 0 : frameType.hashCode());
+		result = prime * result
+				+ ((hexString == null) ? 0 : hexString.hashCode());
+		result = prime * result + (highPrecisionProcessed ? 1231 : 1237);
+		result = prime * result
+				+ ((satelliteId == null) ? 0 : satelliteId.hashCode());
+		result = prime * result
+				+ ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
+		result = prime * result + ((users == null) ? 0 : users.hashCode());
+		result = prime * result + (valid ? 1231 : 1237);
+		result = prime * result + (wodProcessed ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof HexFrameEntity)) {
+			return false;
+		}
+		HexFrameEntity other = (HexFrameEntity) obj;
+		if (createdDate == null) {
+			if (other.createdDate != null) {
+				return false;
+			}
+		} else if (!createdDate.equals(other.createdDate)) {
+			return false;
+		}
+		if (fitterProcessed != other.fitterProcessed) {
+			return false;
+		}
+		if (frameType == null) {
+			if (other.frameType != null) {
+				return false;
+			}
+		} else if (!frameType.equals(other.frameType)) {
+			return false;
+		}
+		if (hexString == null) {
+			if (other.hexString != null) {
+				return false;
+			}
+		} else if (!hexString.equals(other.hexString)) {
+			return false;
+		}
+		if (highPrecisionProcessed != other.highPrecisionProcessed) {
+			return false;
+		}
+		if (satelliteId == null) {
+			if (other.satelliteId != null) {
+				return false;
+			}
+		} else if (!satelliteId.equals(other.satelliteId)) {
+			return false;
+		}
+		if (sequenceNumber == null) {
+			if (other.sequenceNumber != null) {
+				return false;
+			}
+		} else if (!sequenceNumber.equals(other.sequenceNumber)) {
+			return false;
+		}
+		if (users == null) {
+			if (other.users != null) {
+				return false;
+			}
+		} else if (!users.equals(other.users)) {
+			return false;
+		}
+		if (valid != other.valid) {
+			return false;
+		}
+		if (wodProcessed != other.wodProcessed) {
+			return false;
+		}
+		return true;
 	}
 
 }

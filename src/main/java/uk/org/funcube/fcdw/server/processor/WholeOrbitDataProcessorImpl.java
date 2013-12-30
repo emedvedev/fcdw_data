@@ -16,6 +16,7 @@ import java.util.SimpleTimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.org.funcube.fcdw.dao.EpochDao;
@@ -115,7 +116,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 	}
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	private void saveWod(long satelliteId, long oldSeqNo, List<String> frames,
 			List<HexFrameEntity> processedHexFrames, Date receivedDate,
 			EpochEntity epoch) {
@@ -128,7 +129,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 		}
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	private List<HexFrameEntity> getUnprocessedWod(long satelliteId,
 			Calendar cal) {
 		final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(
@@ -136,7 +137,7 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 		return wodList;
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	private List<EpochEntity> getEpoch(long satelliteId) {
 		List<EpochEntity> epochList = epochDao.findBySatelliteId(satelliteId);
 		return epochList;

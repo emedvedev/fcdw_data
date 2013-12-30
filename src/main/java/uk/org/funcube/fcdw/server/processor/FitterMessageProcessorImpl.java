@@ -13,6 +13,7 @@ import java.util.SimpleTimeZone;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.org.funcube.fcdw.dao.FitterMessageDao;
@@ -32,7 +33,7 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 	HexFrameDao hexFrameDao;
 
 	@Override
-	@Transactional(readOnly=false)
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
 	public void process(long satelliteId) {
 		Calendar cal = Calendar.getInstance(TZ);
 		cal.add(Calendar.HOUR, -24);
