@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.server.processor;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,15 +18,17 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.HighResolutionDao;
 import uk.org.funcube.fcdw.domain.ClydeSpaceHPEntity;
+import uk.org.funcube.fcdw.domain.EpochEntity;
 import uk.org.funcube.fcdw.domain.GomSpaceHPEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.HighResolutionEntity;
 
 
-public class HighResolutionProcessorImpl implements HighResolutionProcessor {
+public class HighResolutionProcessorImpl extends AbstractProcessor implements HighResolutionProcessor {
 	
 	private static Logger LOG = Logger.getLogger(HighResolutionProcessorImpl.class.getName());
 	
@@ -34,10 +37,22 @@ public class HighResolutionProcessorImpl implements HighResolutionProcessor {
 	
 	@Autowired
 	HighResolutionDao highResolutionDao;
+	
+	@Autowired
+	EpochDao epochDao;
 
 	@Override
 	@Transactional(readOnly=false)
 	public void process(final long satelliteId) {
+		
+		List<EpochEntity> epochList = getEpoch(satelliteId);
+		
+		if (epochList.isEmpty()) {
+			LOG.error("Did not find epoch for satellite id: " + satelliteId);
+			return;
+		}
+		
+		EpochEntity epoch = epochList.get(0);
 
 		Calendar cal = Calendar.getInstance(TZ);
 		cal.add(Calendar.HOUR, -24);
@@ -71,7 +86,8 @@ public class HighResolutionProcessorImpl implements HighResolutionProcessor {
 					cal.set(Calendar.MILLISECOND, 0);
 					receivedDate = cal.getTime();
 
-					saveHighPrecision(hexFrame.getSatelliteId().intValue(), oldId, frames, receivedDate);
+					saveHighPrecision(hexFrame.getSatelliteId().intValue(), oldId, frames, receivedDate,
+							epoch);
 
 					for (HexFrameEntity hfe : processedHexFrames) {
 						hfe.setHighPrecisionProcessed(true);
@@ -92,7 +108,8 @@ public class HighResolutionProcessorImpl implements HighResolutionProcessor {
 
 	}
 
-	private void saveHighPrecision(final int satelliteId, final long sequenceNumber, final List<String> frames, final Date receivedDate) {
+	private void saveHighPrecision(final int satelliteId, final long seqNo, 
+			final List<String> frames, final Date receivedDate, EpochEntity epoch) {
 
 		HighResolutionEntity hrEntity = null;
 		
@@ -103,22 +120,33 @@ public class HighResolutionProcessorImpl implements HighResolutionProcessor {
 		}
 		
 		final String binaryString = DataProcessor.convertHexBytePairToBinary(sb.toString());
+		
+		// get the epoch sequence number
+		Long epochSequenceNumber = epoch.getSequenceNumber();
+		// get the epoch satelliteTime
+		Long epochTimeLong = epoch.getReferenceTime().getTime();
+		// get current time
+		Long currentSequenceTimeLong = ((seqNo - epochSequenceNumber) * 2 * 60 * 1000) + epochTimeLong;
 
 		for (int i = 0; i < 60; i++) {
 			switch (satelliteId) {
 			case 0:
-				hrEntity = new GomSpaceHPEntity(satelliteId, sequenceNumber, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
+				hrEntity = new GomSpaceHPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
 				break;
 			case 1:
-				hrEntity = new ClydeSpaceHPEntity(satelliteId, sequenceNumber, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
+				hrEntity = new ClydeSpaceHPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
 				break;
 			case 2:
-				hrEntity = new GomSpaceHPEntity(satelliteId, sequenceNumber, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
+				hrEntity = new GomSpaceHPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
 				break;
 			default:
 				LOG.error("Cannot process High Precision data for satellite ID: " + satelliteId);
 				break;
 			}
+			
+			Timestamp satelliteTime = new Timestamp(currentSequenceTimeLong + (i * 1000));
+			
+			hrEntity.setSatelliteTime(satelliteTime);
 
 			highResolutionDao.save(hrEntity);
 		}

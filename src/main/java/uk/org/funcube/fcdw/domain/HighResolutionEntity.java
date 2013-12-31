@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.domain;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.DiscriminatorColumn;
@@ -44,6 +45,7 @@ public class HighResolutionEntity {
 	private Date createdDate;
 	private Long sequenceNumber;
 	private Long satelliteId;
+	private Timestamp satelliteTime;
 
 	public HighResolutionEntity() {
 	}
@@ -158,6 +160,14 @@ public class HighResolutionEntity {
 
 	public final void setSatelliteId(Long satelliteId) {
 		this.satelliteId = satelliteId;
+	}
+
+	public final Timestamp getSatelliteTime() {
+		return satelliteTime;
+	}
+
+	public final void setSatelliteTime(Timestamp satelliteTime) {
+		this.satelliteTime = satelliteTime;
 	}
 
 	public String toString() {

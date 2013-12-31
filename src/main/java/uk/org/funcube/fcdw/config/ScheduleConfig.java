@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import uk.org.funcube.fcdw.server.extract.csv.HighResCsvExtractor;
 import uk.org.funcube.fcdw.server.extract.csv.WodCsvExtractor;
 import uk.org.funcube.fcdw.server.processor.DataProcessor;
 import uk.org.funcube.fcdw.server.processor.FitterMessageProcessor;
@@ -33,6 +34,9 @@ public class ScheduleConfig {
 
 	@Autowired
 	private WodCsvExtractor wodCsvExtractor;
+
+	@Autowired
+	private HighResCsvExtractor highResCsvExtractor;
 	
 	@Autowired
 	private DataProcessor dataProcessor;
@@ -64,6 +68,11 @@ public class ScheduleConfig {
 	@Scheduled(cron="0 0 0 * * ?")
 	public void wodCsvExtractorTask() {
 		wodCsvExtractor.extract(2L);
+	}
+	
+	@Scheduled(cron="0 */2 * * * ?")
+	public void highResCsvExtractorTask() {
+		highResCsvExtractor.extract(2L);
 	}
 	
 	@Scheduled(cron="*/5 * * * * ?")

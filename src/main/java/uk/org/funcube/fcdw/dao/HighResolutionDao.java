@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.dao;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -16,9 +17,15 @@ import uk.org.funcube.fcdw.domain.HighResolutionEntity;
 
 public interface HighResolutionDao extends CrudRepository<HighResolutionEntity, Long> {
 
-	@Query("select max(wod.id) from HighResolutionEntity wod where wod.satelliteId = ?1")
+	@Query("select max(hires.id) from HighResolutionEntity hires where hires.satelliteId = ?1")
 	Long findMaxId(Long satelliteId);
 
-	@Query("select wod from HighResolutionEntity wod where satelliteId = ?1 and id > ?2 order by id desc")
+	@Query("select hires from HighResolutionEntity hires where satelliteId = ?1 and id > ?2 order by id desc")
 	List<HighResolutionEntity> getLastHour(Long satelliteId, Long id);
+
+	@Query("select max(satelliteTime) from HighResolutionEntity where satelliteId = ?1")
+	Timestamp getLatestSatelliteTime(long satelliteId);
+	
+	@Query("select hires from HighResolutionEntity hires where satelliteId = ?1 and satelliteTime > ?2 order by satelliteTime asc")
+	List<HighResolutionEntity> getSinceSatelliteTime(long satelliteId, Timestamp satelliteTime);
 }

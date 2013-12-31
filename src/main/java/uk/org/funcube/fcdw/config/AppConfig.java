@@ -18,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import uk.org.funcube.fcdw.server.extract.csv.HighResCsvExtractor;
 import uk.org.funcube.fcdw.server.extract.csv.WodCsvExtractor;
 import uk.org.funcube.fcdw.server.processor.FitterMessageProcessor;
 import uk.org.funcube.fcdw.server.processor.FitterMessageProcessorImpl;
@@ -60,8 +61,13 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	WodCsvExtractor csvExtractor() {
+	WodCsvExtractor wodCsvExtractor() {
 		return new WodCsvExtractor();
+	}
+	
+	@Bean
+	HighResCsvExtractor csvExtractor() {
+		return new HighResCsvExtractor();
 	}
 
 	@Bean

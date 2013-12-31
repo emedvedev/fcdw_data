@@ -30,7 +30,7 @@ import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.WholeOrbitDataEntity;
 
-public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
+public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements WholeOrbitDataProcessor {
 
 	private static Logger LOG = Logger
 			.getLogger(WholeOrbitDataProcessorImpl.class.getName());
@@ -40,9 +40,6 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 
 	@Autowired
 	WholeOrbitDataDao wholeOrbitDataDao;
-	
-	@Autowired
-	EpochDao epochDao;
 
 	@Autowired
 	MinMaxDao minMaxDao;
@@ -135,12 +132,6 @@ public class WholeOrbitDataProcessorImpl implements WholeOrbitDataProcessor {
 		final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(
 				satelliteId, cal.getTime());
 		return wodList;
-	}
-
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-	private List<EpochEntity> getEpoch(long satelliteId) {
-		List<EpochEntity> epochList = epochDao.findBySatelliteId(satelliteId);
-		return epochList;
 	}
 
 	private void extractAndSaveWod(final Long satelliteId, final long seqNo,
