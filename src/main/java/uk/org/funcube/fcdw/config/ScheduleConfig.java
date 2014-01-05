@@ -70,7 +70,7 @@ public class ScheduleConfig {
 		wodCsvExtractor.extract(2L);
 	}
 	
-	@Scheduled(cron="0 */2 * * * ?")
+	@Scheduled(cron="0 0 * * * ?")
 	public void highResCsvExtractorTask() {
 		highResCsvExtractor.extract(2L);
 	}
