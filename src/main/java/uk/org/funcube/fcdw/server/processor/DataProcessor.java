@@ -317,336 +317,45 @@ public class DataProcessor {
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	private void checkMinMax(long satelliteId, RealTimeEntity realTimeEntity) {
+		
+		final Long[] longValues = realTimeEntity.getLongValues();
 
-		for (int channel = 1; channel <= 27; channel++) {
+		for (int channel = 1; channel <= 43; channel++) {
 			List<MinMaxEntity> channels = minMaxDao
 					.findBySatelliteIdAndChannel(satelliteId, channel);
 			if (channels.isEmpty()) {
 				break;
 			}
 			MinMaxEntity minMaxEntity = channels.get(0);
-			Long c9 = realTimeEntity.getC9();
-			Long c10 = realTimeEntity.getC10();
-			Long c11 = realTimeEntity.getC11();
-			Long c12 = realTimeEntity.getC12();
+			
+			Long channelValue = longValues[channel - 1];
+			
 			switch (channel) {
-			case 1:
-				// Solar Panel Voltage 1
-				if (realTimeEntity.getC1() == 0) {
+			default:
+				if (channelValue == null || channelValue == 0) {
 					break;
 				}
-				if (realTimeEntity.getC1() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC1());
-				} else if (realTimeEntity.getC1() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC1());
-				}
-				break;
-			case 2:
-				// Solar Panel Voltage 2
-				if (realTimeEntity.getC2() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC2() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC2());
-				} else if (realTimeEntity.getC2() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC2());
-				}
-				break;
-			case 3:
-				// Solar Panel Voltage 3
-				if (realTimeEntity.getC3() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC3() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC3());
-				} else if (realTimeEntity.getC3() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC3());
-				}
-				break;
-			case 4:
-				// Total Photo current
-				if (realTimeEntity.getC4() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC4() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC4());
-				} else if (realTimeEntity.getC4() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC4());
-				}
-				break;
-			case 5:
-				// Battery voltage
-				if (realTimeEntity.getC5() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC5() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC5());
-				} else if (realTimeEntity.getC5() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC5());
-				}
-				break;
-			case 6:
-				// Total system current
-				if (realTimeEntity.getC6() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC6() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC6());
-				} else if (realTimeEntity.getC6() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC6());
-				}
-				break;
-			case 7:
-				// Boost converter temp 1
-				if (c9 == 0) {
-					break;
-				}
-				if (c9 > 250) {
-					c9 = c9 - 255;
-				}
-				if (c9 < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(c9);
-				} else if (c9 > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(c9);
-				}
-				break;
-			case 8:
-				// Boost converter temp 2
-				if (c10 == 0) {
-					break;
-				}
-				if (c10 > 250) {
-					c10 = c10 - 255;
-				}
-				if (c10 < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(c10);
-				} else if (c10 > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(c10);
+				if (channelValue < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(channelValue);
+				} else if (channelValue > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(channelValue);
 				}
 				break;
 			case 9:
-				// Boost converter temp 3
-				if (c11 == 0) {
-					break;
-				}
-				if (c11 > 250) {
-					c11 = c11 - 255;
-				}
-				if (c11 < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(c11);
-				} else if (c11 > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(c11);
-				}
-				break;
 			case 10:
-				// Battery temp
-				if (c12 == 0) {
-					break;
-				}
-				if (c12 > 250) {
-					c12 = c12 - 255;
-				}
-				if (c12 < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(c12);
-				} else if (c12 > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(c12);
-				}
-				break;
 			case 11:
-				// Solar panel temp X+
-				if (realTimeEntity.getC20() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC20() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC20());
-				} else if (realTimeEntity.getC20() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC20());
-				}
-				break;
 			case 12:
-				// Solar panel temp X-
-				if (realTimeEntity.getC21() == 0) {
+				// Boost converter temp 1
+				if (channelValue == null || channelValue == 0) {
 					break;
 				}
-				if (realTimeEntity.getC21() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC21());
-				} else if (realTimeEntity.getC21() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC21());
+				if (channelValue > 250) {
+					channelValue = channelValue - 255;
 				}
-				break;
-			case 13:
-				// Solar panel temp Y+
-				if (realTimeEntity.getC22() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC22() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC22());
-				} else if (realTimeEntity.getC22() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC22());
-				}
-				break;
-			case 14:
-				// Solar panel temp Y-
-				if (realTimeEntity.getC23() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC23() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC23());
-				} else if (realTimeEntity.getC23() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC23());
-				}
-				break;
-			case 15:
-				// 3.3 bus voltage
-				if (realTimeEntity.getC24() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC24() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC24());
-				} else if (realTimeEntity.getC24() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC24());
-				}
-				break;
-			case 16:
-				// 3.3 bus current
-				if (realTimeEntity.getC25() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC25() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC25());
-				} else if (realTimeEntity.getC25() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC25());
-				}
-				break;
-			case 17:
-				// 5.0 bus voltage
-				if (realTimeEntity.getC26() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC26() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC26());
-				} else if (realTimeEntity.getC26() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC26());
-				}
-				break;
-			case 18:
-				// Receive temperature
-				if (realTimeEntity.getC34() == null
-						|| realTimeEntity.getC34() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC34() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC34());
-				} else if (realTimeEntity.getC34() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC34());
-				}
-				break;
-			case 19:
-				// Receive current
-				if (realTimeEntity.getC35() == null
-						|| realTimeEntity.getC35() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC35() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC35());
-				} else if (realTimeEntity.getC35() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC35());
-				}
-				break;
-			case 20:
-				// Transmit current 3.3V bus
-				if (realTimeEntity.getC36() == null
-						|| realTimeEntity.getC36() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC36() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC36());
-				} else if (realTimeEntity.getC36() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC36());
-				}
-				break;
-			case 21:
-				// Transmit current 5V bus
-				if (realTimeEntity.getC37() == null
-						|| realTimeEntity.getC37() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC37() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC37());
-				} else if (realTimeEntity.getC37() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC37());
-				}
-				break;
-			case 22:
-				// Forward Power
-				if (realTimeEntity.getC38() == null
-						|| realTimeEntity.getC38() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC38() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC38());
-				} else if (realTimeEntity.getC38() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC38());
-				}
-				break;
-			case 23:
-				// Reflected Power
-				if (realTimeEntity.getC39() == null
-						|| realTimeEntity.getC39() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC39() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC39());
-				} else if (realTimeEntity.getC39() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC39());
-				}
-				break;
-			case 24:
-				// PA Board temperature
-				if (realTimeEntity.getC40() == null
-						|| realTimeEntity.getC40() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC40() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC40());
-				} else if (realTimeEntity.getC40() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC40());
-				}
-				break;
-			case 25:
-				// PA Board current
-				if (realTimeEntity.getC41() == null
-						|| realTimeEntity.getC39() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC41() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC41());
-				} else if (realTimeEntity.getC41() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC41());
-				}
-				break;
-			case 26:
-				// ANTS Temp 0
-				if (realTimeEntity.getC42() == null
-						|| realTimeEntity.getC42() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC42() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC42());
-				} else if (realTimeEntity.getC42() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC42());
-				}
-				break;
-			case 27:
-				// ANTS Temp 1
-				if (realTimeEntity.getC43() == null
-						|| realTimeEntity.getC43() == 0) {
-					break;
-				}
-				if (realTimeEntity.getC43() < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(realTimeEntity.getC43());
-				} else if (realTimeEntity.getC43() > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(realTimeEntity.getC43());
+				if (channelValue < minMaxEntity.getMinimum()) {
+					minMaxEntity.setMinimum(channelValue);
+				} else if (channelValue > minMaxEntity.getMaximum()) {
+					minMaxEntity.setMaximum(channelValue);
 				}
 				break;
 			}
