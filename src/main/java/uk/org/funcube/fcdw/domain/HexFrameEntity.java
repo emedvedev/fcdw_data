@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.domain;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,19 +43,22 @@ public class HexFrameEntity {
 	private boolean wodProcessed;
 	private boolean fitterProcessed;
 	private boolean highPrecisionProcessed;
+	private Timestamp satelliteTime;
 	
 	public HexFrameEntity() {
 	}
 	
 	public HexFrameEntity(
 			final Long satelliteId, final Long frameType, final Long sequenceNumber, 
-			final String hexString, final Date createdDate, final boolean valid) {
+			final String hexString, final Date createdDate, final boolean valid,
+			final Timestamp satelliteTime) {
 		this.satelliteId = satelliteId;
 		this.frameType = frameType;
 		this.sequenceNumber = sequenceNumber;
 		this.hexString = hexString;
 		this.createdDate = createdDate;
 		this.valid = valid;
+		this.satelliteTime = satelliteTime;
 	}
 
 	public Long getId() {
@@ -145,6 +149,14 @@ public class HexFrameEntity {
 		this.highPrecisionProcessed = highPrecisionProcessed;
 	}
 
+	public final Timestamp getSatelliteTime() {
+		return satelliteTime;
+	}
+
+	public final void setSatelliteTime(Timestamp satelliteTime) {
+		this.satelliteTime = satelliteTime;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -159,6 +171,8 @@ public class HexFrameEntity {
 		result = prime * result + (highPrecisionProcessed ? 1231 : 1237);
 		result = prime * result
 				+ ((satelliteId == null) ? 0 : satelliteId.hashCode());
+		result = prime * result
+				+ ((satelliteTime == null) ? 0 : satelliteTime.hashCode());
 		result = prime * result
 				+ ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
 		result = prime * result + ((users == null) ? 0 : users.hashCode());
@@ -211,6 +225,13 @@ public class HexFrameEntity {
 				return false;
 			}
 		} else if (!satelliteId.equals(other.satelliteId)) {
+			return false;
+		}
+		if (satelliteTime == null) {
+			if (other.satelliteTime != null) {
+				return false;
+			}
+		} else if (!satelliteTime.equals(other.satelliteTime)) {
 			return false;
 		}
 		if (sequenceNumber == null) {

@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.domain;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -38,6 +39,7 @@ public class RealTimeEntity {
 	private long sensorId;
 	private long commandCount;
 	private long lastCommand;
+	private Timestamp satelliteTime;
 
 	private Long c1;
 	private Long c2;
@@ -126,7 +128,8 @@ public class RealTimeEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public RealTimeEntity(RealTime realTime) {
+	public RealTimeEntity(RealTime realTime, Timestamp satelliteTime) {
+		this.satelliteTime = satelliteTime;
 		satelliteId = realTime.getSatelliteId();
 		sequenceNumber = realTime.getSequenceNumber();
 		frameType = realTime.getFrameType();
@@ -842,6 +845,14 @@ public class RealTimeEntity {
 
 	public final void setC71(Boolean c71) {
 		this.c71 = c71;
+	}
+
+	public final Timestamp getSatelliteTime() {
+		return satelliteTime;
+	}
+
+	public final void setSatelliteTime(Timestamp satelliteTime) {
+		this.satelliteTime = satelliteTime;
 	}
 	
 

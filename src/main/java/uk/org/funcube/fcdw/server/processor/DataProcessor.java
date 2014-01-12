@@ -9,11 +9,14 @@ package uk.org.funcube.fcdw.server.processor;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.Buffer;
@@ -34,10 +37,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.RealTimeDao;
 import uk.org.funcube.fcdw.dao.UserDao;
+import uk.org.funcube.fcdw.domain.EpochEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
@@ -69,6 +74,9 @@ public class DataProcessor {
 
 	@Autowired
 	Clock clock;
+	
+	@Autowired
+	EpochDao epochDao;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -152,6 +160,16 @@ public class DataProcessor {
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void processHexFrame() {
+		
+		Map<Long, EpochEntity> epochMap = new HashMap<Long, EpochEntity>();
+		
+		Iterator<EpochEntity> iterator = epochDao.findAll().iterator();
+		
+		while (iterator.hasNext()) {
+			EpochEntity epoch = iterator.next();
+			epochMap.put(epoch.getSatelliteId(), epoch);
+		}
+		
 		//LOG.debug("Reading fifo, size:" + FIFO.size() + " , element count: " + FIFO.toArray().length);
 		if (!FIFO.isEmpty()) {
 			final Iterator<UserHexString> iter = FIFO.iterator();
@@ -192,14 +210,10 @@ public class DataProcessor {
 							.findBySatelliteIdAndSequenceNumberAndFrameType(
 									satelliteId, sequenceNumber, frameType);
 		
-					HexFrameEntity hexFrame = null;
-					
-					Set<UserEntity> users = new HashSet<UserEntity>();
-		
 					if (frames != null) {
 						saveUpdateHexFrame(hexString, user, frameType,
 								satelliteId, now, realTime, sequenceNumber,
-								frames);
+								frames, epochMap.get(new Long(satelliteId)));
 					}
 				}
 			}
@@ -210,21 +224,34 @@ public class DataProcessor {
 	private void saveUpdateHexFrame(final String hexString,
 			final UserEntity user, final int frameType, final int satelliteId,
 			final Date now, final RealTime realTime, final long sequenceNumber,
-			final List<HexFrameEntity> frames) {
+			final List<HexFrameEntity> frames,
+			final EpochEntity epoch) {
 		HexFrameEntity hexFrame;
 		Set<UserEntity> users;
 		if (frames.size() == 0) {
+			
+			Timestamp satelliteTime;
+			
+			if (epoch == null) {
+				satelliteTime = new Timestamp(now.getTime());
+			} else {
+				satelliteTime = new Timestamp(
+					epoch.getReferenceTime().getTime() +
+					((sequenceNumber - epoch.getSequenceNumber()) * 2 * 60 * 1000) +
+					frameType * 5 * 1000);
+			}
 
 			hexFrame = new HexFrameEntity(
 					(long) satelliteId, (long) frameType,
-					sequenceNumber, hexString, now, true);
+					sequenceNumber, hexString, now, true,
+					satelliteTime);
 			
 			users = hexFrame.getUsers();
 
 			users.add(user);
 
 			RealTimeEntity realTimeEntity = new RealTimeEntity(
-					realTime);
+					realTime, satelliteTime);
 
 			hexFrameDao.save(hexFrame);
 
