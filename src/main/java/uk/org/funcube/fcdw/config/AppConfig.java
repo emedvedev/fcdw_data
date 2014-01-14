@@ -9,7 +9,6 @@ package uk.org.funcube.fcdw.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -18,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import uk.org.funcube.fcdw.server.extract.csv.RealTimeCsvExtractor;
 import uk.org.funcube.fcdw.server.extract.csv.HighResCsvExtractor;
 import uk.org.funcube.fcdw.server.extract.csv.WodCsvExtractor;
 import uk.org.funcube.fcdw.server.processor.FitterMessageProcessor;
@@ -66,8 +66,13 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	HighResCsvExtractor csvExtractor() {
+	HighResCsvExtractor highResCsvExtractor() {
 		return new HighResCsvExtractor();
+	}
+	
+	@Bean
+	RealTimeCsvExtractor realTimeCsvExtractor() {
+		return new RealTimeCsvExtractor();
 	}
 
 	@Bean

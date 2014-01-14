@@ -6,11 +6,13 @@
 
 package uk.org.funcube.fcdw.dao;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
 
 
@@ -31,4 +33,10 @@ public interface RealTimeDao extends CrudRepository<RealTimeEntity, Long> {
 	@Query
 	List<RealTimeEntity> findBySequenceNumberAndFrameType(
 			Long maxSequenceNumber, Long maxFrameType);
+
+	@Query("select max(satelliteTime) from RealTimeEntity where satelliteId = ?1")
+	Timestamp getLatestSatelliteTime(long satelliteId);
+	
+	@Query("select realTime from RealTimeEntity realTime where satelliteId = ?1 and satelliteTime > ?2 order by satelliteTime asc")
+	List<RealTimeEntity> getSinceSatelliteTime(long satelliteId, Timestamp satelliteTime);
 }

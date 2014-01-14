@@ -238,7 +238,7 @@ public class DataProcessor {
 				satelliteTime = new Timestamp(
 					epoch.getReferenceTime().getTime() +
 					((sequenceNumber - epoch.getSequenceNumber()) * 2 * 60 * 1000) +
-					frameType * 5 * 1000);
+					(frameType * 5 * 1000));
 			}
 
 			hexFrame = new HexFrameEntity(
