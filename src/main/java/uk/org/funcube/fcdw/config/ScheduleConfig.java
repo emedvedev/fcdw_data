@@ -74,7 +74,7 @@ public class ScheduleConfig {
 		wodCsvExtractor.extract(2L);
 	}
 	
-	@Scheduled(cron="0 0 * * * ?")
+	@Scheduled(cron="0 5 * * * ?")
 	public void highResCsvExtractorTask() {
 		highResCsvExtractor.extract(2L);
 	}
@@ -84,7 +84,7 @@ public class ScheduleConfig {
 		dataProcessor.processHexFrame();
 	}
 	
-	@Scheduled(cron="0 0 */4 * * ?")
+	@Scheduled(cron="0 10 * * * ?")
 	public void realTimeCsvExtractorTask() {
 		realTimeCsvExtractor.extract(2L);
 	}
