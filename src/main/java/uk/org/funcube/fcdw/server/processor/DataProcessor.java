@@ -58,7 +58,7 @@ public class DataProcessor {
 	
 	private static final Buffer FIFO = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(1000));
 	
-	long TWO_DAYS_SEQ_COUNT = 14400;
+	long TWO_DAYS_SEQ_COUNT = 1440;
 
 	@Autowired
 	UserDao userDao;
