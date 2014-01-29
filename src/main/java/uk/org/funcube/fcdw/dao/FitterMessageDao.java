@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +19,8 @@ public interface FitterMessageDao extends CrudRepository<FitterMessageEntity, Lo
 
 	@Query
 	List<FitterMessageEntity> findBySatelliteIdAndMessageTextAndDebug(long satelliteId, String messageText, Boolean debug);
+
+	@Query("select fm from FitterMessageEntity fm where satelliteId = ?1 and lastReceived < ?2")
+	List<FitterMessageEntity> getNoneDebugReceivedBefore(long satelliteId, Date time);
 
 }

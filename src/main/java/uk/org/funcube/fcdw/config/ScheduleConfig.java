@@ -62,7 +62,7 @@ public class ScheduleConfig {
 	}
 	
 	@Scheduled(initialDelay=90000, fixedRate=120000)
-	public void fitterMessageTask() {
+	public void processFitterMessageTask() {
 		fitterMessageProcessor.process(0L);
 		fitterMessageProcessor.process(1L);
 		fitterMessageProcessor.process(2L);
@@ -70,6 +70,14 @@ public class ScheduleConfig {
 	}
 	
 	@Scheduled(cron="0 0 0 * * ?")
+	public void truncateFitterMessageTask() {
+		fitterMessageProcessor.truncate(0L);
+		fitterMessageProcessor.truncate(1L);
+		fitterMessageProcessor.truncate(2L);
+		fitterMessageProcessor.truncate(3L);
+	}
+	
+	@Scheduled(cron="0 0 */2 * * ?")
 	public void wodCsvExtractorTask() {
 		wodCsvExtractor.extract(2L);
 	}

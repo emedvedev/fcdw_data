@@ -20,6 +20,7 @@ import uk.org.funcube.fcdw.dao.FitterMessageDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.domain.FitterMessageEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
+import uk.org.funcube.fcdw.server.util.UTCClock;
 
 
 public class FitterMessageProcessorImpl implements FitterMessageProcessor {
@@ -31,12 +32,12 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 	
 	@Autowired
 	HexFrameDao hexFrameDao;
-
-	@Override
+	
+	                                                                                                                                                            @Override
 	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
 	public void process(long satelliteId) {
 		Calendar cal = Calendar.getInstance(TZ);
-		cal.add(Calendar.HOUR, -24);
+		cal.add(Calendar.HOUR_OF_DAY, -24);
 
 		final List<HexFrameEntity> fitterList = hexFrameDao.findUnprocessedFitter(satelliteId, cal.getTime());
 
@@ -62,6 +63,10 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 	private void extractAndSaveFitter(long satelliteId, HexFrameEntity frame, Date lastReceived) {
 
 		StringBuffer sb = new StringBuffer();
+		
+		int frameType = frame.getFrameType().intValue();
+		
+		String slot = getSlotFromFrameType(frameType);
 
 		final String messageHex = frame.getHexString().substring(106, frame.getHexString().length());
 		
@@ -80,7 +85,7 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 						break;
 					} else {
 						final String messageText = sb.toString();
-						saveFitter(satelliteId, lastReceived, messageText, false);
+						saveFitter(satelliteId, lastReceived, messageText, false, slot);
 						sb = new StringBuffer();
 					}
 				} else {
@@ -89,7 +94,7 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 			}
 		} else {
 			final String messageText = messageHex.substring(8, messageHex.length());
-			saveFitter(satelliteId, lastReceived, messageText, true);
+			saveFitter(satelliteId, lastReceived, messageText, true, slot);
 		}
 
 		frame.setFitterProcessed(true);
@@ -97,7 +102,38 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 
 	}
 
-	private void saveFitter(long satelliteId, Date lastReceived, final String messageText, final Boolean isDebug) {
+	/**
+	 * @param frameType
+	 * @return
+	 */
+	private String getSlotFromFrameType(int frameType) {
+
+		String slot = "FM";
+		
+		switch(frameType) {
+		case 13:
+		case 14:
+		case 15:
+			slot += (frameType - 12);
+			break;
+		case 17:
+		case 18:
+		case 19:
+			slot += (frameType - 13);
+			break;
+		case 21:
+		case 22:
+		case 23:
+			slot += (frameType - 13);
+			break;
+		}
+		
+		return slot;
+		
+	}
+
+	private void saveFitter(long satelliteId, Date lastReceived, final String messageText, 
+			final Boolean isDebug, final String slot) {
 		List<FitterMessageEntity> fitterMessages 
 			= fitterMessageDao.findBySatelliteIdAndMessageTextAndDebug(
 					satelliteId, 
@@ -109,13 +145,30 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 		if (fitterMessages.size() != 0) {
 			fitterMessage = fitterMessages.get(0);
 			fitterMessage.setLastReceived(lastReceived);
+			fitterMessage.setSlot(slot);
 		} else {
-			fitterMessage = new FitterMessageEntity(messageText, lastReceived, satelliteId, isDebug);
+			fitterMessage = new FitterMessageEntity(messageText, lastReceived, satelliteId, isDebug, slot);
 		}
 		
 		fitterMessageDao.save(fitterMessage);
 	}
 
 	private static final SimpleTimeZone TZ = new SimpleTimeZone(0, "UTC");
+
+	@Override
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void truncate(long satelliteId) {
+		
+
+		Calendar cal = Calendar.getInstance(TZ);
+		cal.add(Calendar.DAY_OF_MONTH, -7);
+		
+		List<FitterMessageEntity> messages = fitterMessageDao.getNoneDebugReceivedBefore(satelliteId, cal.getTime());
+		
+		for (FitterMessageEntity entity : messages) {
+			entity.setDisplay(false);
+			fitterMessageDao.save(entity);
+		}
+	}
 
 }
