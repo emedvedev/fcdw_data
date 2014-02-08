@@ -6,8 +6,8 @@
 
 package uk.org.funcube.fcdw.server.processor;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.SimpleTimeZone;
 
@@ -20,7 +20,6 @@ import uk.org.funcube.fcdw.dao.FitterMessageDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.domain.FitterMessageEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
-import uk.org.funcube.fcdw.server.util.UTCClock;
 
 
 public class FitterMessageProcessorImpl implements FitterMessageProcessor {
@@ -43,24 +42,16 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 
 		LOG.debug("Found: " + fitterList.size() + " unprocessed fitter frames");
 
-		Date receivedDate = null;
-
 		for (final HexFrameEntity fitterFrame : fitterList) {
 
-			receivedDate = fitterFrame.getCreatedDate();
-
-			cal = Calendar.getInstance(TZ);
-			cal.setTime(receivedDate);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			receivedDate = cal.getTime();
+			Timestamp receivedDate = new Timestamp(fitterFrame.getCreatedDate().getTime());
 
 			extractAndSaveFitter(satelliteId, fitterFrame, receivedDate);
 		}
 		
 	}
 
-	private void extractAndSaveFitter(long satelliteId, HexFrameEntity frame, Date lastReceived) {
+	private void extractAndSaveFitter(long satelliteId, HexFrameEntity frame, Timestamp lastReceived) {
 
 		StringBuffer sb = new StringBuffer();
 		
@@ -132,7 +123,7 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 		
 	}
 
-	private void saveFitter(long satelliteId, Date lastReceived, final String messageText, 
+	private void saveFitter(long satelliteId, Timestamp lastReceived, final String messageText, 
 			final Boolean isDebug, final String slot) {
 		List<FitterMessageEntity> fitterMessages 
 			= fitterMessageDao.findBySatelliteIdAndMessageTextAndDebug(
@@ -147,7 +138,8 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 			fitterMessage.setLastReceived(lastReceived);
 			fitterMessage.setSlot(slot);
 		} else {
-			fitterMessage = new FitterMessageEntity(messageText, lastReceived, satelliteId, isDebug, slot);
+			fitterMessage = new FitterMessageEntity(messageText, lastReceived, 
+					satelliteId, isDebug, slot, lastReceived);
 		}
 		
 		fitterMessageDao.save(fitterMessage);
