@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.server.util;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -41,4 +42,9 @@ public class OffsetClock implements Clock {
     public Clock getBaseClock() {
         return baseClock;
     }
+
+	@Override
+	public Timestamp currentTimeStamp() {
+		return new Timestamp(currentTime());
+	}
 }

@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.server.util;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -15,4 +16,6 @@ public interface Clock {
     long currentTime();
 
     Date currentDate();
+    
+    Timestamp currentTimeStamp();
 }

@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.server.util;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SimpleTimeZone;
@@ -28,4 +29,10 @@ public class UTCClock implements Clock {
     public long currentTime() {
         return Calendar.getInstance(TZ).getTime().getTime();
     }
+
+	@Override
+	public Timestamp currentTimeStamp() {
+		// TODO Auto-generated method stub
+		return new Timestamp(Calendar.getInstance(TZ).getTimeInMillis());
+	}
 }

@@ -6,6 +6,7 @@
 
 package uk.org.funcube.fcdw.server.util;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -25,4 +26,10 @@ public class DefaultClock implements Clock {
     public long currentTime() {
         return System.currentTimeMillis();
     }
+
+	@Override
+	public Timestamp currentTimeStamp() {
+		// TODO Auto-generated method stub
+		return new Timestamp(System.currentTimeMillis());
+	}
 }
