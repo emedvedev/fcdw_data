@@ -6,6 +6,8 @@
 
 package uk.org.funcube.fcdw.domain;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +26,7 @@ public class MinMaxEntity {
 	private Long channel;
 	private Long minimum;
 	private Long maximum;
+	private Date refDate;
 	
 	public MinMaxEntity() {
 	}
@@ -35,12 +38,13 @@ public class MinMaxEntity {
 	 * @param maximum
 	 */
 	public MinMaxEntity(Long satelliteId, Long channel, Long minimum,
-			Long maximum) {
+			Long maximum, Date refDate) {
 		super();
 		this.satelliteId = satelliteId;
 		this.channel = channel;
 		this.minimum = minimum;
 		this.maximum = maximum;
+		this.refDate = refDate;
 	}
 
 	public final Long getId() {
@@ -83,13 +87,23 @@ public class MinMaxEntity {
 		this.maximum = maximum;
 	}
 
+	public final Date getRefDate() {
+		return refDate;
+	}
+
+	public final void setRefDate(Date refDate) {
+		this.refDate = refDate;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((channel == null) ? 0 : channel.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((maximum == null) ? 0 : maximum.hashCode());
 		result = prime * result + ((minimum == null) ? 0 : minimum.hashCode());
+		result = prime * result + ((refDate == null) ? 0 : refDate.hashCode());
 		result = prime * result
 				+ ((satelliteId == null) ? 0 : satelliteId.hashCode());
 		return result;
@@ -114,6 +128,13 @@ public class MinMaxEntity {
 		} else if (!channel.equals(other.channel)) {
 			return false;
 		}
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
 		if (maximum == null) {
 			if (other.maximum != null) {
 				return false;
@@ -126,6 +147,13 @@ public class MinMaxEntity {
 				return false;
 			}
 		} else if (!minimum.equals(other.minimum)) {
+			return false;
+		}
+		if (refDate == null) {
+			if (other.refDate != null) {
+				return false;
+			}
+		} else if (!refDate.equals(other.refDate)) {
 			return false;
 		}
 		if (satelliteId == null) {

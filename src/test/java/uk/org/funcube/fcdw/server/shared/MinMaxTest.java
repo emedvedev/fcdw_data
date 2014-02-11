@@ -7,11 +7,15 @@
 package uk.org.funcube.fcdw.server.shared;
 
 import static org.junit.Assert.*;
+
+import java.util.Date;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
+import uk.org.funcube.fcdw.server.util.UTCClock;
 import uk.org.funcube.fcdw.service.rest.MinMaxServiceRestImpl;
 
 /**
@@ -42,12 +46,17 @@ public class MinMaxTest {
 	 */
 	@Test
 	public final void testMinMaxLongLongLongLong() {
-		MinMax minMax = new MinMax(1L, 2L, 3L, 4L);
+		
+		UTCClock clock = new UTCClock();
+		long currentTime = clock.currentTime();
+		
+		MinMax minMax = new MinMax(1L, 2L, 3L, 4L, new Date(currentTime));
 		
 		Assert.assertEquals(1L,  minMax.getSatelliteId().longValue());
 		Assert.assertEquals(2L,  minMax.getChannel().longValue());
 		Assert.assertEquals(3L,  minMax.getMinimum().longValue());
 		Assert.assertEquals(4L,  minMax.getMaximum().longValue());
+		Assert.assertEquals(currentTime,  minMax.getRefDate().getTime());
 	}
 
 	/**
@@ -56,7 +65,10 @@ public class MinMaxTest {
 	@Test
 	public final void testMinMaxMinMaxEntity() {
 		
-		MinMaxEntity minMaxEntity = new MinMaxEntity(1L, 2L, 3L, 4L);
+		UTCClock clock = new UTCClock();
+		long currentTime = clock.currentTime();
+		
+		MinMaxEntity minMaxEntity = new MinMaxEntity(1L, 2L, 3L, 4L, new Date(currentTime));
 		
 		MinMax minMax = new MinMax(minMaxEntity);
 		
@@ -64,6 +76,7 @@ public class MinMaxTest {
 		Assert.assertEquals(2L,  minMax.getChannel().longValue());
 		Assert.assertEquals(3L,  minMax.getMinimum().longValue());
 		Assert.assertEquals(4L,  minMax.getMaximum().longValue());
+		Assert.assertEquals(currentTime,  minMax.getRefDate().getTime());
 	}
 
 }
