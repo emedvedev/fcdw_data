@@ -50,13 +50,14 @@ public class MinMaxTest {
 		UTCClock clock = new UTCClock();
 		long currentTime = clock.currentTime();
 		
-		MinMax minMax = new MinMax(1L, 2L, 3L, 4L, new Date(currentTime));
+		MinMax minMax = new MinMax(1L, 2L, 3L, 4L, new Date(currentTime), true);
 		
 		Assert.assertEquals(1L,  minMax.getSatelliteId().longValue());
 		Assert.assertEquals(2L,  minMax.getChannel().longValue());
 		Assert.assertEquals(3L,  minMax.getMinimum().longValue());
 		Assert.assertEquals(4L,  minMax.getMaximum().longValue());
 		Assert.assertEquals(currentTime,  minMax.getRefDate().getTime());
+		Assert.assertTrue(minMax.isEnabled());
 	}
 
 	/**
@@ -68,7 +69,7 @@ public class MinMaxTest {
 		UTCClock clock = new UTCClock();
 		long currentTime = clock.currentTime();
 		
-		MinMaxEntity minMaxEntity = new MinMaxEntity(1L, 2L, 3L, 4L, new Date(currentTime));
+		MinMaxEntity minMaxEntity = new MinMaxEntity(1L, 2L, 3L, 4L, new Date(currentTime), true);
 		
 		MinMax minMax = new MinMax(minMaxEntity);
 		
@@ -77,6 +78,7 @@ public class MinMaxTest {
 		Assert.assertEquals(3L,  minMax.getMinimum().longValue());
 		Assert.assertEquals(4L,  minMax.getMaximum().longValue());
 		Assert.assertEquals(currentTime,  minMax.getRefDate().getTime());
+		Assert.assertTrue(minMax.isEnabled());
 	}
 
 }

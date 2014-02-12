@@ -27,6 +27,7 @@ public class MinMaxEntity {
 	private Long minimum;
 	private Long maximum;
 	private Date refDate;
+	private Boolean enabled;
 	
 	public MinMaxEntity() {
 	}
@@ -38,13 +39,14 @@ public class MinMaxEntity {
 	 * @param maximum
 	 */
 	public MinMaxEntity(Long satelliteId, Long channel, Long minimum,
-			Long maximum, Date refDate) {
+			Long maximum, Date refDate, Boolean enabled) {
 		super();
 		this.satelliteId = satelliteId;
 		this.channel = channel;
 		this.minimum = minimum;
 		this.maximum = maximum;
 		this.refDate = refDate;
+		this.enabled = enabled;
 	}
 
 	public final Long getId() {
@@ -95,11 +97,20 @@ public class MinMaxEntity {
 		this.refDate = refDate;
 	}
 
+	public final Boolean isEnabled() {
+		return enabled;
+	}
+
+	public final void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((channel == null) ? 0 : channel.hashCode());
+		result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((maximum == null) ? 0 : maximum.hashCode());
 		result = prime * result + ((minimum == null) ? 0 : minimum.hashCode());
@@ -126,6 +137,13 @@ public class MinMaxEntity {
 				return false;
 			}
 		} else if (!channel.equals(other.channel)) {
+			return false;
+		}
+		if (enabled == null) {
+			if (other.enabled != null) {
+				return false;
+			}
+		} else if (!enabled.equals(other.enabled)) {
 			return false;
 		}
 		if (id == null) {

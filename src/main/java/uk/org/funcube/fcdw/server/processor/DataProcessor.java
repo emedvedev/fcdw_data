@@ -355,6 +355,18 @@ public class DataProcessor {
 			}
 			MinMaxEntity minMaxEntity = channels.get(0);
 			
+			Date refDate = minMaxEntity.getRefDate();
+			
+			Date currentDate = clock.currentDate();
+			
+			long ageInMillis = currentDate.getTime() - refDate.getTime();
+			
+			if (ageInMillis > 7 * 24 * 60 * 60 * 1000) {
+				minMaxEntity.setEnabled(false);
+				minMaxDao.save(minMaxEntity);
+				minMaxEntity = new MinMaxEntity(satelliteId, (long) channel, 99999L, -99999L, currentDate, true);
+			}
+			
 			Long channelValue = longValues[channel - 1];
 			
 			switch (channel) {

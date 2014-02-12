@@ -18,24 +18,20 @@ public class MinMax {
 	private Long minimum;
 	private Long maximum;
 	private Date refDate;
+	private Boolean enabled;
 	
 	public MinMax() {
 	}
 
-	/**
-	 * @param satelliteId
-	 * @param channel
-	 * @param minimum
-	 * @param maximum
-	 */
 	public MinMax(Long satelliteId, Long channel, Long minimum,
-			Long maximum, Date refDate) {
+			Long maximum, Date refDate, Boolean enabled) {
 		super();
 		this.satelliteId = satelliteId;
 		this.channel = channel;
 		this.minimum = minimum;
 		this.maximum = maximum;
 		this.refDate = refDate;
+		this.enabled = enabled;
 	}
 	
 	public MinMax(MinMaxEntity entity) {
@@ -44,6 +40,7 @@ public class MinMax {
 		this.minimum = entity.getMinimum();
 		this.maximum = entity.getMaximum();
 		this.refDate = entity.getRefDate();
+		this.enabled = entity.isEnabled();
 	}
 
 	public final Long getSatelliteId() {
@@ -147,6 +144,10 @@ public class MinMax {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
 	}
 	
 }
