@@ -371,7 +371,7 @@ public class DataProcessor {
 			
 			switch (channel) {
 			default:
-				if (channelValue == null || channelValue == 0) {
+				if (channelValue == null) {
 					break;
 				}
 				if (channelValue < minMaxEntity.getMinimum()) {
