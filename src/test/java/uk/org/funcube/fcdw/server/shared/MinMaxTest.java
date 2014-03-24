@@ -6,8 +6,6 @@
 
 package uk.org.funcube.fcdw.server.shared;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
 
 import junit.framework.Assert;
@@ -16,7 +14,6 @@ import org.junit.Test;
 
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.server.util.UTCClock;
-import uk.org.funcube.fcdw.service.rest.MinMaxServiceRestImpl;
 
 /**
  * @author g4dpz
