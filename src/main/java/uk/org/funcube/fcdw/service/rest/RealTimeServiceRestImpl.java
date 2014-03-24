@@ -17,7 +17,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -121,7 +120,7 @@ public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements 
     		    		String.format(MILLI_AMPS_FORMAT, realTimeEntity.getC4()), 
     		    		String.format(MILLI_VOLT_FORMAT, realTimeEntity.getC5()), 
     		    		String.format(MILLI_AMPS_FORMAT, realTimeEntity.getC6()), 
-    		    		String.format(TEMPERATURE_FORMAT, realTimeEntity.getC12())),
+    		    		String.format(TEMPERATURE_FORMAT, unWrap(realTimeEntity.getC12()))),
     		    new AsibSummary(
     		    		String.format(SOL_TEMPERATURE_FORMAT, scaleAndOffset(realTimeEntity.getC20(), -0.2073, 158.239)), 
     		    		String.format(SOL_TEMPERATURE_FORMAT, scaleAndOffset(realTimeEntity.getC21(), -0.2083, 159.227)),
@@ -273,6 +272,16 @@ public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements 
 					break;
 				}
 			}
+		}
+	}
+
+	private Long unWrap(Long value) {
+		
+		if (value >= 128) {
+			return ~value ^ 255;
+		}
+		else {
+			return value;
 		}
 	}
 
