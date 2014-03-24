@@ -388,9 +388,11 @@ public class DataProcessor {
 				if (channelValue == null || channelValue == 0) {
 					break;
 				}
-				if (channelValue > 250) {
-					channelValue = channelValue - 255;
+				
+				if (channelValue >= 128) {
+					channelValue = ~channelValue ^ 255;
 				}
+				
 				if (channelValue < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(channelValue);
 				} else if (channelValue > minMaxEntity.getMaximum()) {
