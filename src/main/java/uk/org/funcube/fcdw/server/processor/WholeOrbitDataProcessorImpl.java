@@ -215,7 +215,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 					
 					//LOG.debug("Not Found");
 	
-					//checkMinMax(satelliteId, wod);
+					checkMinMax(satelliteId, wod);
 					wod.setSatelliteTime(satelliteTime);
 					//LOG.debug("Saving WOD with sequenceNumber, frameNumber: " + wod.getSequenceNumber() + ", " + wod.getFrameNumber());
 					wholeOrbitDataDao.save(wod);
@@ -252,6 +252,9 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 	private void checkMinMax(long satelliteId, WholeOrbitDataEntity wodEntity) {
 
 		for (int channel = 1; channel <= 14; channel++) {
+			
+			boolean dirty = false;
+			
 			List<MinMaxEntity> channels = minMaxDao
 					.findBySatelliteIdAndChannel(satelliteId, channel);
 			if (channels.isEmpty()) {
@@ -260,66 +263,86 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 			MinMaxEntity minMaxEntity = channels.get(0);
 			switch (channel) {
 			case 1:
+				// Photo Voltage 1
 				if (wodEntity.getC9() == 0) {
 					break;
 				}
 				if (wodEntity.getC9() < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(wodEntity.getC9());
+					dirty = true;
 				} else if (wodEntity.getC9() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC9());
+					dirty = true;
 				}
 				break;
 			case 2:
+				// Photo Voltage 2
 				if (wodEntity.getC10() == 0) {
 					break;
 				}
 				if (wodEntity.getC10() < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(wodEntity.getC10());
+					dirty = true;
 				} else if (wodEntity.getC10() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC10());
+					dirty = true;
 				}
 				break;
 			case 3:
+				// Photo Voltage 3
 				if (wodEntity.getC11() == 0) {
 					break;
 				}
 				if (wodEntity.getC11() < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(wodEntity.getC11());
+					dirty = true;
 				} else if (wodEntity.getC11() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC11());
+					dirty = true;
 				}
 				break;
 			case 4:
+				// Total photo current
 				if (wodEntity.getC12() == 0) {
 					break;
 				}
 				if (wodEntity.getC12() < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(wodEntity.getC12());
+					dirty = true;
 				} else if (wodEntity.getC12() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC12());
+					dirty = true;
 				}
 				break;
 			case 5:
+				// Battery voltage
 				if (wodEntity.getC13() == 0) {
 					break;
 				}
 				if (wodEntity.getC13() < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(wodEntity.getC13());
+					dirty = true;
 				} else if (wodEntity.getC13() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC13());
+					dirty = true;
 				}
 				break;
 			case 6:
+				// Total system current
 				if (wodEntity.getC14() == 0) {
 					break;
 				}
 				if (wodEntity.getC14() < minMaxEntity.getMinimum()) {
 					minMaxEntity.setMinimum(wodEntity.getC14());
+					dirty = true;
 				} else if (wodEntity.getC14() > minMaxEntity.getMaximum()) {
 					minMaxEntity.setMaximum(wodEntity.getC14());
+					dirty = true;
 				}
 				break;
+				/*
 			case 11:
+				// Solar panel temp +X
 				if (wodEntity.getC5() == 0) {
 					break;
 				}
@@ -330,6 +353,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 				}
 				break;
 			case 12:
+				// Solar panel temp -X
 				if (wodEntity.getC6() == 0) {
 					break;
 				}
@@ -340,6 +364,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 				}
 				break;
 			case 13:
+				// Solar panel temp +Y
 				if (wodEntity.getC7() == 0) {
 					break;
 				}
@@ -350,6 +375,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 				}
 				break;
 			case 14:
+				// Solar panel temp -Y
 				if (wodEntity.getC8() == 0) {
 					break;
 				}
@@ -359,8 +385,12 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 					minMaxEntity.setMaximum(wodEntity.getC8());
 				}
 				break;
+				*/
 			}
-			minMaxDao.save(minMaxEntity);
+			
+			if (dirty) {
+				minMaxDao.save(minMaxEntity);
+			}
 		}
 
 	}
