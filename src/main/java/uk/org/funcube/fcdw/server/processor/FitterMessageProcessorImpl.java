@@ -115,7 +115,7 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 		case 21:
 		case 22:
 		case 23:
-			slot += (frameType - 13);
+			slot += (frameType - 14);
 			break;
 		}
 		
