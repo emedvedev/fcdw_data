@@ -149,13 +149,13 @@ public class RealTimeCsvExtractor {
 					// Total System Current mA
 					c6 = String.format("%4d", entity.getC6());
 					// Boost Converter Temp 1 C
-					c7 = String.format("%4d", entity.getC9());
+					c7 = String.format("%4d", twosComplement(entity.getC9()));
 					// Boost Converter Temp 2 C
-					c8 = String.format("%4d", entity.getC10());
+					c8 = String.format("%4d", twosComplement(entity.getC10()));
 					// Boost Converter Temp 3 C
-					c9 = String.format("%4d", entity.getC11());
+					c9 = String.format("%4d", twosComplement(entity.getC11()));
 					// Battery Temp C
-					c10 = String.format("%4d", entity.getC12());
+					c10 = String.format("%4d", twosComplement(entity.getC12()));
 					// Sun Sensor X+
 					c11 = String.format("%4.2f", SOL_ILLUMINATION[entity.getC17().intValue()]);
 					// Sun Sensor Y+
@@ -227,13 +227,13 @@ public class RealTimeCsvExtractor {
 					// Total System Current mA
 					c6 = String.format("%4d", entity.getC6());
 					// Boost Converter Temp 1 C
-					c7 = String.format("%4d", entity.getC9());
+					c7 = String.format("%4d", twosComplement(entity.getC9()));
 					// Boost Converter Temp 2 C
-					c8 = String.format("%4d", entity.getC10());
+					c8 = String.format("%4d", twosComplement(entity.getC10()));
 					// Boost Converter Temp 3 C
-					c9 = String.format("%4d", entity.getC11());
+					c9 = String.format("%4d", twosComplement(entity.getC11()));
 					// Battery Temp C
-					c10 = String.format("%4d", entity.getC12());
+					c10 = String.format("%4d", twosComplement(entity.getC12()));
 					// Sun Sensor X+
 					c11 = String.format("%4.2f", SOL_ILLUMINATION[entity.getC17().intValue()]);
 					// Sun Sensor Y+
@@ -285,6 +285,14 @@ public class RealTimeCsvExtractor {
 			e.printStackTrace();
 		}
 		
+	}
+
+	private long twosComplement(long value) {
+		long channelValue = value;
+		if (channelValue >= 128) {
+			channelValue = ~channelValue ^ 255;
+		}
+		return channelValue;
 	}
 
 
