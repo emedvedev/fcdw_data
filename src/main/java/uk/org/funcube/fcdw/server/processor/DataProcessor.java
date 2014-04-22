@@ -41,11 +41,13 @@ import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.RealTimeDao;
+import uk.org.funcube.fcdw.dao.SatelliteStatusDao;
 import uk.org.funcube.fcdw.dao.UserDao;
 import uk.org.funcube.fcdw.domain.EpochEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
+import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
 import uk.org.funcube.fcdw.domain.UserEntity;
 import uk.org.funcube.fcdw.server.shared.RealTime;
 import uk.org.funcube.fcdw.server.util.Cache;
@@ -78,6 +80,9 @@ public class DataProcessor {
 
 	@Autowired
 	EpochDao epochDao;
+	
+	@Autowired
+	SatelliteStatusDao satelliteStatusDao;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -231,6 +236,8 @@ public class DataProcessor {
 		HexFrameEntity hexFrame;
 		Set<UserEntity> users;
 		if (frames.size() == 0) {
+			
+			SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
 
 			Timestamp satelliteTime;
 
@@ -258,6 +265,12 @@ public class DataProcessor {
 			realTimeDao.save(realTimeEntity);
 
 			checkMinMax(satelliteId, realTimeEntity);
+			
+			satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
+			satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
+			satelliteStatus.setEclipsed(realTime.getSoftwareState().getC9());
+			
+			satelliteStatusDao.save(satelliteStatus);
 
 		} else {
 			hexFrame = frames.get(0);

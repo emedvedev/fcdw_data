@@ -9,6 +9,7 @@ package uk.org.funcube.fcdw.dao;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -22,5 +23,8 @@ public interface FitterMessageDao extends CrudRepository<FitterMessageEntity, Lo
 
 	@Query("select fm from FitterMessageEntity fm where satelliteId = ?1 and lastReceived < ?2")
 	List<FitterMessageEntity> getNoneDebugReceivedBefore(long satelliteId, Date time);
+	
+	@Query("SELECT fm FROM FitterMessageEntity fm where fm.satelliteId = ?1 and fm.debug = 1 order by fm.id desc")
+	List<FitterMessageEntity> getLatestDebug(long satelliteId, Pageable pageable);
 
 }

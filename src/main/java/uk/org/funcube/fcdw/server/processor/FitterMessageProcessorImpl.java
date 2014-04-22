@@ -11,15 +11,20 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.SimpleTimeZone;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.org.funcube.fcdw.dao.FitterMessageDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
+import uk.org.funcube.fcdw.dao.SatelliteStatusDao;
 import uk.org.funcube.fcdw.domain.FitterMessageEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
+import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
+import uk.org.funcube.fcdw.server.shared.FitterDebug;
 
 
 public class FitterMessageProcessorImpl implements FitterMessageProcessor {
@@ -31,7 +36,9 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 	
 	@Autowired
 	HexFrameDao hexFrameDao;
-	
+
+	@Autowired
+	SatelliteStatusDao satelliteStatusDao;
 	                                                                                                                                                            @Override
 	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
 	public void process(long satelliteId) {
@@ -47,6 +54,18 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 			Timestamp receivedDate = new Timestamp(fitterFrame.getCreatedDate().getTime());
 
 			extractAndSaveFitter(satelliteId, fitterFrame, receivedDate);
+		}
+		
+		final List<SatelliteStatusEntity> satelliteStatuses = satelliteStatusDao.findBySatelliteId(satelliteId);
+		if (!satelliteStatuses.isEmpty()) {
+			final SatelliteStatusEntity satelliteStatus = satelliteStatuses.get(0);
+			final List<FitterMessageEntity> latestDebug = fitterMessageDao.getLatestDebug(satelliteId, new PageRequest(0, 1));
+			if (!latestDebug.isEmpty()) {
+				final FitterMessageEntity fitter = latestDebug.get(0);
+				final FitterDebug fitterDebug = new FitterDebug(convertHexBytePairToBinary(fitter.getMessageText()));
+				satelliteStatus.setEclipseModeForced(fitterDebug.getEclipseForce().equals("1"));
+				satelliteStatusDao.save(satelliteStatus);
+			}
 		}
 		
 	}
@@ -161,6 +180,17 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 			entity.setDisplay(false);
 			fitterMessageDao.save(entity);
 		}
+	}
+
+	private static String convertHexBytePairToBinary(final String hexString) {
+		final StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < hexString.length(); i += 2) {
+			final String hexByte = hexString.substring(i, i + 2);
+			final int hexValue = Integer.parseInt(hexByte, 16);
+			sb.append(StringUtils.leftPad(Integer.toBinaryString(hexValue), 8, "0"));
+		}
+		return sb.toString();
 	}
 
 }
