@@ -43,12 +43,14 @@ import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.RealTimeDao;
 import uk.org.funcube.fcdw.dao.SatelliteStatusDao;
 import uk.org.funcube.fcdw.dao.UserDao;
+import uk.org.funcube.fcdw.dao.UserRankingDao;
 import uk.org.funcube.fcdw.domain.EpochEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
 import uk.org.funcube.fcdw.domain.UserEntity;
+import uk.org.funcube.fcdw.domain.UserRankingEntity;
 import uk.org.funcube.fcdw.server.shared.RealTime;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
@@ -83,6 +85,9 @@ public class DataProcessor {
 	
 	@Autowired
 	SatelliteStatusDao satelliteStatusDao;
+	
+	@Autowired
+	UserRankingDao userRankingDao;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -271,6 +276,8 @@ public class DataProcessor {
 			satelliteStatus.setEclipsed(realTime.getSoftwareState().getC9());
 			
 			satelliteStatusDao.save(satelliteStatus);
+			
+			incrementUploadRanking(satelliteId, user.getSiteId(), now);
 
 		} else {
 			hexFrame = frames.get(0);
@@ -280,7 +287,32 @@ public class DataProcessor {
 			users.add(user);
 
 			hexFrameDao.save(hexFrame);
+			
+			incrementUploadRanking(satelliteId, user.getSiteId(), now);
 		}
+	}
+
+	private void incrementUploadRanking(int satelliteId, String siteId, Date now) {
+		
+		final Timestamp latestUploadDate = new Timestamp(now.getTime());
+		
+		List<UserRankingEntity> userRankings 
+			= userRankingDao.findBySatelliteIdAndSiteId(satelliteId, siteId);
+		
+		UserRankingEntity userRanking;
+		
+		if (userRankings.isEmpty()) {
+			
+			userRanking 
+				= new UserRankingEntity((long) satelliteId, siteId, 1L, latestUploadDate);
+		} else {
+			userRanking = userRankings.get(0);
+			userRanking.setLatestUploadDate(latestUploadDate);
+			userRanking.setNumber(userRanking.getNumber() + 1);
+		}
+		
+		userRankingDao.save(userRanking);
+		
 	}
 
 	@RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", method = RequestMethod.GET, produces = "application/json")
