@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -280,15 +279,29 @@ public class DataProcessor {
 			incrementUploadRanking(satelliteId, user.getSiteId(), now);
 
 		} else {
+			
 			hexFrame = frames.get(0);
 
 			users = hexFrame.getUsers();
-
-			users.add(user);
-
-			hexFrameDao.save(hexFrame);
 			
-			incrementUploadRanking(satelliteId, user.getSiteId(), now);
+			boolean userFrameAlreadRegistered = false;
+			
+			for (UserEntity existingUser : users) {
+				if (existingUser.getId().longValue() == user.getId().longValue()) {
+					LOG.error("User " + user.getSiteId() + " attempting duplicate score");
+					userFrameAlreadRegistered = true;
+					break;
+				}
+			}
+			
+			if (!userFrameAlreadRegistered) {
+
+				users.add(user);
+	
+				hexFrameDao.save(hexFrame);
+				
+				incrementUploadRanking(satelliteId, user.getSiteId(), now);
+			}
 		}
 	}
 
