@@ -213,8 +213,8 @@ public class DataProcessor {
 					if (maxSequenceNumber != null
 							&& Math.abs(sequenceNumber - maxSequenceNumber) > TWO_DAYS_SEQ_COUNT) {
 						LOG.error(String
-								.format("Sequence number %d is out of bounds for satelliteId %d",
-										sequenceNumber, satelliteId));
+								.format("User %s loading sequence number %d is out of bounds for satelliteId %d",
+										user.getSiteId(), sequenceNumber, satelliteId));
 						return;
 					}
 
@@ -288,7 +288,9 @@ public class DataProcessor {
 			
 			for (UserEntity existingUser : users) {
 				if (existingUser.getId().longValue() == user.getId().longValue()) {
-					LOG.error("User " + user.getSiteId() + " attempting duplicate score");
+					LOG.error("User " + user.getSiteId() 
+							+ " attempting duplicate score for sat/seq/frame " 
+							+ satelliteId + "/" + sequenceNumber + "/" + frameType);
 					userFrameAlreadRegistered = true;
 					break;
 				}
