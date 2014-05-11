@@ -17,6 +17,7 @@ import uk.org.funcube.fcdw.server.extract.csv.WodCsvExtractor;
 import uk.org.funcube.fcdw.server.processor.DataProcessor;
 import uk.org.funcube.fcdw.server.processor.FitterMessageProcessor;
 import uk.org.funcube.fcdw.server.processor.HighResolutionProcessor;
+import uk.org.funcube.fcdw.server.processor.TleProcessor;
 import uk.org.funcube.fcdw.server.processor.WholeOrbitDataProcessor;
 
 
@@ -45,12 +46,20 @@ public class ScheduleConfig {
 	@Autowired
 	private DataProcessor dataProcessor;
 	
+	@Autowired
+	private TleProcessor tleProcessor;
+	
 	@Scheduled(initialDelay=30000, fixedRate=120000)
 	public void highDefinitionTask() {
 		highDefinitionProcessor.process(0L);
 		highDefinitionProcessor.process(1L);
 		highDefinitionProcessor.process(2L);
 		highDefinitionProcessor.process(3L);
+	}
+	
+	@Scheduled(initialDelay=30000, fixedRate=86400000)
+	public void downloadTleTask() {
+		tleProcessor.process();
 	}
 	
 	@Scheduled(initialDelay=60000, fixedRate=120000)

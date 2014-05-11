@@ -24,6 +24,7 @@ import uk.org.funcube.fcdw.server.processor.FitterMessageProcessor;
 import uk.org.funcube.fcdw.server.processor.FitterMessageProcessorImpl;
 import uk.org.funcube.fcdw.server.processor.HighResolutionProcessor;
 import uk.org.funcube.fcdw.server.processor.HighResolutionProcessorImpl;
+import uk.org.funcube.fcdw.server.processor.TleProcessor;
 import uk.org.funcube.fcdw.server.processor.WholeOrbitDataProcessor;
 import uk.org.funcube.fcdw.server.processor.WholeOrbitDataProcessorImpl;
 import uk.org.funcube.fcdw.server.util.Clock;
@@ -73,6 +74,11 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	RealTimeCsvExtractor realTimeCsvExtractor() {
 		return new RealTimeCsvExtractor();
+	}
+	
+	@Bean
+	TleProcessor tleProcessor() {
+		return new TleProcessor();
 	}
 
 	@Bean
