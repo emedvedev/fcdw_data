@@ -47,6 +47,11 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
+	UTCClock utcClock() {
+		return new UTCClock();
+	}
+
+	@Bean
 	HighResolutionProcessor highDefinitionProcessor() {
 		return new HighResolutionProcessorImpl();
 	}

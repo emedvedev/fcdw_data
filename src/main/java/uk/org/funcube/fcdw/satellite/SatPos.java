@@ -250,7 +250,7 @@ public class SatPos {
     /**
      * @return the eclipseDepth
      */
-    protected final double getEclipseDepth() {
+    public final double getEclipseDepth() {
         return eclipseDepth;
     }
 
@@ -264,7 +264,7 @@ public class SatPos {
     /**
      * @return the eclipsed
      */
-    protected final boolean isEclipsed() {
+    public final boolean isEclipsed() {
         return eclipsed;
     }
 
