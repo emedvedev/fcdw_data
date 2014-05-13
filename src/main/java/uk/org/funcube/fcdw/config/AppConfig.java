@@ -29,6 +29,7 @@ import uk.org.funcube.fcdw.server.processor.WholeOrbitDataProcessor;
 import uk.org.funcube.fcdw.server.processor.WholeOrbitDataProcessorImpl;
 import uk.org.funcube.fcdw.server.util.Clock;
 import uk.org.funcube.fcdw.server.util.UTCClock;
+import uk.org.funcube.fcdw.service.PredictorService;
 
 @EnableWebMvc
 @ComponentScan(basePackages = { "uk.org.funcube.fcdw" })
@@ -84,6 +85,11 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	TleProcessor tleProcessor() {
 		return new TleProcessor();
+	}
+	
+	@Bean
+	PredictorService predictorService() {
+		return new PredictorService();
 	}
 
 	@Bean

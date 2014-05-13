@@ -51,9 +51,11 @@ import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
 import uk.org.funcube.fcdw.domain.UserEntity;
 import uk.org.funcube.fcdw.domain.UserRankingEntity;
 import uk.org.funcube.fcdw.server.shared.RealTime;
+import uk.org.funcube.fcdw.server.shared.SatellitePosition;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
 import uk.org.funcube.fcdw.server.util.UTCClock;
+import uk.org.funcube.fcdw.service.PredictorService;
 
 @Service
 @RequestMapping("/api/data/hex")
@@ -87,6 +89,9 @@ public class DataProcessor {
 	
 	@Autowired
 	UserRankingDao userRankingDao;
+	
+	@Autowired
+	PredictorService predictor;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -239,6 +244,8 @@ public class DataProcessor {
 			final List<HexFrameEntity> frames, final EpochEntity epoch) {
 		HexFrameEntity hexFrame;
 		Set<UserEntity> users;
+		
+		
 		if (frames.size() == 0) {
 			
 			SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
@@ -254,8 +261,34 @@ public class DataProcessor {
 								+ (frameType * 5 * 1000));
 			}
 
+			long[] catalogNumbers = new long[] {39444, 39444, 39444, 39444};
+			
+			boolean outOfOrder = false;
+			
+			List<HexFrameEntity> existingFrames 
+				= hexFrameDao.findBySatelliteIdAndSequenceNumber(satelliteId, sequenceNumber);
+			
+			if (!existingFrames.isEmpty()) {
+				for (HexFrameEntity existingFrame : existingFrames) {
+					if (existingFrame.getCreatedDate().before(now) && existingFrame.getFrameType() > frameType) {
+						outOfOrder = false;
+						break;
+					}
+				}
+			}
+
 			hexFrame = new HexFrameEntity((long) satelliteId, (long) frameType,
 					sequenceNumber, hexString, now, true, satelliteTime);
+			
+			hexFrame.setOutOfOrder(outOfOrder);
+			
+			if (!outOfOrder) {
+				SatellitePosition satellitePosition = predictor.get(catalogNumbers[satelliteId], now);
+				hexFrame.setEclipsed(satellitePosition.getEclipsed());
+				hexFrame.setEclipseDepth(satellitePosition.getEclipseDepth());
+				hexFrame.setLatitude(satellitePosition.getLatitude());
+				hexFrame.setLongitude(satellitePosition.getLongitude());
+			}
 
 			users = hexFrame.getUsers();
 

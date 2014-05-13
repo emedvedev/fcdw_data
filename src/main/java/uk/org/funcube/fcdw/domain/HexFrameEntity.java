@@ -44,6 +44,16 @@ public class HexFrameEntity {
 	private boolean fitterProcessed;
 	private boolean highPrecisionProcessed;
 	private Timestamp satelliteTime;
+
+	private String eclipsed;
+
+	private String eclipseDepth;
+
+	private String latitude;
+
+	private String longitude;
+	
+	private Boolean outOfOrder;
 	
 	public HexFrameEntity() {
 	}
@@ -59,6 +69,7 @@ public class HexFrameEntity {
 		this.createdDate = createdDate;
 		this.valid = valid;
 		this.satelliteTime = satelliteTime;
+		this.outOfOrder = false;
 	}
 
 	public Long getId() {
@@ -157,104 +168,56 @@ public class HexFrameEntity {
 		this.satelliteTime = satelliteTime;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((createdDate == null) ? 0 : createdDate.hashCode());
-		result = prime * result + (fitterProcessed ? 1231 : 1237);
-		result = prime * result
-				+ ((frameType == null) ? 0 : frameType.hashCode());
-		result = prime * result
-				+ ((hexString == null) ? 0 : hexString.hashCode());
-		result = prime * result + (highPrecisionProcessed ? 1231 : 1237);
-		result = prime * result
-				+ ((satelliteId == null) ? 0 : satelliteId.hashCode());
-		result = prime * result
-				+ ((satelliteTime == null) ? 0 : satelliteTime.hashCode());
-		result = prime * result
-				+ ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
-		result = prime * result + ((users == null) ? 0 : users.hashCode());
-		result = prime * result + (valid ? 1231 : 1237);
-		result = prime * result + (wodProcessed ? 1231 : 1237);
-		return result;
+	/**
+	 * @param eclipsed
+	 */
+	public void setEclipsed(String eclipsed) {
+		this.eclipsed = eclipsed;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof HexFrameEntity)) {
-			return false;
-		}
-		HexFrameEntity other = (HexFrameEntity) obj;
-		if (createdDate == null) {
-			if (other.createdDate != null) {
-				return false;
-			}
-		} else if (!createdDate.equals(other.createdDate)) {
-			return false;
-		}
-		if (fitterProcessed != other.fitterProcessed) {
-			return false;
-		}
-		if (frameType == null) {
-			if (other.frameType != null) {
-				return false;
-			}
-		} else if (!frameType.equals(other.frameType)) {
-			return false;
-		}
-		if (hexString == null) {
-			if (other.hexString != null) {
-				return false;
-			}
-		} else if (!hexString.equals(other.hexString)) {
-			return false;
-		}
-		if (highPrecisionProcessed != other.highPrecisionProcessed) {
-			return false;
-		}
-		if (satelliteId == null) {
-			if (other.satelliteId != null) {
-				return false;
-			}
-		} else if (!satelliteId.equals(other.satelliteId)) {
-			return false;
-		}
-		if (satelliteTime == null) {
-			if (other.satelliteTime != null) {
-				return false;
-			}
-		} else if (!satelliteTime.equals(other.satelliteTime)) {
-			return false;
-		}
-		if (sequenceNumber == null) {
-			if (other.sequenceNumber != null) {
-				return false;
-			}
-		} else if (!sequenceNumber.equals(other.sequenceNumber)) {
-			return false;
-		}
-		if (users == null) {
-			if (other.users != null) {
-				return false;
-			}
-		} else if (!users.equals(other.users)) {
-			return false;
-		}
-		if (valid != other.valid) {
-			return false;
-		}
-		if (wodProcessed != other.wodProcessed) {
-			return false;
-		}
-		return true;
+	/**
+	 * @param eclipseDepth
+	 */
+	public void setEclipseDepth(String eclipseDepth) {
+		this.eclipseDepth = eclipseDepth;
+	}
+
+	/**
+	 * @param latitude
+	 */
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @param longitude
+	 */
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
+	public final String getEclipsed() {
+		return eclipsed;
+	}
+
+	public final String getEclipseDepth() {
+		return eclipseDepth;
+	}
+
+	public final String getLatitude() {
+		return latitude;
+	}
+
+	public final String getLongitude() {
+		return longitude;
+	}
+
+	public final Boolean isOutOfOrder() {
+		return outOfOrder;
+	}
+
+	public final void setOutOfOrder(Boolean outOfOrder) {
+		this.outOfOrder = outOfOrder;
 	}
 
 }
