@@ -64,7 +64,7 @@ public class DataProcessor {
 	private static final Buffer FIFO = BufferUtils
 			.synchronizedBuffer(new CircularFifoBuffer(1000));
 
-	long TWO_DAYS_SEQ_COUNT = 1440;
+	long TWO_DAYS_SEQ_COUNT = 1440 * 10;
 
 	@Autowired
 	UserDao userDao;
@@ -296,6 +296,13 @@ public class DataProcessor {
 
 			RealTimeEntity realTimeEntity = new RealTimeEntity(realTime,
 					satelliteTime);
+			
+			if (!outOfOrder) {
+				realTimeEntity.setEclipsed(hexFrame.getEclipsed().equals("yes"));
+				realTimeEntity.setEclipseDepth(Double.parseDouble(hexFrame.getEclipseDepth()));
+				realTimeEntity.setLatitude(Double.parseDouble(hexFrame.getLatitude()));
+				realTimeEntity.setLongitude(Double.parseDouble(hexFrame.getLongitude()));
+			}
 
 			hexFrameDao.save(hexFrame);
 

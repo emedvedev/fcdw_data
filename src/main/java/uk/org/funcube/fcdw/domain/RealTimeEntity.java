@@ -32,14 +32,19 @@ public class RealTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private long satelliteId;
-	private long sequenceNumber;
-	private long frameType;
+	private Long satelliteId;
+	private Long sequenceNumber;
+	private Long frameType;
 	private Date createdDate;
-	private long sensorId;
-	private long commandCount;
-	private long lastCommand;
+	private Long sensorId;
+	private Long commandCount;
+	private Long lastCommand;
 	private Timestamp satelliteTime;
+	
+	private Double latitude;
+	private Double longitude;
+	private Boolean eclipsed;
+	private Double eclipseDepth;
 
 	private Long c1;
 	private Long c2;
@@ -125,7 +130,6 @@ public class RealTimeEntity {
 	}
 
 	public RealTimeEntity() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public RealTimeEntity(RealTime realTime, Timestamp satelliteTime) {
@@ -223,27 +227,27 @@ public class RealTimeEntity {
 		this.id = id;
 	}
 
-	public final long getSatelliteId() {
+	public final Long getSatelliteId() {
 		return satelliteId;
 	}
 
-	public final void setSatelliteId(long satelliteId) {
+	public final void setSatelliteId(Long satelliteId) {
 		this.satelliteId = satelliteId;
 	}
 
-	public final long getSequenceNumber() {
+	public final Long getSequenceNumber() {
 		return sequenceNumber;
 	}
 
-	public final void setSequenceNumber(long sequenceNumber) {
+	public final void setSequenceNumber(Long sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
-	public final long getFrameType() {
+	public final Long getFrameType() {
 		return frameType;
 	}
 
-	public final void setFrameType(long frameType) {
+	public final void setFrameType(Long frameType) {
 		this.frameType = frameType;
 	}
 
@@ -255,27 +259,27 @@ public class RealTimeEntity {
 		this.createdDate = createdDate;
 	}
 
-	public final long getSensorId() {
+	public final Long getSensorId() {
 		return sensorId;
 	}
 
-	public final void setSensorId(long sensorId) {
+	public final void setSensorId(Long sensorId) {
 		this.sensorId = sensorId;
 	}
 
-	public final long getCommandCount() {
+	public final Long getCommandCount() {
 		return commandCount;
 	}
 
-	public final void setCommandCount(long commandCount) {
+	public final void setCommandCount(Long commandCount) {
 		this.commandCount = commandCount;
 	}
 
-	public final long getLastCommand() {
+	public final Long getLastCommand() {
 		return lastCommand;
 	}
 
-	public final void setLastCommand(long lastCommand) {
+	public final void setLastCommand(Long lastCommand) {
 		this.lastCommand = lastCommand;
 	}
 
@@ -853,6 +857,38 @@ public class RealTimeEntity {
 
 	public final void setSatelliteTime(Timestamp satelliteTime) {
 		this.satelliteTime = satelliteTime;
+	}
+
+	public final Double getLatitude() {
+		return latitude;
+	}
+
+	public final void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public final Double getLongitude() {
+		return longitude;
+	}
+
+	public final void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public final Boolean getEclipsed() {
+		return eclipsed;
+	}
+
+	public final void setEclipsed(Boolean eclipsed) {
+		this.eclipsed = eclipsed;
+	}
+
+	public final Double getEclipseDepth() {
+		return eclipseDepth;
+	}
+
+	public final void setEclipseDepth(Double eclipseDepth) {
+		this.eclipseDepth = eclipseDepth;
 	}
 	
 
