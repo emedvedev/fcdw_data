@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.org.funcube.fcdw.server.shared.SatellitePosition;
-import uk.org.funcube.fcdw.server.util.UTCClock;
+import uk.org.funcube.fcdw.server.util.Clock;
 import uk.org.funcube.fcdw.service.PredictorService;
 
 @Controller
@@ -24,7 +24,7 @@ import uk.org.funcube.fcdw.service.PredictorService;
 public class PredictorServiceRestImpl implements PredictorServiceRest {
 	
 	@Autowired
-	UTCClock clock;
+	Clock clock;
 	
 	@Autowired
 	PredictorService predictorService;

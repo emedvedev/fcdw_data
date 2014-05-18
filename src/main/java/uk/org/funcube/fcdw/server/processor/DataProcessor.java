@@ -66,7 +66,7 @@ public class DataProcessor {
 	private static final Buffer FIFO = BufferUtils
 			.synchronizedBuffer(new CircularFifoBuffer(1000));
 
-	long TWO_DAYS_SEQ_COUNT = 1440;
+	long TWO_DAYS_SEQ_COUNT = 1440 * 100;
 
 	@Autowired
 	UserDao userDao;
@@ -291,8 +291,10 @@ public class DataProcessor {
 				SatellitePosition satellitePosition = predictor.get(catalogNumbers[satelliteId], now);
 				hexFrame.setEclipsed(satellitePosition.getEclipsed());
 				hexFrame.setEclipseDepth(satellitePosition.getEclipseDepth());
-				hexFrame.setLatitude(satellitePosition.getLatitude());
-				hexFrame.setLongitude(satellitePosition.getLongitude());
+				latitude = satellitePosition.getLatitude();
+				hexFrame.setLatitude(latitude);
+				longitude = satellitePosition.getLongitude();
+				hexFrame.setLongitude(longitude);
 			}
 
 			users = hexFrame.getUsers();
@@ -302,21 +304,43 @@ public class DataProcessor {
 			RealTimeEntity realTimeEntity = new RealTimeEntity(realTime,
 					satelliteTime);
 			
-			final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);
-			if (dtmfId != null) {
-				final List<DTMFCommandEntity> commandEntities = dtmfCommandDao.findById(dtmfId);
-				if (!commandEntities.isEmpty()) {
-					DTMFCommandEntity lastCommand = commandEntities.get(0);
-					Long lastCommand = realTimeEntity.getDTMFCommand();
-					boolean dtmfStatus = realTimeEntity.getDTMFStatus();
-					if (lastCommand.getValue().longValue() != lastCommand.longValue()) {
-						DTMFCommandEntity newCommand
-							= new DTMFCommandEntity(satelliteId, sequenceNumber, frameType, now, latitude, longitude, valid, value);
-						dtmfCommandDao.save(newCommand);
+			if (!outOfOrder) {
+				final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);
+				
+				if (dtmfId != null) {
+					final List<DTMFCommandEntity> commandEntities = dtmfCommandDao.findById(dtmfId);
+					if (!commandEntities.isEmpty()) {
+						DTMFCommandEntity lastCommand = commandEntities.get(0);
+						Long dtmfValue = realTimeEntity.getLastCommand();
+						if (dtmfValue.longValue() != lastCommand.getValue().longValue()) {
+							DTMFCommandEntity newCommand
+								= new DTMFCommandEntity(
+										(long)satelliteId, 
+										(long)sequenceNumber, 
+										(long)frameType, 
+										new Timestamp(now.getTime()), 
+										latitude, 
+										longitude, 
+										checkStatus(dtmfValue), 
+										dtmfValue);
+							dtmfCommandDao.save(newCommand);
+						}
 					}
+				} else {
+					Long dtmfValue = realTimeEntity.getLastCommand();
+					DTMFCommandEntity newCommand
+					= new DTMFCommandEntity(
+							(long)satelliteId, 
+							(long)sequenceNumber, 
+							(long)frameType, 
+							new Timestamp(now.getTime()), 
+							latitude, 
+							longitude, 
+							checkStatus(dtmfValue), 
+							dtmfValue);
+					dtmfCommandDao.save(newCommand);
 				}
 			}
-			
 
 			hexFrameDao.save(hexFrame);
 
@@ -358,6 +382,41 @@ public class DataProcessor {
 				
 				incrementUploadRanking(satelliteId, user.getSiteId(), now);
 			}
+		}
+	}
+
+	/**
+	 * @param dtmfValue
+	 * @return
+	 */
+	private Boolean checkStatus(Long dtmfValue) {
+		switch (dtmfValue.intValue()) {
+		case 0x02:
+		case 0x04:
+		case 0x08:
+		case 0x09:
+		case 0x0A:
+		case 0x0C:
+		case 0x0D:
+		case 0x0E:
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+		case 0x18:
+		case 0x19:
+		case 0x1A:
+		case 0x1B:
+		case 0x1C:
+		case 0x1D:
+		case 0x1E:
+		case 0x1F:
+			return true;
+		default:
+			return false;
 		}
 	}
 
@@ -627,5 +686,9 @@ public class DataProcessor {
 	private static final String USER_WITH_SITE_ID = "User with site id [";
 
 	private static final String NOT_FOUND = "] not found";
+
+	private String latitude;
+
+	private String longitude;
 
 }
