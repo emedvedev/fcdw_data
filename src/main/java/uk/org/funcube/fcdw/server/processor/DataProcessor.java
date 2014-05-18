@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import uk.org.funcube.fcdw.dao.DTMFCommandDao;
 import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
@@ -43,6 +44,7 @@ import uk.org.funcube.fcdw.dao.RealTimeDao;
 import uk.org.funcube.fcdw.dao.SatelliteStatusDao;
 import uk.org.funcube.fcdw.dao.UserDao;
 import uk.org.funcube.fcdw.dao.UserRankingDao;
+import uk.org.funcube.fcdw.domain.DTMFCommandEntity;
 import uk.org.funcube.fcdw.domain.EpochEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
@@ -92,6 +94,9 @@ public class DataProcessor {
 	
 	@Autowired
 	PredictorService predictor;
+
+	@Autowired
+	DTMFCommandDao dtmfCommandDao;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -296,6 +301,22 @@ public class DataProcessor {
 
 			RealTimeEntity realTimeEntity = new RealTimeEntity(realTime,
 					satelliteTime);
+			
+			final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);
+			if (dtmfId != null) {
+				final List<DTMFCommandEntity> commandEntities = dtmfCommandDao.findById(dtmfId);
+				if (!commandEntities.isEmpty()) {
+					DTMFCommandEntity lastCommand = commandEntities.get(0);
+					Long lastCommand = realTimeEntity.getDTMFCommand();
+					boolean dtmfStatus = realTimeEntity.getDTMFStatus();
+					if (lastCommand.getValue().longValue() != lastCommand.longValue()) {
+						DTMFCommandEntity newCommand
+							= new DTMFCommandEntity(satelliteId, sequenceNumber, frameType, now, latitude, longitude, valid, value);
+						dtmfCommandDao.save(newCommand);
+					}
+				}
+			}
+			
 
 			hexFrameDao.save(hexFrame);
 
