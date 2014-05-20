@@ -66,7 +66,7 @@ public class DataProcessor {
 	private static final Buffer FIFO = BufferUtils
 			.synchronizedBuffer(new CircularFifoBuffer(1000));
 
-	long TWO_DAYS_SEQ_COUNT = 1440 * 100;
+	long TWO_DAYS_SEQ_COUNT = 1440;
 
 	@Autowired
 	UserDao userDao;
@@ -391,6 +391,7 @@ public class DataProcessor {
 	 */
 	private Boolean checkStatus(Long dtmfValue) {
 		switch (dtmfValue.intValue()) {
+		case 0x00:
 		case 0x02:
 		case 0x04:
 		case 0x08:
