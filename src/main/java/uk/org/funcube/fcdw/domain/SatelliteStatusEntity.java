@@ -11,12 +11,15 @@ import javax.persistence.Table;
 public class SatelliteStatusEntity implements SatelliteStatus {
 	
 	@Id
-	Long satelliteId;
+	private Long satelliteId;
 	
-	Long sequenceNumber;
-	Boolean eclipseModeForced;
-	Boolean eclipsed;
-	Timestamp lastUpdated;
+	private Long sequenceNumber;
+	private Boolean eclipseModeForced;
+	private Boolean eclipsed;
+	private Timestamp lastUpdated;
+	private Double eclipseDepth;
+
+	private boolean eclipseSwitch;
 	
 	public SatelliteStatusEntity() {
 	}
@@ -59,6 +62,30 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 
 	public final void setLastUpdated(Timestamp lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	public final Double getEclipseDepth() {
+		return eclipseDepth;
+	}
+
+	public final void setEclipseDepth(Double eclipseDepth) {
+		this.eclipseDepth = eclipseDepth;
+	}
+
+	public void setEclipseSwitch(boolean eclipseSwitch) {
+		this.eclipseSwitch = eclipseSwitch;
+	}
+
+	public Boolean getEclipseModeForced() {
+		return eclipseModeForced;
+	}
+
+	public Boolean getEclipsed() {
+		return eclipsed;
+	}
+
+	public boolean isEclipseSwitch() {
+		return eclipseSwitch;
 	}
 
 }

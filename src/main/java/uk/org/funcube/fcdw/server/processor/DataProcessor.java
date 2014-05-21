@@ -253,7 +253,6 @@ public class DataProcessor {
 		
 		if (frames.size() == 0) {
 			
-			SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
 
 			Timestamp satelliteTime;
 
@@ -295,6 +294,14 @@ public class DataProcessor {
 				hexFrame.setLatitude(latitude);
 				longitude = satellitePosition.getLongitude();
 				hexFrame.setLongitude(longitude);
+				
+				SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
+				satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
+				satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
+				satelliteStatus.setEclipsed(realTime.getSoftwareState().getC9());
+				satelliteStatus.setEclipseDepth(Double.parseDouble(satellitePosition.getEclipseDepth()));
+				
+				satelliteStatusDao.save(satelliteStatus);
 			}
 
 			users = hexFrame.getUsers();
@@ -346,13 +353,9 @@ public class DataProcessor {
 
 			realTimeDao.save(realTimeEntity);
 
-			checkMinMax(satelliteId, realTimeEntity);
-			
-			satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
-			satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
-			satelliteStatus.setEclipsed(realTime.getSoftwareState().getC9());
-			
-			satelliteStatusDao.save(satelliteStatus);
+			if (!outOfOrder) {
+				checkMinMax(satelliteId, realTimeEntity);
+			}
 			
 			incrementUploadRanking(satelliteId, user.getSiteId(), now);
 

@@ -64,6 +64,7 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 				final FitterMessageEntity fitter = latestDebug.get(0);
 				final FitterDebug fitterDebug = new FitterDebug(convertHexBytePairToBinary(fitter.getMessageText()));
 				satelliteStatus.setEclipseModeForced(fitterDebug.getEclipseForce().equals("1"));
+				satelliteStatus.setEclipseSwitch(fitterDebug.getEclipseSwitch().equals("1"));
 				satelliteStatusDao.save(satelliteStatus);
 			}
 		}
