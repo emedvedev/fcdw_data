@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name="SatelliteStatus")
@@ -19,7 +20,7 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 	private Timestamp lastUpdated;
 	private Double eclipseDepth;
 
-	private boolean eclipseSwitch;
+	private Boolean eclipseSwitch;
 	
 	public SatelliteStatusEntity() {
 	}
@@ -72,7 +73,7 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 		this.eclipseDepth = eclipseDepth;
 	}
 
-	public void setEclipseSwitch(boolean eclipseSwitch) {
+	public void setEclipseSwitch(Boolean eclipseSwitch) {
 		this.eclipseSwitch = eclipseSwitch;
 	}
 
@@ -84,8 +85,25 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 		return eclipsed;
 	}
 
-	public boolean isEclipseSwitch() {
+	public Boolean isEclipseSwitch() {
 		return eclipseSwitch;
+	}
+	
+	@Transient
+	public String getMode() {
+		if (!isEclipseSwitch()) {
+			if (!isEclipseModeForced()) {
+				return "Forced Edu.";
+			} else {
+				return "Forced Amateur";
+			}
+		} else {
+			if (!isEclipsed()) {
+				return "Amatuer";
+			} else {
+				return "Edu.";
+			}
+		}
 	}
 
 }
