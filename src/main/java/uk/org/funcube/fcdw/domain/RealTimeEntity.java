@@ -6,9 +6,6 @@
 
 package uk.org.funcube.fcdw.domain;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -854,6 +851,288 @@ public class RealTimeEntity {
 	public final void setSatelliteTime(Timestamp satelliteTime) {
 		this.satelliteTime = satelliteTime;
 	}
+	
+	@Transient
+	public final void setEclipsed(final Boolean eclipsed) {
+		setC44(eclipsed);
+	}
+	
+	@Transient
+	public final Boolean isEclipsed() {
+		return getC44();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent1Plus(Long value) {
+		setC1(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent1Plus() {
+		return getC1();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent1Minus(Long value) {
+		setC2(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent1Minus() {
+		return getC2();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent2Plus(Long value) {
+		setC3(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent2Plus() {
+		return getC3();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent2Minus(Long value) {
+		setC4(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent2Minus() {
+		return getC4();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent3Plus(Long value) {
+		setC5(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent3Plus() {
+		return getC5();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent3Minus(Long value) {
+		setC6(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent3Minus() {
+		return getC6();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent4Plus(Long value) {
+		setC7(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent4Plus() {
+		return getC7();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent4Minus(Long value) {
+		setC8(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent4Minus() {
+		return getC8();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent5Plus(Long value) {
+		setC9(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent5Plus() {
+		return getC9();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent5Minus(Long value) {
+		setC10(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent5Minus() {
+		return getC10();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent6Plus(Long value) {
+		setC11(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent6Plus() {
+		return getC11();
+	}
+	
+	@Transient
+	public final void setSolarArrayCurrent6Minus(Long value) {
+		setC12(value);
+	}
+	
+	@Transient
+	public final Long getSolarArrayCurrent6Minus() {
+		return getC12();
+	}
+	
+	@Transient
+	public final void setSolarArrayTemperature6(Long value) {
+		setC13(value);
+	}
+	
+	@Transient
+	public Long getSolarArrayTemperature6() {
+		return getC13();
+	}
+	
+	@Transient
+	public final void setBattery0CurrentDirection(Boolean value) {
+		setC45(value);
+	}
+	
+	@Transient
+	public Boolean getBattery0CurrentDirection() {
+		return getC45();
+	}
+	
+	@Transient
+	public final void setBattery0Current(Long value) {
+		setC14(value);
+	}
+	
+	@Transient
+	public Long getBattery0Current() {
+		return getC14();
+	}
+	
+	@Transient
+	public final void setBattery0CellVolts(Long value) {
+		setC15(value);
+	}
+	
+	@Transient
+	public Long getBattery0CellVolts() {
+		return getC15();
+	}
+	
+	@Transient
+	public final void setBattery0Volts(Long value) {
+		setC16(value);
+	}
+	
+	@Transient
+	public Long getBattery0Volts() {
+		return getC16();
+	}
+	
+	@Transient
+	public final void setBattery0Temperature(Long value) {
+		setC17(value);
+	}
+	
+	@Transient
+	public Long getBattery0Temperature() {
+		return getC17();
+	}
+	
+	@Transient
+	public final void setBattery1CurrentDirection(Boolean value) {
+		setC46(value);
+	}
+	
+	@Transient
+	public Boolean getBattery1CurrentDirection() {
+		return getC46();
+	}
+	
+	@Transient
+	public final void setBattery1Current(Long value) {
+		setC18(value);
+	}
+	
+	@Transient
+	public Long getBattery1Current() {
+		return getC18();
+	}
+	
+	@Transient
+	public final void setBattery1CellVolts(Long value) {
+		setC19(value);
+	}
+	
+	@Transient
+	public Long getBattery1CellVolts() {
+		return getC19();
+	}
+	
+	@Transient
+	public final void setBattery1Volts(Long value) {
+		setC20(value);
+	}
+	
+	@Transient
+	public Long getBattery1Volts() {
+		return getC20();
+	}
+	
+	@Transient
+	public final void setBattery1Temperature(Long value) {
+		setC21(value);
+	}
+	
+	@Transient
+	public Long getBattery1Temperature() {
+		return getC21();
+	}
+	
+	
+	
+	/*
+	
+	Battery 0 Current
+	Battery 0 Cell Volts
+	Battery 0 Volts
+	Battery 0 Temperature
+	Battery 1 Current Direction
+	Battery 1 Current
+	Battery 1 Cell Volts
+	Battery 1 Volts
+	Battery 1 Temperature
+	Battery 2 Current Direction
+	Battery 2 Current
+	Battery 2 Cell Volts
+	Battery 2 Volts
+	Battery 2 Temperature
+	Battery Heater Forced On
+	Antenna Deployment Timeout 1
+	Antenna Status 0
+	Antenna Status 1
+	Antenna Status 2
+	Antenna Status 3
+	Antenna temperature 0
+	Receiver Doppler
+	Receiver RSSI
+	Temperature
+	Receive current
+	Transmit current 3.3V bus
+	Transmit current 5.0V bus
+	Reverse power
+	Forward power
+	Board temperature
+	Board current
+	Magnetometer 0
+	Magnetometer 1
+	Magnetometer 2
+	AmacTemperature
+	*/
+
 	
 
 }
