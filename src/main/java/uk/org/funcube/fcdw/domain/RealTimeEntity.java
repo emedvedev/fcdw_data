@@ -6,6 +6,9 @@
 
 package uk.org.funcube.fcdw.domain;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -1092,36 +1095,272 @@ public class RealTimeEntity {
 		return getC21();
 	}
 	
+	@Transient
+	public final void setBattery2CurrentDirection(Boolean value) {
+		setC47(value);
+	}
 	
+	@Transient
+	public Boolean getBattery2CurrentDirection() {
+		return getC47();
+	}
+	
+	@Transient
+	public final void setBattery2Current(Long value) {
+		setC22(value);
+	}
+	
+	@Transient
+	public Long getBattery2Current() {
+		return getC22();
+	}
+	
+	@Transient
+	public final void setBattery2CellVolts(Long value) {
+		setC23(value);
+	}
+	
+	@Transient
+	public Long getBattery2CellVolts() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setBattery2Volts(Long value) {
+		setC24(value);
+	}
+	
+	@Transient
+	public Long getBattery2Volts() {
+		return getC24();
+	}
+	
+	@Transient
+	public final void setBattery2Temperature(Long value) {
+		setC25(value);
+	}
+	
+	@Transient
+	public Long getBattery2Temperature() {
+		return getC25();
+	}
+	
+	@Transient
+	public final void setBatteryHeaterForcedOn(Boolean value) {
+		setC48(value);
+	}
+	
+	@Transient
+	public Boolean getBatteryHeaterForcedOn() {
+		return getC48();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaStatus0(Boolean value) {
+		setC49(value);
+	}
+	
+	@Transient
+	public Boolean getAntennaStatus0() {
+		return getC49();
+	}
+	
+	@Transient
+	public final void setAntennaStatus1(Boolean value) {
+		setC50(value);
+	}
+	
+	@Transient
+	public Boolean getAntennaStatus1() {
+		return getC50();
+	}
+	
+	@Transient
+	public final void setAntennaStatus2(Boolean value) {
+		setC51(value);
+	}
+	
+	@Transient
+	public Boolean getAntennaStatus2() {
+		return getC51();
+	}
+	
+	@Transient
+	public final void setAntennaStatus3(Boolean value) {
+		setC52(value);
+	}
+	
+	@Transient
+	public Boolean getAntennaStatus3() {
+		return getC52();
+	}
+	
+	@Transient
+	public final void setAntennaTemperature(Long value) {
+		setC24(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaTemperature() {
+		return getC24();
+	}
+	
+	@Transient
+	public final void setReceiverDoppler(Long value) {
+		setC25(value);
+	}
+	
+	@Transient 
+	public final Long getReceiverDoppler() {
+		return getC25();
+	}
+	
+	@Transient
+	public final void setReceiverRSSI(Long value) {
+		setC26(value);
+	}
+	
+	@Transient 
+	public final Long getReceiverRSSI() {
+		return getC26();
+	}
+	
+	@Transient
+	public final void setReceiverTemperature(Long value) {
+		setC27(value);
+	}
+	
+	@Transient 
+	public final Long getReceiverTemperature() {
+		return getC27();
+	}
+	
+	@Transient
+	public final void set(Long value) {
+		setC28(value);
+	}
+	
+	@Transient 
+	public final Long getReceiveCurrent() {
+		return getC28();
+	}
+	
+	@Transient
+	public final void setTransmitCurrent3v3Bus(Long value) {
+		setC29(value);
+	}
+	
+	@Transient 
+	public final Long getTransmitCurrent3v3Bus() {
+		return getC29();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
+	
+	@Transient
+	public final void setAntennaDeploymentTimeout(Long value) {
+		setC23(value);
+	}
+	
+	@Transient 
+	public final Long getAntennaDeploymentTimeout() {
+		return getC23();
+	}
 	
 	/*
 	
-	Battery 0 Current
-	Battery 0 Cell Volts
-	Battery 0 Volts
-	Battery 0 Temperature
-	Battery 1 Current Direction
-	Battery 1 Current
-	Battery 1 Cell Volts
-	Battery 1 Volts
-	Battery 1 Temperature
-	Battery 2 Current Direction
-	Battery 2 Current
-	Battery 2 Cell Volts
-	Battery 2 Volts
-	Battery 2 Temperature
-	Battery Heater Forced On
-	Antenna Deployment Timeout 1
-	Antenna Status 0
-	Antenna Status 1
-	Antenna Status 2
-	Antenna Status 3
-	Antenna temperature 0
-	Receiver Doppler
-	Receiver RSSI
-	Temperature
-	Receive current
-	Transmit current 3.3V bus
+	 0
+	
+	
+	
 	Transmit current 5.0V bus
 	Reverse power
 	Forward power
