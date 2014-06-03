@@ -370,4 +370,11 @@ public class RealTime {
 		return lastCommand;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean isEclipsed() {
+		return getSoftwareState().getC9();
+	}
+
 }

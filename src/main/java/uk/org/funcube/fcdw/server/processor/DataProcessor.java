@@ -50,10 +50,12 @@ import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
+import uk.org.funcube.fcdw.domain.UkubeRealTimeEntity;
 import uk.org.funcube.fcdw.domain.UserEntity;
 import uk.org.funcube.fcdw.domain.UserRankingEntity;
 import uk.org.funcube.fcdw.server.shared.RealTime;
 import uk.org.funcube.fcdw.server.shared.SatellitePosition;
+import uk.org.funcube.fcdw.server.shared.UkubeRealTime;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
 import uk.org.funcube.fcdw.server.util.UTCClock;
@@ -211,8 +213,19 @@ public class DataProcessor {
 				final String binaryString = convertHexBytePairToBinary(hexString
 						.substring(2, hexString.length()));
 				final Date now = clock.currentDate();
-				final RealTime realTime = new RealTime(satelliteId, frameType,
-						sensorId, now, binaryString);
+				
+				RealTime realTime;
+				
+				if (satelliteId != 1) {
+					realTime = new RealTime(satelliteId, frameType,
+							sensorId, now, binaryString);
+				} else {
+					realTime = new UkubeRealTime(satelliteId, frameType,
+							sensorId, now, binaryString);
+				}
+				
+				
+				
 				final long sequenceNumber = realTime.getSequenceNumber();
 
 				if (sequenceNumber != -1) {
@@ -298,7 +311,7 @@ public class DataProcessor {
 				SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
 				satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
 				satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
-				satelliteStatus.setEclipsed(realTime.getSoftwareState().getC9());
+				satelliteStatus.setEclipsed(realTime.isEclipsed());
 				satelliteStatus.setEclipseDepth(Double.parseDouble(satellitePosition.getEclipseDepth()));
 				
 				satelliteStatusDao.save(satelliteStatus);
@@ -308,8 +321,14 @@ public class DataProcessor {
 
 			users.add(user);
 
-			RealTimeEntity realTimeEntity = new RealTimeEntity(realTime,
+			RealTimeEntity realTimeEntity;
+			
+			if (realTime instanceof RealTime) {
+				realTimeEntity = new RealTimeEntity(realTime,
 					satelliteTime);
+			} else {
+				realTimeEntity = new UkubeRealTimeEntity((UkubeRealTime) realTime, satelliteTime);
+			}
 			
 			if (!outOfOrder) {
 				final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);
@@ -353,7 +372,7 @@ public class DataProcessor {
 
 			realTimeDao.save(realTimeEntity);
 
-			if (!outOfOrder) {
+			if (!outOfOrder && satelliteId != 1) {
 				checkMinMax(satelliteId, realTimeEntity);
 			}
 			

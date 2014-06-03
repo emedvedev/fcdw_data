@@ -53,7 +53,7 @@ public class ScheduleConfig {
 	public void highDefinitionTask() {
 		highDefinitionProcessor.process(0L);
 		highDefinitionProcessor.process(1L);
-		highDefinitionProcessor.process(2L);
+		//highDefinitionProcessor.process(2L);
 		highDefinitionProcessor.process(3L);
 	}
 	
@@ -66,7 +66,7 @@ public class ScheduleConfig {
 	public void wholeOrbitDataTask() {
 		wholeOrbitDataProcessor.process(0L);
 		wholeOrbitDataProcessor.process(1L);
-		wholeOrbitDataProcessor.process(2L);
+		//wholeOrbitDataProcessor.process(2L);
 		wholeOrbitDataProcessor.process(3L);
 	}
 	
