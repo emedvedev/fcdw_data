@@ -369,5 +369,9 @@ public class RealTime {
 	public long getLastCommand() {
 		return lastCommand;
 	}
+	
+	public Boolean isEclipsed() {
+		return softwareState.getC9();
+	}
 
 }

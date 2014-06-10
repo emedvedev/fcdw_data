@@ -53,6 +53,7 @@ import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
 import uk.org.funcube.fcdw.domain.UserEntity;
 import uk.org.funcube.fcdw.domain.UserRankingEntity;
 import uk.org.funcube.fcdw.server.shared.RealTime;
+import uk.org.funcube.fcdw.server.shared.RealTimeFC2;
 import uk.org.funcube.fcdw.server.shared.SatellitePosition;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
@@ -211,8 +212,17 @@ public class DataProcessor {
 				final String binaryString = convertHexBytePairToBinary(hexString
 						.substring(2, hexString.length()));
 				final Date now = clock.currentDate();
-				final RealTime realTime = new RealTime(satelliteId, frameType,
-						sensorId, now, binaryString);
+
+				RealTime realTime;
+				
+				if (satelliteId == 1) {
+					realTime = new RealTimeFC2(satelliteId, frameType,
+							sensorId, now, binaryString);
+				} else {
+					realTime = new RealTime(satelliteId, frameType,
+							sensorId, now, binaryString);
+				}
+				
 				final long sequenceNumber = realTime.getSequenceNumber();
 
 				if (sequenceNumber != -1) {
@@ -221,7 +231,7 @@ public class DataProcessor {
 							.getMaxSequenceNumber(satelliteId);
 
 					if (maxSequenceNumber != null
-							&& Math.abs(sequenceNumber - maxSequenceNumber) > TWO_DAYS_SEQ_COUNT) {
+							&& (maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
 						LOG.error(String
 								.format("User %s loading sequence number %d is out of bounds for satelliteId %d",
 										user.getSiteId(), sequenceNumber, satelliteId));
@@ -298,7 +308,7 @@ public class DataProcessor {
 				SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
 				satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
 				satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
-				satelliteStatus.setEclipsed(realTime.getSoftwareState().getC9());
+				satelliteStatus.setEclipsed(realTime.isEclipsed());
 				satelliteStatus.setEclipseDepth(Double.parseDouble(satellitePosition.getEclipseDepth()));
 				
 				satelliteStatusDao.save(satelliteStatus);
@@ -308,8 +318,13 @@ public class DataProcessor {
 
 			users.add(user);
 
-			RealTimeEntity realTimeEntity = new RealTimeEntity(realTime,
-					satelliteTime);
+			RealTimeEntity realTimeEntity;
+			
+			if (realTime instanceof RealTimeFC2) {
+				realTimeEntity = new RealTimeEntity((RealTimeFC2) realTime, satelliteTime);
+			} else {
+				realTimeEntity = new RealTimeEntity(realTime, satelliteTime);
+			}
 			
 			if (!outOfOrder) {
 				final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);

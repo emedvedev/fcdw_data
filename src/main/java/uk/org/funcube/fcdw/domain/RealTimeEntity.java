@@ -21,6 +21,7 @@ import uk.org.funcube.fcdw.server.shared.DTMF;
 import uk.org.funcube.fcdw.server.shared.EPS;
 import uk.org.funcube.fcdw.server.shared.RF;
 import uk.org.funcube.fcdw.server.shared.RealTime;
+import uk.org.funcube.fcdw.server.shared.RealTimeFC2;
 import uk.org.funcube.fcdw.server.shared.SoftwareState;
 
 
@@ -112,6 +113,13 @@ public class RealTimeEntity {
 	private Boolean c69;
 	private Boolean c70;
 	private Boolean c71;
+	private Long c72;
+	private Long c73;
+	private Long c74;
+	private Long c75;
+	private Long c76;
+	private Long c77;
+	private Long c78;
 	
 	@Transient
 	public final Long[] getLongValues() {
@@ -213,6 +221,79 @@ public class RealTimeEntity {
 		DTMF dtmf = realTime.getDTMF();
 		commandCount = dtmf.getCommandCount();
 		lastCommand = dtmf.getLastCommand();
+	}
+	
+	public RealTimeEntity(RealTimeFC2 realTime, Timestamp satelliteTime) {
+		this.satelliteTime = satelliteTime;
+		satelliteId = realTime.getSatelliteId();
+		sequenceNumber = realTime.getSequenceNumber();
+		frameType = realTime.getFrameType();
+		sensorId = realTime.getSensorId();
+		createdDate = realTime.getCreatedDate();
+		
+		c44 = realTime.isEclipsed();
+		c1 = realTime.getSolarArrayCurrent1Plus();
+		c2 = realTime.getSolarArrayCurrent1Minus();
+		c3 = realTime.getSolarArrayCurrent2Plus();
+		c4 = realTime.getSolarArrayCurrent2Minus();
+		c5 = realTime.getSolarArrayCurrent3Plus();
+		c6 = realTime.getSolarArrayCurrent3Minus();
+		c7 = realTime.getSolarArrayCurrent4Plus();
+		c8 = realTime.getSolarArrayCurrent4Minus();
+		c9 = realTime.getSolarArrayCurrent5Plus();
+		c10 = realTime.getSolarArrayCurrent5Minus();
+		c11 = realTime.getSolarArrayCurrent6Plus();
+		c12 = realTime.getSolarArrayCurrent6Minus();
+		c13 = realTime.getSolarArrayTemperature();
+		c45 = realTime.getBattery0CurrentDirection();
+		c14 = realTime.getBattery0Current();
+		c15 = realTime.getBattery0Volts();
+		c16 = realTime.getBattery0Temperature();
+		c46 = realTime.getBattery1CurrentDirection();
+		c17 = realTime.getBattery1Current();
+		c18 = realTime.getBattery1Volts();
+		c19 = realTime.getBattery1Temperature();
+		c47 = realTime.getBattery2CurrentDirection();
+		c20 = realTime.getBattery2Current();
+		c21 = realTime.getBattery2Volts();
+		c22 = realTime.getBattery2Temperature();
+		c48 = realTime.getBatteryHeaterForcedOn(); 
+		c23 = realTime.getAntennaDeploymentTimeout(); 
+		c24 = realTime.getAntennaStatus0();
+		c25 = realTime.getAntennaStatus1();
+		c26 = realTime.getAntennaStatus2();
+		c27 = realTime.getAntennaStatus3();
+		c28 = realTime.getAntennaTemperature(); 
+		c29 = realTime.getReceiverDoppler(); 
+		c30 = realTime.getReceiverRSSI(); 
+		c31 = realTime.getReceiverTemperature(); 
+		c32 = realTime.getReceiverCurrent(); 
+		c33 = realTime.getTransmitCurrent3v3(); 
+		c34 = realTime.getTransmitCurrent5v0(); 
+		c35 = realTime.getReversePower(); 
+		c36 = realTime.getForwardPower(); 
+		c37 = realTime.getPaBoardTemperature(); ;
+		c38 = realTime.getPaBoardCurrent(); 
+		
+		c39 = realTime.getAmacMode();
+		c40 = realTime.getMagnetometer0();
+		c41 = realTime.getMagnetometer1();
+		c42 = realTime.getMagnetometer2();
+        
+		c43 = realTime.getModeManagerMode();
+		c49 = realTime.getModeManagerCommsNominal();
+        c72 = realTime.getModeManagerCommsState();
+
+        c50 = realTime.getTmtcManagerIdleEnable();
+        c51 = realTime.getTmtcEventForwarding();
+        c73 = realTime.getTcBufferReceiveEnable();
+        c74 = realTime.getTmBufferSendEnable();
+        c75 = realTime.getObcSoftResetCount();
+        c76 = realTime.getEpsHardResetCount();
+        
+        c77 = realTime.getDtmfCommandCount();
+        c78 = realTime.getDtmfLastCommand();
+        c52 = realTime.getDtmfCommandSuccess();
 	}
 
 	public final Long getId() {
@@ -845,6 +926,62 @@ public class RealTimeEntity {
 
 	public final void setC71(Boolean c71) {
 		this.c71 = c71;
+	}
+
+	public final Long getC73() {
+		return c73;
+	}
+
+	public final void setC73(Long c73) {
+		this.c73 = c73;
+	}
+
+	public final Long getC74() {
+		return c74;
+	}
+
+	public final void setC74(Long c74) {
+		this.c74 = c74;
+	}
+
+	public final Long getC75() {
+		return c75;
+	}
+
+	public final void setC75(Long c75) {
+		this.c75 = c75;
+	}
+
+	public final Long getC76() {
+		return c76;
+	}
+
+	public final void setC76(Long c76) {
+		this.c76 = c76;
+	}
+
+	public final Long getC77() {
+		return c77;
+	}
+
+	public final void setC77(Long c77) {
+		this.c77 = c77;
+	}
+
+	public final Long getC78() {
+		return c78;
+	}
+
+	public final void setC78(Long c78) {
+		this.c78 = c78;
+	}
+
+	public final Long getC72() {
+		return c72;
+	}
+
+	public final void setC72(Long c72) {
+		this.c72 = c72;
 	}
 
 	public final Timestamp getSatelliteTime() {
