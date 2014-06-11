@@ -60,6 +60,16 @@ public class RealTime {
 				binaryString);
 	}
 
+	public RealTime(EPS eps, RF rf, Antenna antenna, long sequenceNumber,
+			SoftwareState softwareState, Date date) {
+				this.eps = eps;
+				this.rf = rf;
+				this.antenna = antenna;
+				this.sequenceNumber = sequenceNumber;
+				this.softwareState = softwareState;
+				createdDate = date;
+	}
+
 	public final Date getCreatedDate() {
 		return createdDate;
 	}

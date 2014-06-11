@@ -1,6 +1,7 @@
 package uk.org.funcube.fcdw.domain;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,6 +11,8 @@ import javax.persistence.Transient;
 @Entity
 @Table(name="SatelliteStatus")
 public class SatelliteStatusEntity implements SatelliteStatus {
+	
+	static final SimpleDateFormat SDTF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
 	
 	@Id
 	private Long satelliteId;
@@ -93,17 +96,22 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 	public String getMode() {
 		if (!isEclipseSwitch()) {
 			if (!isEclipseModeForced()) {
-				return "Forced Edu.";
+				return "Forced Education";
 			} else {
-				return "Forced Amateur";
+				return "Forced Transponder";
 			}
 		} else {
 			if (!isEclipsed()) {
-				return "Amatuer";
+				return "Transponder";
 			} else {
-				return "Edu.";
+				return "Education";
 			}
 		}
+	}
+	
+	@Transient
+	public String getSatelliteStatusLastUpdated() {
+		return SDTF.format(lastUpdated);
 	}
 
 }
