@@ -384,9 +384,6 @@ public class DataProcessor {
 			
 			for (UserEntity existingUser : users) {
 				if (existingUser.getId().longValue() == user.getId().longValue()) {
-					LOG.error("User " + user.getSiteId() 
-							+ " attempting duplicate score for sat/seq/frame " 
-							+ satelliteId + "/" + sequenceNumber + "/" + frameType);
 					userFrameAlreadRegistered = true;
 					break;
 				}
