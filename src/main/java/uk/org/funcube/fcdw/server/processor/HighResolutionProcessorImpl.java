@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.HighResolutionDao;
-import uk.org.funcube.fcdw.domain.ClydeSpaceHPEntity;
 import uk.org.funcube.fcdw.domain.EpochEntity;
+import uk.org.funcube.fcdw.domain.FC2HPEntity;
 import uk.org.funcube.fcdw.domain.GomSpaceHPEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.HighResolutionEntity;
@@ -134,7 +134,7 @@ public class HighResolutionProcessorImpl extends AbstractProcessor implements Hi
 				hrEntity = new GomSpaceHPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
 				break;
 			case 1:
-				hrEntity = new ClydeSpaceHPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
+				hrEntity = new FC2HPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);
 				break;
 			case 2:
 				hrEntity = new GomSpaceHPEntity(satelliteId, seqNo, binaryString.substring(i * 80, i * 80 + 80), receivedDate);

@@ -62,6 +62,11 @@ public class WholeOrbitDataEntity {
 	private long c24;
 	private long c25;
 	private long c26;
+	private Boolean c27;
+	private Boolean c28;
+	private Boolean c29;
+	private Boolean c30;
+	
 
 	public WholeOrbitDataEntity() {
 	}
@@ -320,5 +325,37 @@ public class WholeOrbitDataEntity {
 
 	public final void setSatelliteTime(Timestamp satelliteTime) {
 		this.satelliteTime = satelliteTime;
+	}
+
+	public final Boolean getC27() {
+		return c27;
+	}
+
+	public final void setC27(Boolean c27) {
+		this.c27 = c27;
+	}
+
+	public final Boolean getC28() {
+		return c28;
+	}
+
+	public final void setC28(Boolean c28) {
+		this.c28 = c28;
+	}
+
+	public final Boolean getC29() {
+		return c29;
+	}
+
+	public final void setC29(Boolean c29) {
+		this.c29 = c29;
+	}
+
+	public final Boolean getC30() {
+		return c30;
+	}
+
+	public final void setC30(Boolean c30) {
+		this.c30 = c30;
 	}
 }

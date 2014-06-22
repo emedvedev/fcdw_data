@@ -19,12 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.org.funcube.fcdw.dao.EpochDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.WholeOrbitDataDao;
-import uk.org.funcube.fcdw.domain.ClydeSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.EpochEntity;
+import uk.org.funcube.fcdw.domain.FC2WODEntity;
 import uk.org.funcube.fcdw.domain.GomSpaceWODEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
@@ -174,7 +173,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 						frameTime);
 				break;
 			case 1:
-				wod = new ClydeSpaceWODEntity(
+				wod = new FC2WODEntity(
 						satelliteId,
 						seqNo,
 						frameNumber,
