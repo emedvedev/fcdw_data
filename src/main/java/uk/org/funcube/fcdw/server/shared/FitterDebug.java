@@ -1,10 +1,11 @@
+package uk.org.funcube.fcdw.server.shared;
 // FUNcube Data Warehouse
 // Copyright 2013 (c) David A.Johnson, G4DPZ, AMSAT-UK
 // This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 // To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter
 // to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-package uk.org.funcube.fcdw.server.shared;
+
 
 public class FitterDebug {
 
@@ -86,7 +87,7 @@ public class FitterDebug {
 	private final String safeModeForce;
 	private final String debugMode1;
 	private final String delayBoot;
-	private final String ukubeEnabled;
+	private String cycleFitterMessages;
 
 	private int position = 0;
 
@@ -142,24 +143,26 @@ public class FitterDebug {
 		safeCurrentModeDuration = get16bitsAsUInt();
 		safeCksum = get8bitsAsUInt(0xff);
 
-		antsARM = get1Bit(); // System armed
-		antsA4B = get1Bit(); // Deployment active (burning)
-		antsA4T = get1Bit(); // Timed out last deployment
-		antsA4S = get1Bit(); // Switch bit (1==closed, 0==deployed)
-		// skip 1 bit
-		get1Bit();
-		antsA3B = get1Bit(); // Deployment active (burning)
-		antsA3T = get1Bit(); // Timed out last deployment
 		antsA3S = get1Bit(); // Switch bit (1==closed, 0==deployed)
-		antsIGN = get1Bit(); // Ignore switches when activating (1==true)
-		antsA2B = get1Bit(); // Deployment active (burning)
-		antsA2T = get1Bit(); // Timed out last deployment
-		antsA2S = get1Bit(); // Switch bit (1==closed, 0==deployed)
+		antsA3T = get1Bit(); // Timed out last deployment
+		antsA3B = get1Bit(); // Deployment active (burning)
 		// skip 1 bit
 		get1Bit();
-		antsA1B = get1Bit(); // Deployment active (burning)
-		antsA1T = get1Bit(); // Timed out last deployment
+		
+		antsA4S = get1Bit(); // Switch bit (1==closed, 0==deployed)
+		antsA4T = get1Bit(); // Timed out last deployment
+		antsA4B = get1Bit(); // Deployment active (burning)
+		antsARM = get1Bit(); // System armed
+		
 		antsA1S = get1Bit();
+		antsA1T = get1Bit(); // Timed out last deployment
+		antsA1B = get1Bit(); // Deployment active (burning)
+		// skip 1 bit
+		get1Bit();		
+		antsA2S = get1Bit(); // Switch bit (1==closed, 0==deployed)
+		antsA2T = get1Bit(); // Timed out last deployment
+		antsA2B = get1Bit(); // Deployment active (burning)
+		antsIGN = get1Bit(); // Ignore switches when activating (1==true)
 
 		burnSideA0 = get16bitsAsUInt();
 		burnSideA1 = get16bitsAsUInt();
@@ -171,17 +174,24 @@ public class FitterDebug {
 		burnSideB3 = get16bitsAsUInt();
 		burnCksum = get8bitsAsUInt(0xff);
 
-		bootLoadFitterMsgs = get8bitsAsUInt(0x01);
-		errorDevice = get8bitsAsUInt(0x01);
-		antsPowerCycle = get8bitsAsUInt(0x01);
-		enableFitterUpload = get8bitsAsUInt(0x01);
-		eclipseSwitch = get8bitsAsUInt(0x01);
-		eclipseForce = get8bitsAsUInt(0x01);
-		safeModeDetect = get8bitsAsUInt(0x01);
-		safeModeForce = get8bitsAsUInt(0x01);
-		debugMode1 = get8bitsAsUInt(0x01);
-		delayBoot = get8bitsAsUInt(0x01);
-		ukubeEnabled = get8bitsAsUInt(0x01);
+		safeModeForce = get1Bit();
+		safeModeDetect = get1Bit();
+		eclipseForce = get1Bit();
+		eclipseSwitch = get1Bit();
+		enableFitterUpload = get1Bit();
+		antsPowerCycle = get1Bit();
+		errorDevice = get1Bit();
+		bootLoadFitterMsgs = get1Bit();
+		
+		get1Bit();
+		get1Bit();
+		get1Bit();
+		get1Bit();
+		get1Bit();
+		
+		delayBoot = get1Bit();
+		cycleFitterMessages = get1Bit();
+		debugMode1 = get1Bit();
 	}
 
 	public final String getDtmfRejectedToneCount() {
@@ -472,8 +482,8 @@ public class FitterDebug {
 		return delayBoot;
 	}
 
-	public final String getUkubeEnabled() {
-		return ukubeEnabled;
+	public final String getCycleFitterMessages() {
+		return cycleFitterMessages;
 	}
 
 	private String get1Bit() {
