@@ -11,6 +11,7 @@ import java.util.Date;
 import org.jboss.logging.Logger;
 
 import sun.util.LocaleServiceProviderPool.LocalizedObjectGetter;
+import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.server.processor.DataProcessor;
 
 /**
@@ -97,6 +98,73 @@ public class RealTimeFC2 extends RealTime {
 		setSensorId(sensorId);
 		setCreatedDate(now);
 		parseBinary(binaryString);
+	}
+
+	/**
+	 * @param realTimeEntity
+	 */
+	public RealTimeFC2(RealTimeEntity realTimeEntity) {
+
+		setEclipsed(realTimeEntity.getC44());
+		setSolarArrayCurrent1Plus(realTimeEntity.getC1());
+		setSolarArrayCurrent1Minus(realTimeEntity.getC2());
+		setSolarArrayCurrent2Plus(realTimeEntity.getC3());
+		setSolarArrayCurrent2Minus(realTimeEntity.getC4());
+		setSolarArrayCurrent3Plus(realTimeEntity.getC5());
+		setSolarArrayCurrent3Minus(realTimeEntity.getC6());
+		setSolarArrayCurrent4Plus(realTimeEntity.getC7());
+		setSolarArrayCurrent4Minus(realTimeEntity.getC8());
+		setSolarArrayCurrent5Plus(realTimeEntity.getC9());
+		setSolarArrayCurrent5Minus(realTimeEntity.getC10());
+		setSolarArrayCurrent6Plus(realTimeEntity.getC11());
+		setSolarArrayCurrent6Minus(realTimeEntity.getC12());
+		setSolarArrayTemperature(realTimeEntity.getC13()); 
+		setBattery0CurrentDirection(realTimeEntity.getC45()); 
+		setBattery0Current(realTimeEntity.getC14()); 
+		setBattery0Volts(realTimeEntity.getC15()); 
+		setBattery0Temperature(realTimeEntity.getC16()); 
+		setBattery1CurrentDirection(realTimeEntity.getC46()); 
+		setBattery1Current(realTimeEntity.getC17()); 
+		setBattery1Volts(realTimeEntity.getC18()); 
+		setBattery1Temperature(realTimeEntity.getC19()); ; 
+		setBattery2CurrentDirection(realTimeEntity.getC47()); 
+		setBattery2Current(realTimeEntity.getC20()); 
+		setBattery2Volts(realTimeEntity.getC21()); 
+		setBattery2Temperature(realTimeEntity.getC22()); 
+		setBatteryHeaterForcedOn(realTimeEntity.getC48()); 
+		setAntennaDeploymentTimeout(realTimeEntity.getC23()); 
+		setAntennaStatus0(realTimeEntity.getC24());
+		setAntennaStatus1(realTimeEntity.getC25());
+		setAntennaStatus2(realTimeEntity.getC26());
+		setAntennaStatus3(realTimeEntity.getC27());
+		setAntennaTemperature(realTimeEntity.getC28()); 
+		setReceiverDoppler(realTimeEntity.getC29()); 
+		setReceiverRSSI(realTimeEntity.getC30()); 
+		setReceiverTemperature(realTimeEntity.getC31()); 
+		setReceiverCurrent(realTimeEntity.getC32()); 
+		setTransmitCurrent3v3(realTimeEntity.getC33()); 
+		setTransmitCurrent5v0(realTimeEntity.getC34()); 
+		setReversePower(realTimeEntity.getC35()); 
+		setForwardPower(realTimeEntity.getC36()); 
+		setPaBoardTemperature(realTimeEntity.getC37()); ;
+		setPaBoardCurrent(realTimeEntity.getC38()); 
+        setAmacMode(realTimeEntity.getC39());
+        setMagnetometer0(realTimeEntity.getC40());
+        setMagnetometer1(realTimeEntity.getC41());
+        setMagnetometer2(realTimeEntity.getC42());
+        setModeManagerMode(realTimeEntity.getC43());
+        setModeManagerCommsNominal(realTimeEntity.getC49());
+        setModeManagerCommsState(realTimeEntity.getC72());
+        setTmtcManagerIdleEnable(realTimeEntity.getC50());
+        setTmtcEventForwarding(realTimeEntity.getC51());
+        setTcBufferReceiveEnable(realTimeEntity.getC73());
+        setTmBufferSendEnable(realTimeEntity.getC74());
+        setObcSoftResetCount(realTimeEntity.getC75());
+        setEpsHardResetCount(realTimeEntity.getC76());
+        setSequenceNumber(realTimeEntity.getSequenceNumber());
+		setDtmfCommandCount(realTimeEntity.getC77());
+		setDtmfLastCommand(realTimeEntity.getC78());
+		setDtmfCommandSuccess(realTimeEntity.getC52());
 	}
 
 	private void parseBinary(String binaryString) {
@@ -728,5 +796,50 @@ public class RealTimeFC2 extends RealTime {
 
 	public final void setEpsHardResetCount(Long epsHardResetCount) {
 		this.epsHardResetCount = epsHardResetCount;
+	}
+	
+	/*
+	 * 	Current -3.200E+00	2.926E+03
+		Volts -9.470E-03	9.799E+00
+		Temp -1.630E-01	4.753E+00
+	 */
+
+	public String getBattery0CurrentString() {
+		double sign = getBattery0CurrentDirection() ? 1.0 : -1.0;
+		return String.format("%4.0f", ((battery0Current * -3.200E+00) + 2.926E+03) * sign);
+	}
+
+	public String getBattery0VoltsString() {
+		return String.format("%4.1f", (battery0Volts * -9.470E-03) + 9.799E+00);
+	}
+
+	public String getBattery0TemperatureString() {
+		return String.format("%5.1f", (battery0Temperature * -1.630E-01) + 4.753E+00);
+	}
+
+	public String getBattery1CurrentString() {
+		double sign = getBattery1CurrentDirection() ? 1.0 : -1.0;
+		return String.format("%4.0f", ((battery1Current * -3.200E+00) + 2.926E+03) * sign);
+	}
+
+	public String getBattery1VoltsString() {
+		return String.format("%4.1f", (battery1Volts * -9.470E-03) + 9.799E+00);
+	}
+
+	public String getBattery1TemperatureString() {
+		return String.format("%5.1f", (battery1Temperature * -1.630E-01) + 4.753E+00);
+	}
+
+	public String getBattery2CurrentString() {
+		double sign = getBattery2CurrentDirection() ? 1.0 : -1.0;
+		return String.format("%4.0f", ((battery2Current * -3.200E+00) + 2.926E+03) * sign);
+	}
+
+	public String getBattery2VoltsString() {
+		return String.format("%4.1f", (battery2Volts * -9.470E-03) + 9.799E+00);
+	}
+
+	public String getBattery2TemperatureString() {
+		return String.format("%5.1f", (battery2Temperature * -1.630E-01) + 4.753E+00);
 	}
 }
