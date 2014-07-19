@@ -27,7 +27,9 @@ import uk.org.funcube.fcdw.dao.RealTimeDao;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
 import uk.org.funcube.fcdw.server.shared.FC2EpsSummary;
 import uk.org.funcube.fcdw.server.shared.FC2RealTimeSummary;
+import uk.org.funcube.fcdw.server.shared.PaSummary;
 import uk.org.funcube.fcdw.server.shared.RealTimeFC2;
+import uk.org.funcube.fcdw.server.shared.RfSummary;
 
 
 @Controller
@@ -84,7 +86,18 @@ public class FC2RealTimeServiceRestImpl extends AbstractServiceRestImpl implemen
     					realTimeFC2.getBattery2CurrentString(), 
     					realTimeFC2.getBattery2VoltsString(),
     					realTimeFC2.getBattery2TemperatureString()
-    		    )));
+    		    ),
+    		    new PaSummary(
+    		    		realTimeFC2.getForwardPowerString(), 
+    		    		realTimeFC2.getReversePowerString(), 
+    		    		realTimeFC2.getPaDeviceTemperatureString(), 
+    		    		realTimeFC2.getPaBusCurrentString()
+    		    ),
+    		    new RfSummary(
+    		    		realTimeFC2.getReceiverTemperatureString(), 
+    		    		realTimeFC2.getReceiverCurrentString(), 
+    		    		realTimeFC2.getTransmitCurrent3v3String(), 
+    		    		realTimeFC2.getTransmitCurrent5v0String())));
 	    try {
 			return objectMapper.writeValueAsString(new JSONPObject(callback, map));
 		} catch (JsonGenerationException e) {

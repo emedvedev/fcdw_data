@@ -144,8 +144,8 @@ public class RealTimeFC2 extends RealTime {
 		setReceiverCurrent(realTimeEntity.getC32()); 
 		setTransmitCurrent3v3(realTimeEntity.getC33()); 
 		setTransmitCurrent5v0(realTimeEntity.getC34()); 
-		setReversePower(realTimeEntity.getC35()); 
-		setForwardPower(realTimeEntity.getC36()); 
+		setForwardPower(realTimeEntity.getC35()); 
+		setReversePower(realTimeEntity.getC36()); 
 		setPaBoardTemperature(realTimeEntity.getC37()); ;
 		setPaBoardCurrent(realTimeEntity.getC38()); 
         setAmacMode(realTimeEntity.getC39());
@@ -841,5 +841,37 @@ public class RealTimeFC2 extends RealTime {
 
 	public String getBattery2TemperatureString() {
 		return String.format("%5.1f", (battery2Temperature * -1.630E-01) + 4.753E+00);
+	}
+
+	public String getForwardPowerString() {
+		return String.format("%5.1f", (forwardPower * 2.063E+00) + 5.000E-03);
+	}
+
+	public String getReversePowerString() {
+		return String.format("%5.1f", (reversePower * 2.063E+00) + 5.000E-03);
+	}
+
+	public String getPaDeviceTemperatureString() {
+		return String.format("%5.1f", (paBoardTemperature * -8.570E-01) + 1.937E+02);
+	}
+
+	public String getPaBusCurrentString() {
+		return String.format("%5.1f", (paBoardCurrent * 5.496E-01) + 2.544E+00);
+	}
+
+	public String getReceiverTemperatureString() {
+		return String.format("%5.1f", (receiverTemperature * -0.857) + 193.672);
+	}
+
+	public String getReceiverCurrentString() {
+		return String.format("%4d", receiverCurrent);
+	}
+
+	public String getTransmitCurrent3v3String() {
+		return String.format("%4d", transmitCurrent3v3);
+	}
+
+	public String getTransmitCurrent5v0String() {
+		return String.format("%4d", transmitCurrent5v0);
 	}
 }

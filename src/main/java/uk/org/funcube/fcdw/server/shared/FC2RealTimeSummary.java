@@ -9,14 +9,26 @@ package uk.org.funcube.fcdw.server.shared;
 public class FC2RealTimeSummary {
 	
 	private FC2EpsSummary epsSummary;
+	private PaSummary paSummary;
+	private RfSummary rfSummary;
 
-	public FC2RealTimeSummary(FC2EpsSummary epsSummary) {
+	public FC2RealTimeSummary(FC2EpsSummary epsSummary, PaSummary paSummary, RfSummary rfSummary) {
 		super();
 		this.epsSummary = epsSummary;
+		this.paSummary = paSummary;
+		this.rfSummary = rfSummary;
 	}
 
 	public final FC2EpsSummary getEpsSummary() {
 		return epsSummary;
+	}
+
+	public final PaSummary getPaSummary() {
+		return paSummary;
+	}
+
+	public final RfSummary getRfSummary() {
+		return rfSummary;
 	}
 }
 	
