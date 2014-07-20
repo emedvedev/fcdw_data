@@ -8,6 +8,8 @@ package uk.org.funcube.fcdw.server.shared;
 
 import java.util.Date;
 
+import javax.sound.midi.Sequence;
+
 import org.jboss.logging.Logger;
 
 import sun.util.LocaleServiceProviderPool.LocalizedObjectGetter;
@@ -105,6 +107,7 @@ public class RealTimeFC2 extends RealTime {
 	 */
 	public RealTimeFC2(RealTimeEntity realTimeEntity) {
 
+		setSequenceNumber(realTimeEntity.getSequenceNumber());
 		setEclipsed(realTimeEntity.getC44());
 		setSolarArrayCurrent1Plus(realTimeEntity.getC1());
 		setSolarArrayCurrent1Minus(realTimeEntity.getC2());
@@ -873,5 +876,19 @@ public class RealTimeFC2 extends RealTime {
 
 	public String getTransmitCurrent5v0String() {
 		return String.format("%4d", transmitCurrent5v0);
+	}
+
+	/**
+	 * @return
+	 */
+	public String getSequenceNumberString() {
+		return Long.toString(getSequenceNumber());
+	}
+
+	/**
+	 * @return
+	 */
+	public String isEclipsedString() {
+		return (eclipsed) ? "true" : "false" ;
 	}
 }
