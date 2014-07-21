@@ -67,7 +67,8 @@ public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements 
 		
 		Long maxSequenceNumber = realTimeDao.findMaxSequenceNumber(2L);
 		Long maxFrameType = realTimeDao.findMaxFrameType(2L, maxSequenceNumber);
-		List<RealTimeEntity> entities = realTimeDao.findBySequenceNumberAndFrameType(maxSequenceNumber, maxFrameType);
+		List<RealTimeEntity> entities 
+			= realTimeDao.findBySatelliteIdAndSequenceNumberAndFrameType(2L, maxSequenceNumber, maxFrameType);
 		
 		if (entities.isEmpty()) {
 			return callback + "([error:" + "No data found" + "]);";
@@ -106,7 +107,8 @@ public class RealTimeServiceRestImpl extends AbstractServiceRestImpl implements 
 		
 		Long maxSequenceNumber = realTimeDao.findMaxSequenceNumber(satelliteId);
 		Long maxFrameType = realTimeDao.findMaxFrameType(satelliteId, maxSequenceNumber);
-		List<RealTimeEntity> entities = realTimeDao.findBySequenceNumberAndFrameType(maxSequenceNumber, maxFrameType);
+		List<RealTimeEntity> entities 
+			= realTimeDao.findBySatelliteIdAndSequenceNumberAndFrameType(satelliteId, maxSequenceNumber, maxFrameType);
 		
 		if (entities.isEmpty()) {
 			return callback + "([error:" + "No data found" + "]);";

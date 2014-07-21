@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.org.funcube.fcdw.dao.RealTimeDao;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
+import uk.org.funcube.fcdw.server.shared.FC2AntsSummary;
 import uk.org.funcube.fcdw.server.shared.FC2EpsSummary;
 import uk.org.funcube.fcdw.server.shared.FC2RealTimeSummary;
 import uk.org.funcube.fcdw.server.shared.FC2SoftwareSummary;
@@ -65,7 +66,8 @@ public class FC2RealTimeServiceRestImpl extends AbstractServiceRestImpl implemen
 		
 		Long maxSequenceNumber = realTimeDao.findMaxSequenceNumber(satelliteId);
 		Long maxFrameType = realTimeDao.findMaxFrameType(satelliteId, maxSequenceNumber);
-		List<RealTimeEntity> entities = realTimeDao.findBySequenceNumberAndFrameType(maxSequenceNumber, maxFrameType);
+		List<RealTimeEntity> entities 
+			= realTimeDao.findBySatelliteIdAndSequenceNumberAndFrameType(satelliteId, maxSequenceNumber, maxFrameType);
 		
 		if (entities.isEmpty()) {
 			return callback + "([error:" + "No data found" + "]);";
@@ -100,9 +102,18 @@ public class FC2RealTimeServiceRestImpl extends AbstractServiceRestImpl implemen
     		    		realTimeFC2.getTransmitCurrent3v3String(), 
     		    		realTimeFC2.getTransmitCurrent5v0String()
     		    ),
+    		    new FC2AntsSummary(
+    		    		realTimeFC2.getAntennaTemperatureString(), 
+    		    		realTimeFC2.getAntennaStatus0String(), 
+    		    		realTimeFC2.getAntennaStatus1String(), 
+    		    		realTimeFC2.getAntennaStatus2String(), 
+    		    		realTimeFC2.getAntennaStatus3String()
+    		    ),
     		    new FC2SoftwareSummary(
     		    		realTimeFC2.getSequenceNumberString(),
-    		    		realTimeFC2.isEclipsedString()
+    		    		realTimeFC2.isEclipsedString(),
+    		    		realTimeFC2.getObcSoftResetCountString(),
+    		    		realTimeFC2.getEpsHardResetCountString()
     		    )
     	));
 	    try {

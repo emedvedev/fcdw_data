@@ -31,8 +31,8 @@ public interface RealTimeDao extends CrudRepository<RealTimeEntity, Long> {
 	Long findMaxFrameType(Long satelliteId, Long sequenceNumber);
 
 	@Query
-	List<RealTimeEntity> findBySequenceNumberAndFrameType(
-			Long maxSequenceNumber, Long maxFrameType);
+	List<RealTimeEntity> findBySatelliteIdAndSequenceNumberAndFrameType(
+			Long satelliteId, Long maxSequenceNumber, Long maxFrameType);
 
 	@Query("select max(satelliteTime) from RealTimeEntity where satelliteId = ?1")
 	Timestamp getLatestSatelliteTime(long satelliteId);

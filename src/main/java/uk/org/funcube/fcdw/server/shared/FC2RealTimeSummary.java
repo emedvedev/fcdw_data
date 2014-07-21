@@ -12,13 +12,15 @@ public class FC2RealTimeSummary {
 	private PaSummary paSummary;
 	private RfSummary rfSummary;
 	private FC2SoftwareSummary softwareSummary;
+	private FC2AntsSummary fc2AntsSummary;
 
 	public FC2RealTimeSummary(FC2EpsSummary epsSummary, PaSummary paSummary, 
-			RfSummary rfSummary, FC2SoftwareSummary softwareSummary) {
+			RfSummary rfSummary, FC2AntsSummary fc2AntsSummary, FC2SoftwareSummary softwareSummary) {
 		super();
 		this.epsSummary = epsSummary;
 		this.paSummary = paSummary;
 		this.rfSummary = rfSummary;
+		this.fc2AntsSummary = fc2AntsSummary;
 		this.softwareSummary = softwareSummary;
 	}
 
@@ -36,6 +38,10 @@ public class FC2RealTimeSummary {
 
 	public final FC2SoftwareSummary getSoftwareSummary() {
 		return softwareSummary;
+	}
+
+	public final FC2AntsSummary getAntsSummary() {
+		return fc2AntsSummary;
 	}
 }
 	

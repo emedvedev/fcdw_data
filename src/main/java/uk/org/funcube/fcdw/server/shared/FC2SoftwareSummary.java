@@ -13,11 +13,15 @@ public class FC2SoftwareSummary {
 	
 	private String sequenceNumber;
 	private String inEclipseMode;
+	private String obcResetCount;
+	private String epsResetCount;
 	
-	public FC2SoftwareSummary(String sequenceNumber, String inEclipseMode) {
+	public FC2SoftwareSummary(String sequenceNumber, String inEclipseMode, String obcResetCount, String epsResetCount) {
 		super();
 		this.sequenceNumber = sequenceNumber;
 		this.inEclipseMode = inEclipseMode;
+		this.obcResetCount = obcResetCount;
+		this.epsResetCount = epsResetCount;
 	}
 	public final String getSequenceNumber() {
 		return sequenceNumber;
@@ -25,6 +29,12 @@ public class FC2SoftwareSummary {
 	
 	public final String getInEclipseMode() {
 		return inEclipseMode;
+	}
+	public final String getEpsResetCount() {
+		return epsResetCount;
+	}
+	public final String getObcResetCount() {
+		return obcResetCount;
 	}
 	
 	

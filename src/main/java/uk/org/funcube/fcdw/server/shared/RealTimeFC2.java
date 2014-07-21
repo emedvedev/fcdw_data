@@ -891,4 +891,27 @@ public class RealTimeFC2 extends RealTime {
 	public String isEclipsedString() {
 		return (eclipsed) ? "true" : "false" ;
 	}
+
+
+	public final String getAntennaTemperatureString() {
+		return String.format("%5.1f", (antennaTemperature * -2.926E-01) + 1.901E+02);
+	}
+	public final String getAntennaStatus0String() {
+		return antennaStatus0.toString();
+	}
+	public final String getAntennaStatus1String() {
+		return antennaStatus1.toString();
+	}
+	public final String getAntennaStatus2String() {
+		return antennaStatus2.toString();
+	}
+	public final String getAntennaStatus3String() {
+		return antennaStatus3.toString();
+	}
+	public String getObcSoftResetCountString() {
+		return obcSoftResetCount.toString();
+	}
+	public String getEpsHardResetCountString() {
+		return epsHardResetCount.toString();
+	}
 }
