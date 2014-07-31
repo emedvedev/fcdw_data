@@ -147,8 +147,8 @@ public class RealTimeFC2 extends RealTime {
 		setReceiverCurrent(realTimeEntity.getC32()); 
 		setTransmitCurrent3v3(realTimeEntity.getC33()); 
 		setTransmitCurrent5v0(realTimeEntity.getC34()); 
-		setForwardPower(realTimeEntity.getC35()); 
-		setReversePower(realTimeEntity.getC36()); 
+		setReversePower(realTimeEntity.getC35()); 
+		setForwardPower(realTimeEntity.getC36()); 
 		setPaBoardTemperature(realTimeEntity.getC37()); ;
 		setPaBoardCurrent(realTimeEntity.getC38()); 
         setAmacMode(realTimeEntity.getC39());
@@ -808,8 +808,7 @@ public class RealTimeFC2 extends RealTime {
 	 */
 
 	public String getBattery0CurrentString() {
-		double sign = getBattery0CurrentDirection() ? 1.0 : -1.0;
-		return String.format("%4.0f", ((battery0Current * -3.200E+00) + 2.926E+03) * sign);
+		return String.format("%4.0f", ((battery0Current * -3.200E+00) + 2.926E+03));
 	}
 
 	public String getBattery0VoltsString() {
@@ -821,8 +820,7 @@ public class RealTimeFC2 extends RealTime {
 	}
 
 	public String getBattery1CurrentString() {
-		double sign = getBattery1CurrentDirection() ? 1.0 : -1.0;
-		return String.format("%4.0f", ((battery1Current * -3.200E+00) + 2.926E+03) * sign);
+		return String.format("%4.0f", ((battery1Current * -3.200E+00) + 2.926E+03));
 	}
 
 	public String getBattery1VoltsString() {
@@ -834,8 +832,7 @@ public class RealTimeFC2 extends RealTime {
 	}
 
 	public String getBattery2CurrentString() {
-		double sign = getBattery2CurrentDirection() ? 1.0 : -1.0;
-		return String.format("%4.0f", ((battery2Current * -3.200E+00) + 2.926E+03) * sign);
+		return String.format("%4.0f", ((battery2Current * -3.200E+00) + 2.926E+03));
 	}
 
 	public String getBattery2VoltsString() {
@@ -894,7 +891,7 @@ public class RealTimeFC2 extends RealTime {
 
 
 	public final String getAntennaTemperatureString() {
-		return String.format("%5.1f", (antennaTemperature * -2.926E-01) + 1.901E+02);
+		return String.format("%4d", antennaTemperature);
 	}
 	public final String getAntennaStatus0String() {
 		return antennaStatus0.toString();
