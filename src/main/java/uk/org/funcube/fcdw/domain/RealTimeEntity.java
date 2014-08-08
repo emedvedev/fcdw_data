@@ -290,6 +290,8 @@ public class RealTimeEntity {
         c74 = realTime.getTmBufferSendEnable();
         c75 = realTime.getObcSoftResetCount();
         c76 = realTime.getEpsHardResetCount();
+        c53 = realTime.isFunTrxEnable();
+        c54 = realTime.isFunTrxSampleEnable();
         
         c77 = realTime.getDtmfCommandCount();
         c78 = realTime.getDtmfLastCommand();

@@ -92,6 +92,10 @@ public class RealTimeFC2 extends RealTime {
 	
 	private int stringPos = 0;
 
+	private boolean funTrxSampleEnable;
+
+	private boolean funTrxEnable;
+
 	public RealTimeFC2(int satelliteId, int frameType, int sensorId, Date now,
 			String binaryString) {
 		super();
@@ -241,8 +245,8 @@ public class RealTimeFC2 extends RealTime {
         setMagnetometer1(get12BitsAsULong(binaryString));
         setMagnetometer2(get12BitsAsULong(binaryString));
         
-        get1BitAsInt(binaryString); // step over the useless Funtrx enabled bits
-        get1BitAsInt(binaryString); // step over the useless Funtrx enabled bits
+        setFunTrxEnable(get1BitAsInt(binaryString) == 1);
+        setFunTrxSampleEnable(get1BitAsInt(binaryString) == 1);
 
         setModeManagerMode(get3BitsAsULong(binaryString));
         setModeManagerCommsNominal(get1BitAsInt(binaryString) == 1);
@@ -255,16 +259,23 @@ public class RealTimeFC2 extends RealTime {
         setObcSoftResetCount(get8BitsAsULong(binaryString));
         setEpsHardResetCount(get8BitsAsULong(binaryString));
         
-        LOG.debug("Finised Realtime, stringPos: " + stringPos);
-        
         // end of ukcube data ours is last 36 bits
-        //stringPos = 404 + 8; // start of the payload (plus id byte)
-        stringPos = 440 - 36;
+        stringPos += 20;
+        
+        LOG.debug("Reading seqNo from stringPos: " + stringPos);
         
 		setSequenceNumber(get24BitsAsULong(binaryString));
 		setDtmfCommandCount(get6BitsAsULong(binaryString));
 		setDtmfLastCommand(get5BitsAsULong(binaryString));
 		setDtmfCommandSuccess(get1BitAsInt(binaryString) == 1);
+	}
+
+	private void setFunTrxSampleEnable(boolean funTrxSampleEnable) {
+		this.funTrxSampleEnable = funTrxSampleEnable;
+	}
+
+	private void setFunTrxEnable(boolean funTrxEnable) {
+		this.funTrxEnable = funTrxEnable;
 	}
 
 	private int get1BitAsInt(String binaryString) {
@@ -689,10 +700,6 @@ public class RealTimeFC2 extends RealTime {
 		this.magnetometer2 = magnetometer2;
 	}
 
-	public Long getMagnetometerTemperature() {
-		return magnetometerTemperature;
-	}
-
 	public void setMagnetometerTemperature(Long magnetometerTemperature) {
 		this.magnetometerTemperature = magnetometerTemperature;
 	}
@@ -803,44 +810,45 @@ public class RealTimeFC2 extends RealTime {
 	
 	/*
 	 * 	Current -3.200E+00	2.926E+03
-		Volts -9.470E-03	9.799E+00
+		Volts -9.470E-03 * 4.0	9.798896E+00
 		Temp -1.630E-01	4.753E+00
 	 */
 
 	public String getBattery0CurrentString() {
-		return String.format("%4.0f", ((battery0Current * -3.200E+00) + 2.926E+03));
+		return String.format("%4.0f", ((battery0Current * -3.200E+00 * 4.0) + 2.926E+03));
 	}
 
 	public String getBattery0VoltsString() {
-		return String.format("%4.1f", (battery0Volts * -9.470E-03) + 9.799E+00);
+		return String.format("%4.1f", (battery0Volts * -9.470E-03 * 4.0) + 9.798896E+00);
 	}
 
 	public String getBattery0TemperatureString() {
-		return String.format("%5.1f", (battery0Temperature * -1.630E-01) + 4.753E+00);
+		// -0.163 *4*(binstr, 172, 8) + 75
+		return String.format("%5.1f", (battery0Temperature * -1.630E-01 * 4) + 75.0+00);
 	}
 
 	public String getBattery1CurrentString() {
-		return String.format("%4.0f", ((battery1Current * -3.200E+00) + 2.926E+03));
+		return String.format("%4.0f", ((battery1Current * -3.200E+00 * 4.0) + 2.926E+03));
 	}
 
 	public String getBattery1VoltsString() {
-		return String.format("%4.1f", (battery1Volts * -9.470E-03) + 9.799E+00);
+		return String.format("%4.1f", (battery1Volts * -9.470E-03 * 4.0) + 9.798896E+00);
 	}
 
 	public String getBattery1TemperatureString() {
-		return String.format("%5.1f", (battery1Temperature * -1.630E-01) + 4.753E+00);
+		return String.format("%5.1f", (battery1Temperature * -1.630E-01 * 4) + 75.0+00);
 	}
 
 	public String getBattery2CurrentString() {
-		return String.format("%4.0f", ((battery2Current * -3.200E+00) + 2.926E+03));
+		return String.format("%4.0f", ((battery2Current * -3.200E+00 * 4.0) + 2.926E+03));
 	}
 
 	public String getBattery2VoltsString() {
-		return String.format("%4.1f", (battery2Volts * -9.470E-03) + 9.799E+00);
+		return String.format("%4.1f", (battery2Volts * -9.470E-03 * 4.0) + 9.798896E+00);
 	}
 
 	public String getBattery2TemperatureString() {
-		return String.format("%5.1f", (battery2Temperature * -1.630E-01) + 4.753E+00);
+		return String.format("%5.1f", (battery2Temperature * -1.630E-01 * 4) + 75.0+00);
 	}
 
 	public String getForwardPowerString() {
@@ -852,7 +860,13 @@ public class RealTimeFC2 extends RealTime {
 	}
 
 	public String getPaDeviceTemperatureString() {
-		return String.format("%5.1f", (paBoardTemperature * -8.570E-01) + 1.937E+02);
+		// .29764694373E+001 + 3.80132039683E-001 *X -9.59767044686E-003  *x^2+5.15917746352E-005*x^3-9.77975220499E-008*x^4
+		double value = 6.29764694373E+001 +
+				(3.80132039683E-001 * paBoardTemperature) +
+				(-9.59767044686E-003 * paBoardTemperature * paBoardTemperature) +
+				(5.15917746352E-005 * paBoardTemperature * paBoardTemperature * paBoardTemperature) +
+				(-9.77975220499E-008 * paBoardTemperature * paBoardTemperature * paBoardTemperature * paBoardTemperature);
+		return String.format("%5.1f", value);
 	}
 
 	public String getPaBusCurrentString() {
@@ -910,5 +924,25 @@ public class RealTimeFC2 extends RealTime {
 	}
 	public String getEpsHardResetCountString() {
 		return epsHardResetCount.toString();
+	}
+
+	public Long getMagnetometerMagnitude() {
+		return (long) Math.sqrt(
+				(magnetometer0 * magnetometer0) +
+				(magnetometer1 * magnetometer1) +
+				(magnetometer2 * magnetometer2)
+				);
+	}
+	
+	public String getMagnetometerMagnitudeString() {
+		return String.format("%7d", (reversePower * 2.063E+00) + 5.000E-03);
+	}
+
+	public final boolean isFunTrxSampleEnable() {
+		return funTrxSampleEnable;
+	}
+
+	public final boolean isFunTrxEnable() {
+		return funTrxEnable;
 	}
 }

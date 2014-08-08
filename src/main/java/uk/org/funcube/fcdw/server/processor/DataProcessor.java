@@ -24,6 +24,7 @@ import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.org.funcube.fcdw.dao.DTMFCommandDao;
 import uk.org.funcube.fcdw.dao.EpochDao;
+import uk.org.funcube.fcdw.dao.FrameTypeFortyDao;
 import uk.org.funcube.fcdw.dao.HexFrameDao;
 import uk.org.funcube.fcdw.dao.MinMaxDao;
 import uk.org.funcube.fcdw.dao.RealTimeDao;
@@ -46,6 +48,7 @@ import uk.org.funcube.fcdw.dao.UserDao;
 import uk.org.funcube.fcdw.dao.UserRankingDao;
 import uk.org.funcube.fcdw.domain.DTMFCommandEntity;
 import uk.org.funcube.fcdw.domain.EpochEntity;
+import uk.org.funcube.fcdw.domain.FrameTypeFortyEntity;
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 import uk.org.funcube.fcdw.domain.MinMaxEntity;
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
@@ -98,6 +101,9 @@ public class DataProcessor {
 
 	@Autowired
 	DTMFCommandDao dtmfCommandDao;
+
+	@Autowired
+	FrameTypeFortyDao frameTypeFortyDao;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -243,13 +249,26 @@ public class DataProcessor {
 									satelliteId, sequenceNumber, frameType);
 
 					if (frames != null) {
-						saveUpdateHexFrame(hexString, user, frameType,
+						
+						if (frames.size() > 0 && satelliteId == 1 && frameType == 40) {
+							processFrameTypeForty(hexString, now, sequenceNumber);
+						} else {
+							saveUpdateHexFrame(hexString, user, frameType,
 								satelliteId, now, realTime, sequenceNumber,
 								frames, epochMap.get(new Long(satelliteId)));
+						}
 					}
 				}
 			}
 		}
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	private void processFrameTypeForty(String payload, Date now,
+			long sequenceNumber) {
+		
+		frameTypeFortyDao.save(new FrameTypeFortyEntity(sequenceNumber, now, payload));
+		
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
@@ -275,7 +294,7 @@ public class DataProcessor {
 								+ (frameType * 5 * 1000));
 			}
 
-			long[] catalogNumbers = new long[] {39444, 39444, 39444, 39444};
+			long[] catalogNumbers = new long[] {39444, 40074, 39444, 39444};
 			
 			boolean outOfOrder = false;
 			
@@ -298,18 +317,24 @@ public class DataProcessor {
 			
 			if (!outOfOrder) {
 				SatellitePosition satellitePosition = predictor.get(catalogNumbers[satelliteId], now);
-				hexFrame.setEclipsed(satellitePosition.getEclipsed());
-				hexFrame.setEclipseDepth(satellitePosition.getEclipseDepth());
-				latitude = satellitePosition.getLatitude();
-				hexFrame.setLatitude(latitude);
-				longitude = satellitePosition.getLongitude();
-				hexFrame.setLongitude(longitude);
+				
+				if (satellitePosition != null) {
+					hexFrame.setEclipsed(satellitePosition.getEclipsed());
+					hexFrame.setEclipseDepth(satellitePosition.getEclipseDepth());
+					latitude = satellitePosition.getLatitude();
+					hexFrame.setLatitude(latitude);
+					longitude = satellitePosition.getLongitude();
+					hexFrame.setLongitude(longitude);
+				}
 				
 				SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(satelliteId).get(0);
 				satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
 				satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
 				satelliteStatus.setEclipsed(realTime.isEclipsed());
-				satelliteStatus.setEclipseDepth(Double.parseDouble(satellitePosition.getEclipseDepth()));
+				
+				if (satellitePosition != null) {
+					satelliteStatus.setEclipseDepth(Double.parseDouble(satellitePosition.getEclipseDepth()));
+				}
 				
 				satelliteStatusDao.save(satelliteStatus);
 			}
@@ -363,10 +388,21 @@ public class DataProcessor {
 					dtmfCommandDao.save(newCommand);
 				}
 			}
+			
+			if (satelliteId == 1) {
+				boolean valid = 
+						(realTimeEntity.getC53() && realTimeEntity.getC54());
+				hexFrame.setValid(valid);
+				hexFrameDao.save(hexFrame);
+				if (valid) {
+					realTimeDao.save(realTimeEntity);
+				}
+			} else {
+				hexFrameDao.save(hexFrame);
+				realTimeDao.save(realTimeEntity);
+			}
 
-			hexFrameDao.save(hexFrame);
-
-			realTimeDao.save(realTimeEntity);
+			
 
 			if (!outOfOrder) {
 				checkMinMax(satelliteId, realTimeEntity);
