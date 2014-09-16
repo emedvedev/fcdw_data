@@ -54,6 +54,8 @@ public class HexFrameEntity {
 	private String longitude;
 	
 	private Boolean outOfOrder;
+
+	private String digest;
 	
 	public HexFrameEntity() {
 	}
@@ -218,6 +220,14 @@ public class HexFrameEntity {
 
 	public final void setOutOfOrder(Boolean outOfOrder) {
 		this.outOfOrder = outOfOrder;
+	}
+
+	public void setDigest(final String digest) {
+		this.digest = digest;
+	}
+
+	public final String getDigest() {
+		return digest;
 	}
 
 }

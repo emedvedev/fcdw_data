@@ -24,7 +24,7 @@ import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -232,16 +232,20 @@ public class DataProcessor {
 				final long sequenceNumber = realTime.getSequenceNumber();
 
 				if (sequenceNumber != -1) {
+					
+					if (satelliteId != 1) {
 
-					Long maxSequenceNumber = hexFrameDao
-							.getMaxSequenceNumber(satelliteId);
-
-					if (maxSequenceNumber != null
-							&& (maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
-						LOG.error(String
-								.format("User %s loading sequence number %d is out of bounds for satelliteId %d",
-										user.getSiteId(), sequenceNumber, satelliteId));
-						return;
+						Long maxSequenceNumber = hexFrameDao
+								.getMaxSequenceNumber(satelliteId);
+	
+						if (maxSequenceNumber != null
+								&& (maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
+							LOG.error(String
+									.format("User %s loading sequence number %d is out of bounds for satelliteId %d",
+											user.getSiteId(), sequenceNumber, satelliteId));
+							return;
+						}
+					
 					}
 
 					final List<HexFrameEntity> frames = hexFrameDao
@@ -285,7 +289,7 @@ public class DataProcessor {
 
 			Timestamp satelliteTime;
 
-			if (epoch == null) {
+			if (epoch == null || satelliteId == 1) {
 				satelliteTime = new Timestamp(now.getTime());
 			} else {
 				satelliteTime = new Timestamp(
@@ -742,5 +746,36 @@ public class DataProcessor {
 	private String latitude;
 
 	private String longitude;
+
+	public void processSha2() {
+		
+		do {
+			List<HexFrameEntity> hexFrames = getNullDigests();
+			if (hexFrames.size() == 0) {
+				break;
+			}
+			addDigests(hexFrames);
+		} while(true);
+		
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	private void addDigests(List<HexFrameEntity> hexFrames) {
+		for (HexFrameEntity hexFrameEntity : hexFrames) {
+			try {
+				MessageDigest md = MessageDigest.getInstance("SHA-256");
+				hexFrameEntity.setDigest(new String(md.digest(hexFrameEntity.getHexString().getBytes())));
+				hexFrameDao.save(hexFrameEntity);
+			} catch (NoSuchAlgorithmException e) {
+				LOG.error(e.getMessage());
+			}
+		}
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+	private List<HexFrameEntity> getNullDigests() {
+		List<HexFrameEntity> hexFrames = hexFrameDao.findBySatelliteIdAndDigest(1L, (String)null, new PageRequest(0, 100));
+		return hexFrames;
+	}
 
 }

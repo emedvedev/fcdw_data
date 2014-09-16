@@ -9,6 +9,7 @@ package uk.org.funcube.fcdw.dao;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -53,6 +54,9 @@ public interface HexFrameDao extends CrudRepository<HexFrameEntity, Long> {
 
 	@Query
 	List<HexFrameEntity> findBySatelliteIdAndSequenceNumber(long satelliteId, long sequenceNumber);
+
+	@Query
+	List<HexFrameEntity> findBySatelliteIdAndDigest(long satelliteId, String digest, Pageable pageable);
 	
 
 }
