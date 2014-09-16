@@ -51,10 +51,9 @@ public class FC2RealTimeServiceRestImpl extends AbstractServiceRestImpl implemen
 		ObjectMapper objectMapper = new ObjectMapper();
 	    Map<String, Object> map = new HashMap<String, Object>();
 		
-		Long maxSequenceNumber = realTimeDao.findMaxSequenceNumber(satelliteId);
-		Long maxFrameType = realTimeDao.findMaxFrameType(satelliteId, maxSequenceNumber);
+		Long maxId = realTimeDao.findMaxId(satelliteId);
 		List<RealTimeEntity> entities 
-			= realTimeDao.findBySatelliteIdAndSequenceNumberAndFrameType(satelliteId, maxSequenceNumber, maxFrameType);
+			= realTimeDao.findById(maxId);
 		
 		if (entities.isEmpty()) {
 			return callback + "([error:" + "No data found" + "]);";
