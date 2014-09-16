@@ -52,9 +52,9 @@ public class ScheduleConfig {
 	@Scheduled(initialDelay=30000, fixedRate=120000)
 	public void highDefinitionTask() {
 		highDefinitionProcessor.process(0L);
-		highDefinitionProcessor.process(1L);
+		//highDefinitionProcessor.process(1L);
 		highDefinitionProcessor.process(2L);
-		highDefinitionProcessor.process(3L);
+		//highDefinitionProcessor.process(3L);
 	}
 	
 	@Scheduled(initialDelay=30000, fixedRate=86400000)
@@ -62,12 +62,17 @@ public class ScheduleConfig {
 		tleProcessor.process();
 	}
 	
+	@Scheduled(initialDelay=30000, fixedRate=86400000)
+	public void sha2ProcessorTask() {
+		//dataProcessor.processSha2();
+	}
+	
 	@Scheduled(initialDelay=60000, fixedRate=120000)
 	public void wholeOrbitDataTask() {
 		wholeOrbitDataProcessor.process(0L);
-		wholeOrbitDataProcessor.process(1L);
+		//wholeOrbitDataProcessor.process(1L);
 		wholeOrbitDataProcessor.process(2L);
-		wholeOrbitDataProcessor.process(3L);
+		//wholeOrbitDataProcessor.process(3L);
 	}
 	
 	@Scheduled(initialDelay=90000, fixedRate=120000)
@@ -88,7 +93,7 @@ public class ScheduleConfig {
 	
 	@Scheduled(cron="0 0 */2 * * ?")
 	public void wodCsvExtractorTask() {
-		wodCsvExtractor.extract(2L);
+		wodCsvExtractor.extractDaily(2L);
 	}
 	
 	@Scheduled(cron="0 5 * * * ?")
