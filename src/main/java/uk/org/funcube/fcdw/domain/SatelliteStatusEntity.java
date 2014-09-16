@@ -22,8 +22,8 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 	private Boolean eclipsed;
 	private Timestamp lastUpdated;
 	private Double eclipseDepth;
-
 	private Boolean eclipseSwitch;
+	private Timestamp lastWodDump;
 	
 	public SatelliteStatusEntity() {
 	}
@@ -126,6 +126,14 @@ public class SatelliteStatusEntity implements SatelliteStatus {
 		}
 	}
 	
+	public final Timestamp getLastWodDump() {
+		return lastWodDump;
+	}
+
+	public final void setLastWodDump(Timestamp lastWodDump) {
+		this.lastWodDump = lastWodDump;
+	}
+
 	public final String toString() {
 		return "SatelliteStatus: lastUpdated: " + lastUpdated
 		+ "satelliteId: " + satelliteId
