@@ -852,11 +852,11 @@ public class RealTimeFC2 extends RealTime {
 	}
 
 	public String getForwardPowerString() {
-		return String.format("%5.1f", (forwardPower * 2.063E+00) + 5.000E-03);
+		return String.format("%5.1f", (0.005 * Math.pow(forwardPower.doubleValue(), 2.0629)));
 	}
 
 	public String getReversePowerString() {
-		return String.format("%5.1f", (reversePower * 2.063E+00) + 5.000E-03);
+		return String.format("%5.1f", (0.005 * Math.pow(reversePower.doubleValue(), 2.0629)));
 	}
 
 	public String getPaDeviceTemperatureString() {
