@@ -61,6 +61,7 @@ import uk.org.funcube.fcdw.server.shared.SatellitePosition;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
 import uk.org.funcube.fcdw.server.util.UTCClock;
+import uk.org.funcube.fcdw.service.MailService;
 import uk.org.funcube.fcdw.service.PredictorService;
 
 @Service
@@ -104,6 +105,9 @@ public class DataProcessor {
 
 	@Autowired
 	FrameTypeFortyDao frameTypeFortyDao;
+	
+	@Autowired
+	MailService mailService;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
@@ -262,6 +266,30 @@ public class DataProcessor {
 								frames, epochMap.get(new Long(satelliteId)));
 						}
 					}
+				}
+			}
+		} else {
+			Long maxSequenceNumber = hexFrameDao.getMaxSequenceNumber(2L);
+			Long maxFrameType = hexFrameDao.getMaxFrameType(2L, maxSequenceNumber);
+			HexFrameEntity lastHexFrame 
+				= hexFrameDao.findBySatelliteIdAndSequenceNumberAndFrameType(2L, maxSequenceNumber, maxFrameType).get(0);
+			List<SatelliteStatusEntity> satelliteStatusList = satelliteStatusDao.findBySatelliteId(2L);
+			if (satelliteStatusList.size() != 0) {
+				final SatelliteStatusEntity satelliteStatus = satelliteStatusList.get(0);
+				final Timestamp lastReceived = satelliteStatus.getLastUpdated();
+				final Timestamp lastNoShowNotification = satelliteStatus.getLastNoShowNotification();
+				
+				long currentTime = clock.currentDate().getTime();
+				if (((currentTime - lastHexFrame.getCreatedDate().getTime()) > 105 * 60 * 1000) &&
+					((currentTime - lastNoShowNotification.getTime()) > 105 * 60 * 1000)) {
+					
+					LOG.error("FUNcube has not been seen for more than one orbit!");
+					Map<String, Object> fields = new HashMap<String, Object>();
+					fields.put("lastReceived", lastNoShowNotification.toString());
+					mailService.sendUsingTemplate("dave@g4dpz.me.uk", fields, "oneOrbitNoShowEmail");
+					
+					satelliteStatus.setLastNoShowNotification(new Timestamp(currentTime));
+					satelliteStatusDao.save(satelliteStatus);
 				}
 			}
 		}

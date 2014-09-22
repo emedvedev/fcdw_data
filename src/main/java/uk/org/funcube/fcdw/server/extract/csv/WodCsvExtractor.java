@@ -32,7 +32,7 @@ public class WodCsvExtractor {
 	WholeOrbitDataDao wholeOrbitDataDao;
 	
 	@Transactional(readOnly=true, propagation = Propagation.REQUIRED)
-	public void extract(long satelliteId) {
+	public void extractDaily(long satelliteId) {
 		
 		Date currentDate = clock.currentDate();
 		
