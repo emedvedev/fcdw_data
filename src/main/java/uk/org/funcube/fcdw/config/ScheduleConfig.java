@@ -93,7 +93,7 @@ public class ScheduleConfig {
 	
 	@Scheduled(cron="0 0 */2 * * ?")
 	public void wodCsvExtractorTask() {
-		wodCsvExtractor.extractDaily(2L);
+		wodCsvExtractor.extract(2L);
 	}
 	
 	@Scheduled(cron="0 5 * * * ?")

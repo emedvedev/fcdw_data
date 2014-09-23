@@ -17,10 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TransferQueue;
 
-import org.apache.commons.collections.Buffer;
-import org.apache.commons.collections.BufferUtils;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +66,8 @@ import uk.org.funcube.fcdw.service.PredictorService;
 @RequestMapping("/api/data/hex")
 public class DataProcessor {
 
-	private static final Buffer FIFO = BufferUtils
-			.synchronizedBuffer(new CircularFifoBuffer(1000));
+	private static final TransferQueue<UserHexString> FIFO 
+		= new LinkedTransferQueue<DataProcessor.UserHexString>();
 
 	long TWO_DAYS_SEQ_COUNT = 1440;
 
@@ -425,6 +424,8 @@ public class DataProcessor {
 			for (UserEntity existingUser : users) {
 				if (existingUser.getId().longValue() == user.getId().longValue()) {
 					userFrameAlreadRegistered = true;
+					LOG.error(String.format("User %s attempted to add duplicate record for seq/frame: %d, %d", 
+							existingUser.getSiteId(), hexFrame.getSequenceNumber(), hexFrame.getFrameType()));
 					break;
 				}
 			}
@@ -492,7 +493,9 @@ public class DataProcessor {
 		} else {
 			userRanking = userRankings.get(0);
 			userRanking.setLatestUploadDate(latestUploadDate);
-			userRanking.setNumber(userRanking.getNumber() + 1);
+			Long number = userRanking.getNumber();
+			number++;
+			userRanking.setNumber(number);
 		}
 		
 		userRankingDao.save(userRanking);
