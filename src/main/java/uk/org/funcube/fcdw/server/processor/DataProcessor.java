@@ -60,6 +60,7 @@ import uk.org.funcube.fcdw.server.shared.SatellitePosition;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
 import uk.org.funcube.fcdw.server.util.UTCClock;
+import uk.org.funcube.fcdw.service.MailService;
 import uk.org.funcube.fcdw.service.PredictorService;
 
 @Service
@@ -103,6 +104,9 @@ public class DataProcessor {
 
 	@Autowired
 	FrameTypeFortyDao frameTypeFortyDao;
+
+	@Autowired
+	MailService mailService;
 
 	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
 
