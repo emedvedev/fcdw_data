@@ -49,7 +49,7 @@ public class MailService {
 
 		String body = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, template + ".vm", "utf-8", emailTags);
 
-		sendMail("dave@g4dpz.me.uk", toAddress, "FUNcube Warehouse Registration", body);
+		sendMail("dave@g4dpz.me.uk", toAddress, "FC1 No Show Warning", body);
 
 	}
 }

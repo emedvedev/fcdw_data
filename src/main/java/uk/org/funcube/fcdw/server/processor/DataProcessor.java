@@ -268,6 +268,30 @@ public class DataProcessor {
 				}
 			}
 		}
+		else {
+			SatelliteStatusEntity satelliteStatus = satelliteStatusDao.findBySatelliteId(2L).get(0);
+			Timestamp lastUpdated = satelliteStatus.getLastUpdated();
+			long lastUpdatedMs = lastUpdated.getTime();
+			// get the current time
+			long currentTimeMs = clock.currentTime();
+			// if it was more than one orbit ago, send a new email, if necessary
+			if ((currentTimeMs - lastUpdatedMs) > 105 * 60 * 1000) {
+				Timestamp lastNoShowNotification = satelliteStatus.getLastNoShowNotification();
+				long lastNoShowNotificationMs = lastNoShowNotification.getTime();
+				if ((currentTimeMs - lastNoShowNotificationMs) > 105 * 60 * 1000) {
+					sendNoShowEmail(lastUpdated);
+					satelliteStatus.setLastNoShowNotification(new Timestamp(currentTimeMs));
+					satelliteStatusDao.save(satelliteStatus);
+				}
+			}
+		}
+	}
+
+	private void sendNoShowEmail(Timestamp lastUpdated) {
+		Map<String, Object> emailTags = new HashMap<String, Object>();
+		emailTags.put("satelliteName", "FUNcube 1");
+		emailTags.put("lastUpdated", lastUpdated);
+		mailService.sendUsingTemplate("operations@funcube.net", emailTags, "noshow");
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
