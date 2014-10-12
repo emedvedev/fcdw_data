@@ -57,6 +57,10 @@ public interface HexFrameDao extends CrudRepository<HexFrameEntity, Long> {
 
 	@Query
 	List<HexFrameEntity> findBySatelliteIdAndDigest(long satelliteId, String digest, Pageable pageable);
+
+	@Query
+	List<HexFrameEntity> findBySatelliteIdAndSequenceNumberAndDigest(
+			long satelliteId, long sequenceNumber, String digest);
 	
 
 }

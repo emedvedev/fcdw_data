@@ -211,6 +211,7 @@ public class DataProcessor {
 				final String hexString = userHexString.getHexString();
 				final UserEntity user = userHexString.getUser();
 				final Date createdDate = userHexString.getCreatedDate();
+				final String digest = generateDigest(hexString);
 
 				final int frameId = Integer.parseInt(hexString.substring(0, 2),
 						16);
@@ -262,7 +263,7 @@ public class DataProcessor {
 						} else {
 							saveUpdateHexFrame(hexString, user, frameType,
 								satelliteId, now, realTime, sequenceNumber,
-								frames, epochMap.get(new Long(satelliteId)));
+								frames, epochMap.get(new Long(satelliteId)), digest);
 						}
 					}
 				}
@@ -306,7 +307,7 @@ public class DataProcessor {
 	private void saveUpdateHexFrame(final String hexString,
 			final UserEntity user, final int frameType, final int satelliteId,
 			final Date now, final RealTime realTime, final long sequenceNumber,
-			final List<HexFrameEntity> frames, final EpochEntity epoch) {
+			final List<HexFrameEntity> frames, final EpochEntity epoch, String digest) {
 		HexFrameEntity hexFrame;
 		Set<UserEntity> users;
 		
@@ -424,6 +425,7 @@ public class DataProcessor {
 				boolean valid = 
 						(realTimeEntity.getC53() && realTimeEntity.getC54());
 				hexFrame.setValid(valid);
+				hexFrame.setDigest(digest);
 				hexFrameDao.save(hexFrame);
 				if (valid) {
 					realTimeDao.save(realTimeEntity);
@@ -450,10 +452,15 @@ public class DataProcessor {
 			boolean userFrameAlreadRegistered = false;
 			
 			for (UserEntity existingUser : users) {
-				if (existingUser.getId().longValue() == user.getId().longValue()) {
+				if (satelliteId != 1 && (existingUser.getId().longValue() == user.getId().longValue())) {
 					userFrameAlreadRegistered = true;
-					LOG.error(String.format("User %s attempted to add duplicate record for seq/frame: %d, %d", 
-							existingUser.getSiteId(), hexFrame.getSequenceNumber(), hexFrame.getFrameType()));
+					LOG.error(String.format("User %s attempted to add duplicate record for satId/seq/frame: %d, %d, %d", 
+							existingUser.getSiteId(), satelliteId, hexFrame.getSequenceNumber(), hexFrame.getFrameType()));
+					break;
+				} else if ((existingUser.getId().longValue() == user.getId().longValue()) && hexFrame.getDigest() != null && digest.equals(hexFrame.getDigest())) {
+					userFrameAlreadRegistered = true;
+					LOG.error(String.format("User %s attempted to add duplicate record for satId/seq/frame: %d, %d, %d", 
+							existingUser.getSiteId(), satelliteId, hexFrame.getSequenceNumber(), hexFrame.getFrameType()));
 					break;
 				}
 			}
@@ -807,6 +814,29 @@ public class DataProcessor {
 	private List<HexFrameEntity> getNullDigests() {
 		List<HexFrameEntity> hexFrames = hexFrameDao.findBySatelliteIdAndDigest(1L, (String)null, new PageRequest(0, 100));
 		return hexFrames;
+	}
+	
+	private final String generateDigest(final String string) {
+		
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+	        md.update(string.getBytes());
+	 
+	        byte byteData[] = md.digest();
+	 
+	        //convert the byte to hex format method 1
+	        StringBuffer sb = new StringBuffer();
+	        for (int i = 0; i < byteData.length; i++) {
+	         sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+	        }
+	        
+	        return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			LOG.error(e.getMessage());
+			return "";
+		}
+        
 	}
 
 }
