@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.org.funcube.fcdw.dao.TleDao;
 import uk.org.funcube.fcdw.domain.TleEntity;
+import uk.org.funcube.fcdw.domain.UserEntity;
 import uk.org.funcube.fcdw.satellite.GroundStationPosition;
 import uk.org.funcube.fcdw.satellite.SatPos;
 import uk.org.funcube.fcdw.satellite.Satellite;
@@ -29,6 +30,11 @@ public class PredictorService {
 	
 	@Transactional(readOnly = true)
 	public SatellitePosition get(Long catnum, Date instant) {
+		return get(catnum, instant, new GroundStationPosition(0.0, 0.0, 200.0));
+	}
+		
+	public SatellitePosition get(Long catnum, Date instant, GroundStationPosition groundStationPosition) {	
+		
 		SatellitePosition position = null;
 		
 		List<TleEntity> tleEntities = tleDao.findByCatnum(catnum);
@@ -68,7 +74,7 @@ public class PredictorService {
 			satellite.calculateSatelliteGroundTrack();
 			
 			SatPos satPos 
-				= satellite.calculateSatPosForGroundStation(new GroundStationPosition(0.0, 0.0, 0.0));
+				= satellite.calculateSatPosForGroundStation(groundStationPosition);
 			
 			final NumberFormat numberFormat = NumberFormat.getNumberInstance();
 	        numberFormat.setMaximumFractionDigits(2);
@@ -77,7 +83,8 @@ public class PredictorService {
 					numberFormat.format(satPos.getLatitude() / (Math.PI * 2.0) * 360),
 					numberFormat.format(satPos.getLongitude() / (Math.PI * 2.0) * 360),
 					satPos.isEclipsed() ? "yes" : "no",
-					numberFormat.format(satPos.getEclipseDepth()));
+					numberFormat.format(satPos.getEclipseDepth()),
+					satPos.isAboveHorizon());
 		}
 		
 		return position;

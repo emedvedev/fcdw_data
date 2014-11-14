@@ -520,9 +520,7 @@ public abstract class AbstractSatellite implements Satellite, Serializable {
         final int sector = (int)(satPos.getAzimuth() / TWO_PI
                 * 360.0 / 10.0);
 
-        if (gsPos.getHorizonElevations()[sector] > satPos.getElevation()) {
-            satPos.setAboveHorizon(false);
-        }
+        satPos.setAboveHorizon(satPos.getElevation() > gsPos.getHorizonElevations()[sector]);
     }
 
     /**

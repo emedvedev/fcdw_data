@@ -10,26 +10,42 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.org.funcube.fcdw.dao.SatelliteStatusDao;
 import uk.org.funcube.fcdw.dao.WholeOrbitDataDao;
+import uk.org.funcube.fcdw.domain.SatelliteStatusEntity;
 import uk.org.funcube.fcdw.domain.WholeOrbitDataEntity;
+import uk.org.funcube.fcdw.server.processor.DataProcessor;
 import uk.org.funcube.fcdw.server.util.Clock;
 
 import com.csvreader.CsvWriter;
 
 public class WodCsvExtractor {
 	
+
+	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss zzz";
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
+	protected static final SimpleDateFormat SDTF = new SimpleDateFormat(DATE_TIME_FORMAT);
+	protected static final SimpleDateFormat SDF = new SimpleDateFormat(DATE_FORMAT);
+	
 	@Autowired
 	Clock clock;
 	
 	@Autowired
 	WholeOrbitDataDao wholeOrbitDataDao;
+	
+	@Autowired
+	SatelliteStatusDao satelliteStatusDao;
+	
+	private static Logger LOG = Logger.getLogger(WodCsvExtractor.class.getName());
 	
 	@Transactional(readOnly=true, propagation = Propagation.REQUIRED)
 	public void extract(long satelliteId) {
@@ -52,6 +68,16 @@ public class WodCsvExtractor {
 			fileLocation.delete();
 		}
 		
+		writeFile(wod24, fileLocation);
+		
+	}
+
+
+	/**
+	 * @param wod24
+	 * @param fileLocation
+	 */
+	private void writeFile(List<WholeOrbitDataEntity> wod, File fileLocation) {
 		try {
 			// use FileWriter constructor that specifies open for appending
 			CsvWriter csvOutput = new CsvWriter(new FileWriter(fileLocation, true), ',');
@@ -90,9 +116,9 @@ public class WodCsvExtractor {
 			String c13 = "";
 			String c14 = "";
 			
-			for (WholeOrbitDataEntity entity : wod24) {
+			for (WholeOrbitDataEntity entity : wod) {
 				
-				Timestamp satelliteTime = entity.getSatelliteTime();
+				Timestamp satelliteTime = new Timestamp(entity.getCreatedDate().getTime());
 				
 				if (tsLong == 0) {
 					tsLong = satelliteTime.getTime();
@@ -152,7 +178,6 @@ public class WodCsvExtractor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 
@@ -213,6 +238,50 @@ public class WodCsvExtractor {
 		}
 
 		csvOutput.endRecord();
+	}
+	
+	@Transactional(readOnly=false)
+	public void extractWeekly(long satelliteId) {
+		List<SatelliteStatusEntity> satelliteStatuses = satelliteStatusDao.findBySatelliteId(satelliteId);
+		
+		if (satelliteStatuses.isEmpty()) {
+			LOG.error("No satellite status found for satellite id: " + satelliteId);
+			return;
+		}
+		
+		SatelliteStatusEntity satelliteStatus = satelliteStatuses.get(0);
+		final Timestamp lastDumpTime = satelliteStatus.getLastWodDump();
+		LOG.debug("Last dump time recorded: " + SDTF.format(new Date(lastDumpTime.getTime())));
+		final Date lastDumpDate = new Date(lastDumpTime.getTime() + 1000);
+		final Timestamp newDumpTime = new Timestamp(lastDumpTime.getTime() + (7 * 24 * 60 * 60 * 1000));
+		LOG.debug("New end dump time calculated: " + SDTF.format(new Date(newDumpTime.getTime())));
+		final Date newDumpDate = new Date(newDumpTime.getTime());
+		
+		final String fileName = "wod" + SDF.format(newDumpDate) + ".csv";
+		
+		String fileSeparator = System.getProperty("file.separator");
+		
+		File fileLocation = new File(System.getProperty("wodweekly.dir") + fileSeparator + fileName);
+		
+		LOG.debug("Dumping WOD for period : " 
+				+ SDTF.format(lastDumpDate) 
+				+ " to " 
+				+ SDTF.format(newDumpDate) + " "
+				+ "to file " + fileName);
+		
+		List<WholeOrbitDataEntity> wodWeekly 
+			= wholeOrbitDataDao.getBySatelliteIdAndValidAndCreatedDateBetween(satelliteId, lastDumpDate, newDumpDate);
+		
+		LOG.debug("First date in list:" + SDTF.format(wodWeekly.get(0).getCreatedDate()));
+		LOG.debug("Last date list:" + SDTF.format(wodWeekly.get(wodWeekly.size() - 1).getCreatedDate()));
+		
+		if (!wodWeekly.isEmpty()) {
+		
+			writeFile(wodWeekly, fileLocation);
+			
+			satelliteStatus.setLastWodDump(newDumpTime);
+			satelliteStatusDao.save(satelliteStatus);
+		}
 	}
 
 

@@ -93,7 +93,8 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 
 						saveWod(satelliteId, oldSeqNo, frames,
 								processedHexFrames, receivedDate,
-								epoch);
+								epoch,
+								wodFrame.isOutOfOrder());
 					}
 					frames = new ArrayList<String>();
 					processedHexFrames = new ArrayList<HexFrameEntity>();
@@ -115,9 +116,9 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	private void saveWod(long satelliteId, long oldSeqNo, List<String> frames,
 			List<HexFrameEntity> processedHexFrames, Date receivedDate,
-			EpochEntity epoch) {
+			EpochEntity epoch, Boolean outOfOrder) {
 		extractAndSaveWod(satelliteId, oldSeqNo, frames,
-				receivedDate, epoch);
+				receivedDate, epoch, outOfOrder);
 
 		for (HexFrameEntity hfe : processedHexFrames) {
 			hfe.setWodProcessed(true);
@@ -134,7 +135,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 	}
 
 	private void extractAndSaveWod(final Long satelliteId, final long seqNo,
-			final List<String> frames, final Date receivedDate, EpochEntity epoch) {
+			final List<String> frames, final Date receivedDate, EpochEntity epoch, Boolean outOfOrder) {
 
 		final Date frameTime = new Date(
 				receivedDate.getTime() - 104 * 60 * 1000);
@@ -216,6 +217,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 	
 					checkMinMax(satelliteId, wod);
 					wod.setSatelliteTime(satelliteTime);
+					wod.setValid(!outOfOrder);
 					//LOG.debug("Saving WOD with sequenceNumber, frameNumber: " + wod.getSequenceNumber() + ", " + wod.getFrameNumber());
 					wholeOrbitDataDao.save(wod);
 	

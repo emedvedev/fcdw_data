@@ -47,7 +47,10 @@ public class GroundStationPosition {
     private double longitude;
     private double heightAMSL;
     private double theta;
-    private final int[] horizonElevations = new int[36];
+    private final int[] horizonElevations 
+    	= new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     /**
      * @param latitude the latitue of the ground station in degrees, North: positive

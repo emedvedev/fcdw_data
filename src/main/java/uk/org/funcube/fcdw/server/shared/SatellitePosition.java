@@ -16,17 +16,19 @@ public class SatellitePosition {
 	private String longitude;
 	private String eclipsed;
 	private String eclipseDepth;
+	private boolean aboveHorizon;
 
 	public SatellitePosition() {
 	}
 
 	public SatellitePosition(String latitude, String longitude,
-			String eclipsed, String eclipseDepth) {
+			String eclipsed, String eclipseDepth, boolean aboveHorizon) {
 		super();
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.eclipsed = eclipsed;
 		this.eclipseDepth = eclipseDepth;
+		this.aboveHorizon = aboveHorizon;
 	}
 
 	public void setLatitude(String latitude) {
@@ -59,6 +61,13 @@ public class SatellitePosition {
 
 	public final String getEclipseDepth() {
 		return eclipseDepth;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isAboveHorizon() {
+		return aboveHorizon;
 	}
 
 }

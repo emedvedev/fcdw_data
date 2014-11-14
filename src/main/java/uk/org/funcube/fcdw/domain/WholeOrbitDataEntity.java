@@ -35,6 +35,7 @@ public class WholeOrbitDataEntity {
 	private long frameNumber;
 	private Date createdDate;
 	private Timestamp satelliteTime;
+	private Boolean valid;
 
 	private long c1;
 	private long c2;
@@ -193,6 +194,14 @@ public class WholeOrbitDataEntity {
 
 	public long getSequenceNumber() {
 		return sequenceNumber;
+	}
+
+	public final Boolean getValid() {
+		return valid;
+	}
+
+	public final void setValid(Boolean valid) {
+		this.valid = valid;
 	}
 
 	public final void setC1(final long c1) {

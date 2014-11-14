@@ -7,6 +7,7 @@
 package uk.org.funcube.fcdw.dao;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -49,6 +50,10 @@ public interface WholeOrbitDataDao extends CrudRepository<WholeOrbitDataEntity, 
 	
 	@Query("select wod from WholeOrbitDataEntity wod where satelliteId = ?1 and satelliteTime > ?2 order by satelliteTime asc")
 	List<WholeOrbitDataEntity> getSinceSatelliteTime(long satelliteId, Timestamp satelliteTime);
+
+	@Query("select wod from WholeOrbitDataEntity wod where satelliteId = ?1 and valid = 1 and createdDate between ?2 and ?3 order by sequenceNumber, frameNumber")
+	List<WholeOrbitDataEntity> getBySatelliteIdAndValidAndCreatedDateBetween(
+			long satelliteId, Date lastDumpDate, Date newDumpDate);
 		
 
 }

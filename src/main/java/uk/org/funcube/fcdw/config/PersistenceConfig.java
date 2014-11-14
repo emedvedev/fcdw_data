@@ -1,8 +1,21 @@
-// FUNcube Data Warehouse
-// Copyright 2013 (c) David A.Johnson, G4DPZ, AMSAT-UK
-// This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-// To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter
-// to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+/*
+	This file is part of the FUNcube Data Warehouse
+	
+	Copyright 2013,2014 (c) David A.Johnson, G4DPZ, AMSAT-UK
+
+    The FUNcube Data Warehouse is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    The FUNcube Data Warehouse is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with The FUNcube Data Warehouse.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package uk.org.funcube.fcdw.config;
 
