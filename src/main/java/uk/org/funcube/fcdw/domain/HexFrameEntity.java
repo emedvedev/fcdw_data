@@ -20,6 +20,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @Entity
 @Table(name = "HexFrame")
 public class HexFrameEntity {
@@ -29,6 +32,7 @@ public class HexFrameEntity {
 	private Long id;
 
 	@ManyToMany
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@JoinTable(name="HexFrameUser", 
 			joinColumns=@JoinColumn(name="hexFrameId"),
 			inverseJoinColumns=@JoinColumn(name="userId"))  

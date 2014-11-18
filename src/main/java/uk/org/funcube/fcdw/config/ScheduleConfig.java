@@ -114,11 +114,6 @@ public class ScheduleConfig {
 		highResCsvExtractor.extract(2L);
 	}
 	
-	@Scheduled(cron="*/5 * * * * ?")
-	public void hexDataTask() {
-		dataProcessor.processHexFrame();
-	}
-	
 	@Scheduled(cron="0 0 0 * * ?")
 	public void wodWeeklyCsvExtractorTask() {
 		wodCsvExtractor.extractWeekly(2L);
