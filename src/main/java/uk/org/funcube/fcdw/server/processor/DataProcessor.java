@@ -247,15 +247,14 @@ public class DataProcessor {
 						.getMaxSequenceNumber(satelliteId);
 
 				if (maxSequenceNumber != null
-						&& (maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
+						&& Math.abs(maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
 					final String message = String
 									.format("User %s loading sequence number %d is out of bounds for satelliteId %d",
 											user.getSiteId(), sequenceNumber,
 											satelliteId);
 					LOG.error(message);
 
-					return new ResponseEntity<String>(message,
-							HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>("OK", HttpStatus.OK);
 				}
 
 			}
@@ -273,8 +272,7 @@ public class DataProcessor {
 			}
 		}
 
-		return new ResponseEntity<String>("BAD_REQUEST",
-				HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<String>("OK", HttpStatus.OK);
 	}
 
 	private void sendNoShowEmail(Timestamp lastUpdated) {
@@ -461,8 +459,7 @@ public class DataProcessor {
 					userFrameAlreadRegistered = true;
 					LOG.error(message);
 
-					return new ResponseEntity<String>(message,
-							HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>("OK", HttpStatus.OK);
 					
 				} else if ((existingUser.getId().longValue() == user.getId()
 						.longValue())
@@ -471,8 +468,7 @@ public class DataProcessor {
 					userFrameAlreadRegistered = true;
 					LOG.error(message);
 
-					return new ResponseEntity<String>(message,
-							HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>("OK", HttpStatus.OK);
 				}
 			}
 
