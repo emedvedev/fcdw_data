@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @Table(name="UserRanking2")
 public class UserRankingEntity implements Serializable {
 
-	private static final long serialVersionUID = 6947497970486667863L;
+	private static final long serialVersionUID = -1336911362484026855L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,12 +30,14 @@ public class UserRankingEntity implements Serializable {
 	private String siteId;
 	private Long number;
 	private Timestamp latestUploadDate;
+	private String siteAlias;
 
 	public UserRankingEntity(Long satelliteId, String siteId, Long number, Timestamp latestUploadDate) {
 		this.satelliteId = satelliteId;
 		this.siteId = siteId;
 		this.number = number;
 		this.latestUploadDate = latestUploadDate;
+		this.siteAlias = siteId;
 	}
 
 	public UserRankingEntity() {
@@ -79,6 +81,14 @@ public class UserRankingEntity implements Serializable {
 
 	public final void setLatestUploadDate(Timestamp latestUploadDate) {
 		this.latestUploadDate = latestUploadDate;
+	}
+
+	public final String getSiteAlias() {
+		return siteAlias;
+	}
+
+	public final void setSiteAlias(String siteAlias) {
+		this.siteAlias = siteAlias;
 	}
 
 }
