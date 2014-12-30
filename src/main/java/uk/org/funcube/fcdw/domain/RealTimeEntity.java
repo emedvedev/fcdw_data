@@ -41,6 +41,7 @@ public class RealTimeEntity {
 	private long commandCount;
 	private long lastCommand;
 	private Timestamp satelliteTime;
+	private boolean valid;
 
 	private Long c1;
 	private Long c2;
@@ -992,6 +993,14 @@ public class RealTimeEntity {
 
 	public final void setSatelliteTime(Timestamp satelliteTime) {
 		this.satelliteTime = satelliteTime;
+	}
+
+	public final boolean isValid() {
+		return valid;
+	}
+
+	public final void setValid(boolean valid) {
+		this.valid = valid;
 	}
 	
 

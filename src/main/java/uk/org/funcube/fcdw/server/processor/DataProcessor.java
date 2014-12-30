@@ -418,20 +418,19 @@ public class DataProcessor {
 					dtmfCommandDao.save(newCommand);
 				}
 			}
+			
+			boolean valid = true;
 
 			if (satelliteId == 1) {
-				boolean valid = (realTimeEntity.getC53() && realTimeEntity
+				valid = (realTimeEntity.getC53() && realTimeEntity
 						.getC54());
-				hexFrame.setValid(valid);
 				hexFrame.setDigest(digest);
-				hexFrameDao.save(hexFrame);
-				if (valid) {
-					realTimeDao.save(realTimeEntity);
-				}
-			} else {
-				hexFrameDao.save(hexFrame);
-				realTimeDao.save(realTimeEntity);
 			}
+		
+			hexFrame.setValid(valid);
+			hexFrameDao.save(hexFrame);
+			realTimeEntity.setValid(valid);
+			realTimeDao.save(realTimeEntity);
 
 			if (!outOfOrder) {
 				checkMinMax(satelliteId, realTimeEntity);
