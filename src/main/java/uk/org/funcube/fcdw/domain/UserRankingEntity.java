@@ -15,80 +15,90 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name="UserRanking2")
+@Table(name = "UserRanking2")
 public class UserRankingEntity implements Serializable {
 
-	private static final long serialVersionUID = -1336911362484026855L;
+    private static final long serialVersionUID = -1336911362484026855L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	private Long satelliteId;
-	private String siteId;
-	private Long number;
-	private Timestamp latestUploadDate;
-	private String siteAlias;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public UserRankingEntity(Long satelliteId, String siteId, Long number, Timestamp latestUploadDate) {
-		this.satelliteId = satelliteId;
-		this.siteId = siteId;
-		this.number = number;
-		this.latestUploadDate = latestUploadDate;
-		this.siteAlias = siteId;
-	}
+    private Long satelliteId;
+    private String siteId;
+    private Long number;
+    private Timestamp latestUploadDate;
+    private Timestamp firstUploadDate;
+    private String siteAlias;
 
-	public UserRankingEntity() {
-	}
+    public UserRankingEntity(final Long satelliteId, final String siteId, 
+            final Long number, final Timestamp latestUploadDate, final Timestamp firstUploadDate) {
+        this.satelliteId = satelliteId;
+        this.siteId = siteId;
+        this.number = number;
+        this.latestUploadDate = latestUploadDate;
+        this.siteAlias = siteId;
+        this.firstUploadDate = firstUploadDate;
+    }
 
-	public final Long getId() {
-		return id;
-	}
+    public UserRankingEntity() {
+    }
 
-	public final void setId(Long id) {
-		this.id = id;
-	}
+    public final Long getId() {
+        return id;
+    }
 
-	public final Long getSatelliteId() {
-		return satelliteId;
-	}
+    public final void setId(Long id) {
+        this.id = id;
+    }
 
-	public final void setSatelliteId(Long satlliteId) {
-		this.satelliteId = satlliteId;
-	}
+    public final Long getSatelliteId() {
+        return satelliteId;
+    }
 
-	public final String getSiteId() {
-		return siteId;
-	}
+    public final void setSatelliteId(Long satlliteId) {
+        this.satelliteId = satlliteId;
+    }
 
-	public final void setSiteId(String siteId) {
-		this.siteId = siteId;
-	}
+    public final String getSiteId() {
+        return siteId;
+    }
 
-	public final Long getNumber() {
-		return number;
-	}
+    public final void setSiteId(String siteId) {
+        this.siteId = siteId;
+    }
 
-	public final void setNumber(Long number) {
-		this.number = number;
-	}
+    public final Long getNumber() {
+        return number;
+    }
 
-	public final Timestamp getLatestUploadDate() {
-		return latestUploadDate;
-	}
+    public final void setNumber(Long number) {
+        this.number = number;
+    }
 
-	public final void setLatestUploadDate(Timestamp latestUploadDate) {
-		this.latestUploadDate = latestUploadDate;
-	}
+    public final Timestamp getLatestUploadDate() {
+        return latestUploadDate;
+    }
 
-	public final String getSiteAlias() {
-		return siteAlias;
-	}
+    public final void setLatestUploadDate(Timestamp latestUploadDate) {
+        this.latestUploadDate = latestUploadDate;
+    }
 
-	public final void setSiteAlias(String siteAlias) {
-		this.siteAlias = siteAlias;
-	}
+    public final String getSiteAlias() {
+        return siteAlias;
+    }
+
+    public final void setSiteAlias(String siteAlias) {
+        this.siteAlias = siteAlias;
+    }
+
+    public final Timestamp getFirstUploadDate() {
+        return firstUploadDate;
+    }
+
+    public final void setFirstUploadDate(Timestamp firstUploadDate) {
+        this.firstUploadDate = firstUploadDate;
+    }
 
 }

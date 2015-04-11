@@ -13,15 +13,17 @@ public class UserRankingTest {
 	private static final String SITE_ID = "g4dpz";
 	private static final Long SATLLITE_ID = 1L;
 	private static final Timestamp LATEST_UPLOADED_DATE = new Timestamp(2014, 1, 1, 23, 59, 0, 0);
+    private static final Timestamp FIRST_UPLOADED_DATE = new Timestamp(2014, 1, 1, 22, 59, 0, 0);
 
 	@Test
 	public void testConstruction() {
 		UserRankingEntity userRankingEntity 
-			= new UserRankingEntity(SATLLITE_ID, SITE_ID, NUMBER, LATEST_UPLOADED_DATE);
+			= new UserRankingEntity(SATLLITE_ID, SITE_ID, NUMBER, LATEST_UPLOADED_DATE, FIRST_UPLOADED_DATE);
 		Assert.assertEquals(SATLLITE_ID, userRankingEntity.getSatelliteId());
 		Assert.assertEquals(SITE_ID, userRankingEntity.getSiteId());
 		Assert.assertEquals(NUMBER, userRankingEntity.getNumber());
 		Assert.assertEquals(LATEST_UPLOADED_DATE, userRankingEntity.getLatestUploadDate());
+        Assert.assertEquals(FIRST_UPLOADED_DATE, userRankingEntity.getFirstUploadDate());
 	}
 	
 	@Test

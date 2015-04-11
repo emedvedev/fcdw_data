@@ -11,13 +11,13 @@ package uk.org.funcube.fcdw.server.shared;
  */
 public class EpsSummary {
 	
-	String totalPhotoCurrent;
-	String batteryVoltage;
-	String totalSystemCurrent;
-	String batteryTemp;
+	private String totalPhotoCurrent;
+	private String batteryVoltage;
+	private String totalSystemCurrent;
+	private String batteryTemp;
 	
-	public EpsSummary(String totalPhotoCurrent, String batteryVoltage,
-			String totalSystemCurrent, String batteryTemp) {
+	public EpsSummary(final String totalPhotoCurrent, final String batteryVoltage,
+	        final String totalSystemCurrent, final String batteryTemp) {
 		super();
 		this.totalPhotoCurrent = totalPhotoCurrent;
 		this.batteryVoltage = batteryVoltage;

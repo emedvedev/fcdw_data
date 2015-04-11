@@ -7,36 +7,38 @@
 package uk.org.funcube.fcdw.server.shared;
 
 /**
- * @author  g4dpz
+ * @author g4dpz
  */
 public class FC2SoftwareSummary {
-	
-	private String sequenceNumber;
-	private String inEclipseMode;
-	private String obcResetCount;
-	private String epsResetCount;
-	
-	public FC2SoftwareSummary(String sequenceNumber, String inEclipseMode, String obcResetCount, String epsResetCount) {
-		super();
-		this.sequenceNumber = sequenceNumber;
-		this.inEclipseMode = inEclipseMode;
-		this.obcResetCount = obcResetCount;
-		this.epsResetCount = epsResetCount;
-	}
-	public final String getSequenceNumber() {
-		return sequenceNumber;
-	}
-	
-	public final String getInEclipseMode() {
-		return inEclipseMode;
-	}
-	public final String getEpsResetCount() {
-		return epsResetCount;
-	}
-	public final String getObcResetCount() {
-		return obcResetCount;
-	}
-	
-	
-	
+
+    private String sequenceNumber;
+    private String inEclipseMode;
+    private String obcResetCount;
+    private String epsResetCount;
+
+    public FC2SoftwareSummary(final String sequenceNumber, final String inEclipseMode, final String obcResetCount,
+            final String epsResetCount) {
+        super();
+        this.sequenceNumber = sequenceNumber;
+        this.inEclipseMode = inEclipseMode;
+        this.obcResetCount = obcResetCount;
+        this.epsResetCount = epsResetCount;
+    }
+
+    public final String getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public final String getInEclipseMode() {
+        return inEclipseMode;
+    }
+
+    public final String getEpsResetCount() {
+        return epsResetCount;
+    }
+
+    public final String getObcResetCount() {
+        return obcResetCount;
+    }
+
 }

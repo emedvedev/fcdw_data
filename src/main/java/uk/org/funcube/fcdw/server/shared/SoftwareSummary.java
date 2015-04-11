@@ -33,10 +33,10 @@ public class SoftwareSummary {
 	 * @param inEclipseMode
 	 * @param inSafeMode
 	 */
-	public SoftwareSummary(String sequenceNumber, String dataValidAsib,
-			String dataValidEps, String dataValidPa, String dataValidRf,
-			String dataValidMse, String dataValidAntsBusB,
-			String dataValidAntsBusA, String inEclipseMode, String inSafeMode) {
+	public SoftwareSummary(final String sequenceNumber, final String dataValidAsib,
+			final String dataValidEps, final String dataValidPa, final String dataValidRf,
+			final String dataValidMse, final String dataValidAntsBusB,
+			final String dataValidAntsBusA, final String inEclipseMode, final String inSafeMode) {
 		super();
 		this.sequenceNumber = sequenceNumber;
 		this.dataValidAsib = dataValidAsib;
@@ -79,7 +79,4 @@ public class SoftwareSummary {
 	public final String getInSafeMode() {
 		return inSafeMode;
 	}
-	
-	
-	
 }

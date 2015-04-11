@@ -6,9 +6,8 @@
 
 package uk.org.funcube.fcdw.server.shared;
 
-import static org.junit.Assert.*;
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -17,7 +16,11 @@ import org.junit.Test;
  */
 public class EpsTest {
 
-	@Test
+	public EpsTest() {
+        super();
+    }
+
+    @Test
 	public final void testSetAndGet() {
 		EPS eps = new EPS();
 		eps.setC1(1L);

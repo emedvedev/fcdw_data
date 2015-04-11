@@ -57,9 +57,9 @@ public class ClydeSpaceRF extends RF {
 	}
 
 	public ClydeSpaceRF(long sensorId,
-			long c1, long c2, long c3, long c4, long c5, long c6,long c7, long c8, long c9) {
+			long c1, long c2, long c3, long c4, long c5, long c6, long c7, long c8, long c9) {
 		setSensorId(sensorId);
-		setC1(c1);setC2(c2);setC3(c3);setC4(c4);setC5(c5);setC6(c6);setC7(c7);setC8(c8);setC9(c9);
+		setC1(c1); setC2(c2); setC3(c3); setC4(c4); setC5(c5); setC6(c6); setC7(c7); setC8(c8); setC9(c9); 
 	}
 
 	/**

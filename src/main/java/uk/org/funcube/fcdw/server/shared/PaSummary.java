@@ -41,7 +41,4 @@ public class PaSummary {
 	public final String getPaBusCurrent() {
 		return paBusCurrent;
 	}
-	
-	
-	
 }

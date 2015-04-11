@@ -9,156 +9,162 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name="SatelliteStatus")
+@Table(name = "SatelliteStatus")
 public class SatelliteStatusEntity implements SatelliteStatus {
-	
-	static final SimpleDateFormat SDTF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
-	
-	@Id
-	private Long satelliteId;
-	
-	private Long sequenceNumber;
-	private Boolean eclipseModeForced;
-	private Boolean eclipsed;
-	private Timestamp lastUpdated;
-	private Double eclipseDepth;
-	private Boolean eclipseSwitch;
-	private Timestamp lastWodDump;
-	private Timestamp lastResetNotification;
-	private Timestamp lastNoShowNotification;
-	
-	public SatelliteStatusEntity() {
-	}
 
-	public final Long getSatelliteId() {
-		return satelliteId;
-	}
+    static final SimpleDateFormat SDTF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
 
-	public final void setSatelliteId(Long satelliteId) {
-		this.satelliteId = satelliteId;
-	}
+    @Id
+    private Long satelliteId;
 
-	public final Long getSequenceNumber() {
-		return sequenceNumber;
-	}
+    private Long sequenceNumber;
+    private Boolean eclipseModeForced;
+    private Boolean eclipsed;
+    private Timestamp lastUpdated;
+    private Double eclipseDepth;
+    private Boolean eclipseSwitch;
+    private Timestamp lastWodDump;
+    private Timestamp lastResetNotification;
+    private Timestamp lastNoShowNotification;
 
-	public final void setSequenceNumber(Long sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
+    public SatelliteStatusEntity() {
+    }
 
-	public final Boolean isEclipseModeForced() {
-		return eclipseModeForced;
-	}
+    public final Long getSatelliteId() {
+        return satelliteId;
+    }
 
-	public final void setEclipseModeForced(Boolean eclipseModeForced) {
-		this.eclipseModeForced = eclipseModeForced;
-	}
+    public final void setSatelliteId(Long satelliteId) {
+        this.satelliteId = satelliteId;
+    }
 
-	public final Boolean isEclipsed() {
-		return eclipsed;
-	}
+    public final Long getSequenceNumber() {
+        return sequenceNumber;
+    }
 
-	public final void setEclipsed(Boolean eclipsed) {
-		this.eclipsed = eclipsed;
-	}
+    public final void setSequenceNumber(Long sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
 
-	public final Timestamp getLastUpdated() {
-		return lastUpdated;
-	}
+    public final Boolean isEclipseModeForced() {
+        return eclipseModeForced;
+    }
 
-	public final void setLastUpdated(Timestamp lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
+    public final void setEclipseModeForced(Boolean eclipseModeForced) {
+        this.eclipseModeForced = eclipseModeForced;
+    }
 
-	public final Double getEclipseDepth() {
-		return eclipseDepth;
-	}
+    public final Boolean isEclipsed() {
+        return eclipsed;
+    }
 
-	public final void setEclipseDepth(Double eclipseDepth) {
-		this.eclipseDepth = eclipseDepth;
-	}
+    public final void setEclipsed(Boolean eclipsed) {
+        this.eclipsed = eclipsed;
+    }
 
-	public void setEclipseSwitch(Boolean eclipseSwitch) {
-		this.eclipseSwitch = eclipseSwitch;
-	}
+    public final Timestamp getLastUpdated() {
+        return lastUpdated;
+    }
 
-	public Boolean getEclipseModeForced() {
-		return eclipseModeForced;
-	}
+    public final void setLastUpdated(Timestamp lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 
-	public Boolean getEclipsed() {
-		return eclipsed;
-	}
+    public final Double getEclipseDepth() {
+        return eclipseDepth;
+    }
 
-	public Boolean isEclipseSwitch() {
-		return eclipseSwitch;
-	}
-	
-	@Transient
-	public String getMode() {
-		if (isEclipseSwitch()) {
-			return "Auto";
-		} else {
-			return "Manual";
-		}
-	}
-	
-	@Transient
-	public String getTransponderState() {
-		if (!isEclipseSwitch()) {
-			if (!isEclipseModeForced()) {
-				return "Off";
-			} else {
-				return "On";
-			}
-		} else {
-			if (!isEclipseModeForced()) {
-				if (!isEclipsed()) {
-					return "Off";
-				} else {
-					return "On";
-				}
-			} else {
-				if (!isEclipsed()) {
-					return "Off";
-				} else {
-					return "On";
-				}
-			}
-		}
-	}
-	
-	public final Timestamp getLastWodDump() {
-		return lastWodDump;
-	}
+    public final void setEclipseDepth(Double eclipseDepth) {
+        this.eclipseDepth = eclipseDepth;
+    }
 
-	public final void setLastWodDump(Timestamp lastWodDump) {
-		this.lastWodDump = lastWodDump;
-	}
+    public void setEclipseSwitch(Boolean eclipseSwitch) {
+        this.eclipseSwitch = eclipseSwitch;
+    }
 
-	public final Timestamp getLastResetNotification() {
-		return lastResetNotification;
-	}
+    public Boolean getEclipseModeForced() {
+        return eclipseModeForced;
+    }
 
-	public final void setLastResetNotification(Timestamp lastResetNotification) {
-		this.lastResetNotification = lastResetNotification;
-	}
+    public Boolean getEclipsed() {
+        return eclipsed;
+    }
 
-	public final Timestamp getLastNoShowNotification() {
-		return lastNoShowNotification;
-	}
+    public Boolean isEclipseSwitch() {
+        return eclipseSwitch;
+    }
 
-	public final void setLastNoShowNotification(Timestamp lastNoShowNotification) {
-		this.lastNoShowNotification = lastNoShowNotification;
-	}
+    @Transient
+    public String getMode() {
+        if (isEclipseSwitch()) {
+            return "Auto";
+        }
+        else {
+            return "Manual";
+        }
+    }
 
-	public final String toString() {
-		return "SatelliteStatus: lastUpdated: " + lastUpdated
-		+ "satelliteId: " + satelliteId
-		+ ", sequenceNumber: " + sequenceNumber
-		+ ", eclipseModeForced :" + eclipseModeForced
-		+ ", eclipsed: " + eclipsed
-		+ ", eclipseSwitch :" + eclipseSwitch;
-	}
+    @Transient
+    public String getTransponderState() {
+        if (!isEclipseSwitch()) {
+            if (!isEclipseModeForced()) {
+                return "Off";
+            }
+            else {
+                return "On";
+            }
+        }
+        else {
+            if (!isEclipseModeForced()) {
+                if (!isEclipsed()) {
+                    return "Off";
+                }
+                else {
+                    return "On";
+                }
+            }
+            else {
+                if (!isEclipsed()) {
+                    return "Off";
+                }
+                else {
+                    return "On";
+                }
+            }
+        }
+    }
+
+    public final Timestamp getLastWodDump() {
+        return lastWodDump;
+    }
+
+    public final void setLastWodDump(Timestamp lastWodDump) {
+        this.lastWodDump = lastWodDump;
+    }
+
+    public final Timestamp getLastResetNotification() {
+        return lastResetNotification;
+    }
+
+    public final void setLastResetNotification(Timestamp lastResetNotification) {
+        this.lastResetNotification = lastResetNotification;
+    }
+
+    public final Timestamp getLastNoShowNotification() {
+        return lastNoShowNotification;
+    }
+
+    public final void setLastNoShowNotification(Timestamp lastNoShowNotification) {
+        this.lastNoShowNotification = lastNoShowNotification;
+    }
+
+    public final String toString() {
+        return "SatelliteStatus: lastUpdated: " + lastUpdated
+                + "satelliteId: " + satelliteId
+                + ", sequenceNumber: " + sequenceNumber
+                + ", eclipseModeForced :" + eclipseModeForced
+                + ", eclipsed: " + eclipsed
+                + ", eclipseSwitch :" + eclipseSwitch;
+    }
 
 }

@@ -6,9 +6,8 @@
 
 package uk.org.funcube.fcdw.server.shared;
 
-import static org.junit.Assert.*;
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -17,9 +16,14 @@ import org.junit.Test;
  */
 public class DtmfTest {
 
-	@Test
+	public DtmfTest() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    @Test
 	public final void testConstruction() {
-		DTMF dtmf = new DTMF("11111111110");
+		final DTMF dtmf = new DTMF("11111111110");
 		Assert.assertEquals(63L, dtmf.getCommandCount());
 		Assert.assertEquals(30L, dtmf.getLastCommand());
 	}

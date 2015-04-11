@@ -22,63 +22,65 @@ import uk.org.funcube.fcdw.satellite.TLE;
 import uk.org.funcube.fcdw.server.util.Clock;
 
 public class TleProcessor {
-	
-	private static final String ELEM_URL_CELESTRAK_CUBESAT = "http://celestrak.com/NORAD/elements/cubesat.txt";
-	private static final String CELESTRAK_CUBESAT = "CELESTRAK_CUBESAT";
-	
-	private static final Logger LOGGER = Logger
-			.getLogger(TleProcessor.class.getName());
-	
 
-	private static ConcurrentMap<String, TLE> allSatElems = new ConcurrentHashMap<String, TLE>();
-	
-	@Autowired
-	TleDao tleDao;
-	
-	@Autowired
-	Clock clock;
+    private static final String ELEM_URL_CELESTRAK_CUBESAT = "http://celestrak.com/NORAD/elements/cubesat.txt";
+    private static final String CELESTRAK_CUBESAT = "CELESTRAK_CUBESAT";
 
-	public void process() {
-		LOGGER.info("loadCelestrakKeps " + CELESTRAK_CUBESAT 
-				+ (loadElemFromNetwork(CELESTRAK_CUBESAT) ? " succeed" : " failed"));
-		
-	}
+    private static final Logger LOGGER = Logger
+            .getLogger(TleProcessor.class.getName());
 
-	@Transactional(readOnly = false)
-	private boolean loadElemFromNetwork(final String kepSource) {
-		boolean success = false;
-		URL url;
-		try {
-			
-			url = new URL(ELEM_URL_CELESTRAK_CUBESAT);
+    private static ConcurrentMap<String, TLE> allSatElems = new ConcurrentHashMap<String, TLE>();
 
-			final List<TLE> tmpSatElems = TLE.importSat(url.openStream());
+    @Autowired
+    TleDao tleDao;
 
-			for (TLE tle : tmpSatElems) {
+    @Autowired
+    Clock clock;
 
-				final String catalogueId = Long.toString(tle.getCatnum());
+    public void process() {
+        LOGGER.info("loadCelestrakKeps " + CELESTRAK_CUBESAT
+                + (loadElemFromNetwork(CELESTRAK_CUBESAT) ? " succeed" : " failed"));
 
-				TLE storedTle = allSatElems.get(catalogueId);
+    }
 
-				if (storedTle == null) { 
-					tle.setCreateddate(clock.currentDate());
-					tleDao.save(new TleEntity(tle));
-					allSatElems.put(catalogueId, tle);
-				} else if (storedTle.getSetnum() < tle.getSetnum()) {
-					tle.setCreateddate(clock.currentDate());
-					allSatElems.replace(catalogueId, tle);
-				}
-			}
+    @Transactional(readOnly = false)
+    private boolean loadElemFromNetwork(final String kepSource) {
+        boolean success = false;
+        URL url;
+        try {
 
-			success = true;
-			
-		} catch (final IOException e) {
-			LOGGER.info("Unable to get " + kepSource + " keps.");
-			success = false;
-		} catch (final IllegalArgumentException e) {
-			e.printStackTrace();
-		}
-		return success;
-	}
+            url = new URL(ELEM_URL_CELESTRAK_CUBESAT);
+
+            final List<TLE> tmpSatElems = TLE.importSat(url.openStream());
+
+            for (TLE tle : tmpSatElems) {
+
+                final String catalogueId = Long.toString(tle.getCatnum());
+
+                TLE storedTle = allSatElems.get(catalogueId);
+
+                if (storedTle == null) {
+                    tle.setCreateddate(clock.currentDate());
+                    tleDao.save(new TleEntity(tle));
+                    allSatElems.put(catalogueId, tle);
+                }
+                else if (storedTle.getSetnum() < tle.getSetnum()) {
+                    tle.setCreateddate(clock.currentDate());
+                    allSatElems.replace(catalogueId, tle);
+                }
+            }
+
+            success = true;
+
+        }
+        catch (final IOException e) {
+            LOGGER.info("Unable to get " + kepSource + " keps.");
+            success = false;
+        }
+        catch (final IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
 
 }

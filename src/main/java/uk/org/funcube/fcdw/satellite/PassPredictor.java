@@ -274,7 +274,7 @@ public class PassPredictor {
     }
 
     /**
-     * Gets a list of SatPassTime
+     * Gets a list of SatPassTime.
      * 
      * @param start Date
      * 

@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import uk.org.funcube.fcdw.domain.RealTimeEntity;
-import uk.org.funcube.fcdw.domain.RealTimeEntity;
 
 
 public interface RealTimeDao extends CrudRepository<RealTimeEntity, Long> {

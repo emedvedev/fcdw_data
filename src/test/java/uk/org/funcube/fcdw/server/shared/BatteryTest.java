@@ -6,9 +6,7 @@
 
 package uk.org.funcube.fcdw.server.shared;
 
-import static org.junit.Assert.*;
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -17,9 +15,13 @@ import org.junit.Test;
  */
 public class BatteryTest {
 
-	@Test
+	public BatteryTest() {
+        super();
+    }
+
+    @Test
 	public final void testConstruction() {
-		Battery battery = new Battery(100L, 101L, 102L, 103L);
+		final Battery battery = new Battery(100L, 101L, 102L, 103L);
 		Assert.assertEquals(100L, battery.getBatteryCurrent1().longValue());
 		Assert.assertEquals(101L, battery.getBatteryCurrent2().longValue());
 		Assert.assertEquals(102L, battery.getBatteryVoltage1().longValue());

@@ -120,12 +120,12 @@ public class GomSpaceEPS extends EPS {
 	}
 
 	public GomSpaceEPS(
-			long c1, long c2, long c3, long c4, long c5, long c6,long c7, long c8, long c9, long c10,
-			long c11, long c12, long c13, long c14, long c15, long c16,long c17, long c18, long c19, long c20,
+			long c1, long c2, long c3, long c4, long c5, long c6, long c7, long c8, long c9, long c10,
+			long c11, long c12, long c13, long c14, long c15, long c16, long c17, long c18, long c19, long c20,
 			long c21, long c22, long c23, long c24, long c25, long c26) {
-		setC1(c1);setC2(c2);setC3(c3);setC4(c4);setC5(c5);setC6(c6);setC7(c7);setC8(c8);setC9(c9);setC10(c10);
-		setC11(c11);setC12(c12);setC13(c13);setC14(c14);setC15(c15);setC16(c16);setC17(c17);setC18(c18);setC19(c19);setC20(c20);
-		setC21(c21);setC22(c22);setC23(c23);setC24(c24);setC25(c25);setC26(c26);
+		setC1(c1); setC2(c2); setC3(c3); setC4(c4); setC5(c5); setC6(c6); setC7(c7); setC8(c8); setC9(c9); setC10(c10); 
+		setC11(c11); setC12(c12); setC13(c13); setC14(c14); setC15(c15); setC16(c16); setC17(c17); setC18(c18); setC19(c19); setC20(c20); 
+		setC21(c21); setC22(c22); setC23(c23); setC24(c24); setC25(c25); setC26(c26); 
 	}
 
 	public final Long getPhotoVoltage1() {

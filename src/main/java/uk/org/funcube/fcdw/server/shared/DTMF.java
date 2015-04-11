@@ -8,52 +8,57 @@ package uk.org.funcube.fcdw.server.shared;
 
 public class DTMF {
 
-	private long commandCount;
-	private long lastCommand;
+    private long commandCount;
+    private long lastCommand;
 
-	public DTMF(long commandCount, long lastCommand) {
-		super();
-		this.commandCount = commandCount;
-		this.lastCommand = lastCommand;
-	}
+    public DTMF(long commandCount, long lastCommand) {
+        super();
+        this.commandCount = commandCount;
+        this.lastCommand = lastCommand;
+    }
 
-	public DTMF(String binaryString) {
-		
-		commandCount = Long.parseLong(binaryString.substring(0, 6), 2);
-	    lastCommand = Long.parseLong(binaryString.substring(6, 11), 2);
-	}
+    public DTMF(String binaryString) {
 
-	public final long getCommandCount() {
-		return commandCount;
-	}
+        commandCount = Long.parseLong(binaryString.substring(0, 6), 2);
+        lastCommand = Long.parseLong(binaryString.substring(6, 11), 2);
+    }
 
-	public final long getLastCommand() {
-		return lastCommand;
-	}
+    public final long getCommandCount() {
+        return commandCount;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (commandCount ^ (commandCount >>> 32));
-		result = prime * result + (int) (lastCommand ^ (lastCommand >>> 32));
-		return result;
-	}
+    public final long getLastCommand() {
+        return lastCommand;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DTMF other = (DTMF) obj;
-		if (commandCount != other.commandCount)
-			return false;
-		if (lastCommand != other.lastCommand)
-			return false;
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int)(commandCount ^ (commandCount >>> 32));
+        result = prime * result + (int)(lastCommand ^ (lastCommand >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        DTMF other = (DTMF)obj;
+        if (commandCount != other.commandCount) {
+            return false;
+        }
+        if (lastCommand != other.lastCommand) {
+            return false;
+        }
+        return true;
+    }
 
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the FUNcube Data Warehouse
-	
+
 	Copyright 2013,2014 (c) David A.Johnson, G4DPZ, AMSAT-UK
 
     The FUNcube Data Warehouse is free software: you can redistribute it and/or modify
@@ -81,775 +81,806 @@ import uk.org.funcube.fcdw.service.PredictorService;
 @RequestMapping("/api/data/hex")
 public class DataProcessor {
 
-	private final Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
-	long TWO_DAYS_SEQ_COUNT = 1440;
+    static final long TWO_DAYS_SEQ_COUNT = 1440;
 
-	@Autowired
-	UserDao userDao;
+    @Autowired
+    UserDao userDao;
 
-	@Autowired
-	HexFrameDao hexFrameDao;
+    @Autowired
+    HexFrameDao hexFrameDao;
 
-	@Autowired
-	RealTimeDao realTimeDao;
+    @Autowired
+    RealTimeDao realTimeDao;
 
-	@Autowired
-	MinMaxDao minMaxDao;
+    @Autowired
+    MinMaxDao minMaxDao;
 
-	@Autowired
-	Clock clock;
+    @Autowired
+    Clock clock;
 
-	@Autowired
-	EpochDao epochDao;
-
-	@Autowired
-	SatelliteStatusDao satelliteStatusDao;
+    @Autowired
+    EpochDao epochDao;
+
+    @Autowired
+    SatelliteStatusDao satelliteStatusDao;
 
-	@Autowired
-	UserRankingDao userRankingDao;
+    @Autowired
+    UserRankingDao userRankingDao;
+
+    @Autowired
+    PredictorService predictor;
+
+    @Autowired
+    DTMFCommandDao dtmfCommandDao;
+
+    @Autowired
+    FrameTypeFortyDao frameTypeFortyDao;
 
-	@Autowired
-	PredictorService predictor;
+    @Autowired
+    MailService mailService;
 
-	@Autowired
-	DTMFCommandDao dtmfCommandDao;
+    private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
+
+    public DataProcessor() {
+        super();
+    }
+
+    @RequestMapping(value = "/{siteId}/", method = RequestMethod.POST)
+    public ResponseEntity<String> uploadData(@PathVariable final String siteId,
+            @RequestParam(value = "digest") final String digest,
+            @RequestBody final String body) {
 
-	@Autowired
-	FrameTypeFortyDao frameTypeFortyDao;
+        lock.lock();
 
-	@Autowired
-	MailService mailService;
+        try {
+            return processUpload(siteId, digest, body);
+        }
+        finally {
+            lock.unlock();
+        }
 
-	private static Logger LOG = Logger.getLogger(DataProcessor.class.getName());
+    }
+
+    @Transactional(readOnly = false)
+    private ResponseEntity<String> processUpload(final String siteId, final String digest,
+            final String body) {
+        // get the user from the repository
+        final List<UserEntity> users = userDao.findBySiteId(siteId);
+
+        if (users.size() != 0) {
+
+            String hexString = StringUtils.substringBetween(body, "=", "&");
+            hexString = hexString.replace("+", " ");
 
-	@RequestMapping(value = "/{siteId}/", method = RequestMethod.POST)
-	public ResponseEntity<String> uploadData(@PathVariable String siteId,
-			@RequestParam(value = "digest") String digest,
-			@RequestBody String body) {
+            String authKey = userAuthKeys.get(siteId);
+            final UserEntity user = users.get(0);
 
-		lock.lock();
+            try {
 
-		try {
-			return processUpload(siteId, digest, body);
-		} finally {
-			lock.unlock();
-		}
+                if (authKey == null) {
+                    if (user != null) {
+                        authKey = user.getAuthKey();
+                        userAuthKeys.put(siteId, authKey);
+                    }
+                    else {
+                        LOG.error(USER_WITH_SITE_ID + siteId + NOT_FOUND);
+                        return new ResponseEntity<String>("UNAUTHORIZED",
+                                HttpStatus.UNAUTHORIZED);
+                    }
+                }
 
-	}
+                final String calculatedDigest = DataProcessor.calculateDigest(hexString,
+                        authKey, null);
+                final String calculatedDigestUTF8 = DataProcessor.calculateDigest(hexString,
+                        authKey, new Integer(8));
+                final String calculatedDigestUTF16 = DataProcessor.calculateDigest(hexString,
+                        authKey, new Integer(16));
 
-	@Transactional(readOnly = false)
-	private ResponseEntity<String> processUpload(String siteId, String digest,
-			String body) {
-		// get the user from the repository
-		List<UserEntity> users = userDao.findBySiteId(siteId);
-
-		if (users.size() != 0) {
-
-			String hexString = StringUtils.substringBetween(body, "=", "&");
-			hexString = hexString.replace("+", " ");
-
-			String authKey = userAuthKeys.get(siteId);
-			final UserEntity user = users.get(0);
-
-			try {
-
-				if (authKey == null) {
-					if (user != null) {
-						authKey = user.getAuthKey();
-						userAuthKeys.put(siteId, authKey);
-					} else {
-						LOG.error(USER_WITH_SITE_ID + siteId + NOT_FOUND);
-						return new ResponseEntity<String>("UNAUTHORIZED",
-								HttpStatus.UNAUTHORIZED);
-					}
-				}
-
-				final String calculatedDigest = calculateDigest(hexString,
-						authKey, null);
-				final String calculatedDigestUTF8 = calculateDigest(hexString,
-						authKey, new Integer(8));
-				final String calculatedDigestUTF16 = calculateDigest(hexString,
-						authKey, new Integer(16));
-
-				if (null != digest
-						&& (digest.equals(calculatedDigest)
-								|| digest.equals(calculatedDigestUTF8) || digest
-									.equals(calculatedDigestUTF16))) {
-
-					hexString = StringUtils.deleteWhitespace(hexString);
-
-					final Date now = new Date(5000 * (clock.currentDate().getTime() / 5000));
-
-					return processHexFrame(new UserHexString(user,
-							StringUtils.deleteWhitespace(hexString), now));
-				} else {
-					LOG.error(USER_WITH_SITE_ID + siteId + HAD_INCORRECT_DIGEST
-							+ ", received: " + digest + ", calculated: "
-							+ calculatedDigest);
-					return new ResponseEntity<String>("UNAUTHORIZED",
-							HttpStatus.UNAUTHORIZED);
-				}
-			} catch (final Exception e) {
-				LOG.error(e.getMessage());
-				return new ResponseEntity<String>(e.getMessage(),
-						HttpStatus.BAD_REQUEST);
-			}
-
-		} else {
-			LOG.error("Site id: " + siteId + " not found in database");
-			return new ResponseEntity<String>("UNAUTHORIZED",
-					HttpStatus.UNAUTHORIZED);
-		}
-	}
-
-	private ResponseEntity<String> processHexFrame(UserHexString userHexString) {
-
-		Map<Long, EpochEntity> epochMap = new HashMap<Long, EpochEntity>();
-
-		Iterator<EpochEntity> iterator = epochDao.findAll().iterator();
-
-		while (iterator.hasNext()) {
-			EpochEntity epoch = iterator.next();
-			epochMap.put(epoch.getSatelliteId(), epoch);
-		}
-
-		final String hexString = userHexString.getHexString();
-		final UserEntity user = userHexString.getUser();
-		final Date createdDate = userHexString.getCreatedDate();
-		final String digest = generateDigest(hexString);
-
-		final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
-
-		final int frameType = frameId & 63;
-		final int satelliteId = (frameId & (128 + 64)) >> 6;
-		final int sensorId = frameId % 2;
-		final String binaryString = convertHexBytePairToBinary(hexString
-				.substring(2, hexString.length()));
-
-		RealTime realTime;
-
-		if (satelliteId == 1) {
-			realTime = new RealTimeFC2(satelliteId, frameType, sensorId, createdDate,
-					binaryString);
-		} else {
-			realTime = new RealTime(satelliteId, frameType, sensorId, createdDate,
-					binaryString);
-		}
-
-		final long sequenceNumber = realTime.getSequenceNumber();
-
-		if (sequenceNumber != -1) {
-
-			if (satelliteId != 1) {
-
-				Long maxSequenceNumber = hexFrameDao
-						.getMaxSequenceNumber(satelliteId);
-
-				if (maxSequenceNumber != null
-						&& Math.abs(maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
-					final String message = String
-									.format("User %s loading sequence number %d is out of bounds for satelliteId %d",
-											user.getSiteId(), sequenceNumber,
-											satelliteId);
-					LOG.error(message);
-
-					return new ResponseEntity<String>("OK", HttpStatus.OK);
-				}
-
-			}
-
-			final List<HexFrameEntity> frames = hexFrameDao
-					.findBySatelliteIdAndSequenceNumberAndFrameType(
-							satelliteId, sequenceNumber, frameType);
-
-			if (frames.size() > 0 && satelliteId == 1 && frameType == 40) {
-				return processFrameTypeForty(hexString, createdDate, sequenceNumber);
-			} else {
-				return saveUpdateHexFrame(hexString, user, frameType, satelliteId,
-						createdDate, realTime, sequenceNumber, frames,
-						epochMap.get(new Long(satelliteId)), digest);
-			}
-		}
-
-		return new ResponseEntity<String>("OK", HttpStatus.OK);
-	}
-
-	private void sendNoShowEmail(Timestamp lastUpdated) {
-		Map<String, Object> emailTags = new HashMap<String, Object>();
-		emailTags.put("satelliteName", "FUNcube 1");
-		emailTags.put("lastUpdated", lastUpdated);
-		mailService.sendUsingTemplate("operations@funcube.net", emailTags,
-				"noshow");
-	}
-
-	private ResponseEntity<String> processFrameTypeForty(String payload, Date now,
-			long sequenceNumber) {
-
-		frameTypeFortyDao.save(new FrameTypeFortyEntity(sequenceNumber, now,
-				payload));
-		
-		return new ResponseEntity<String>("OK",
-					HttpStatus.OK);
-
-	}
-
-	private ResponseEntity<String> saveUpdateHexFrame(final String hexString,
-			final UserEntity user, final int frameType, final int satelliteId,
-			final Date now, final RealTime realTime, final long sequenceNumber,
-			final List<HexFrameEntity> frames, final EpochEntity epoch,
-			String digest) {
-		HexFrameEntity hexFrame;
-		Set<UserEntity> users;
-
-		if (frames.size() == 0) {
-
-			Timestamp satelliteTime;
-
-			if (epoch == null || satelliteId == 1) {
-				satelliteTime = new Timestamp(now.getTime());
-			} else {
-				satelliteTime = new Timestamp(
-						epoch.getReferenceTime().getTime()
-								+ ((sequenceNumber - epoch.getSequenceNumber()) * 2 * 60 * 1000)
-								+ (frameType * 5 * 1000));
-			}
-
-			long[] catalogNumbers = new long[] { 39444, 40074, 39444, 39444 };
-
-			boolean outOfOrder = false;
-
-			List<HexFrameEntity> existingFrames = hexFrameDao
-					.findBySatelliteIdAndSequenceNumber(satelliteId,
-							sequenceNumber);
-
-			if (!existingFrames.isEmpty()) {
-				for (HexFrameEntity existingFrame : existingFrames) {
-					if (existingFrame.getCreatedDate().before(now)
-							&& existingFrame.getFrameType() > frameType) {
-						outOfOrder = false;
-						break;
-					}
-				}
-			}
-
-			hexFrame = new HexFrameEntity((long) satelliteId, (long) frameType,
-					sequenceNumber, hexString, now, true, satelliteTime);
-
-			hexFrame.setOutOfOrder(outOfOrder);
-
-			GroundStationPosition groundStationPosition = new GroundStationPosition(
-					Double.parseDouble(user.getLatitude()),
-					Double.parseDouble(user.getLongitude()), 100.0);
-
-			SatellitePosition satellitePosition = predictor.get(
-					catalogNumbers[satelliteId], now, groundStationPosition);
-
-			if (!satellitePosition.isAboveHorizon()) {
-				LOG.error("User [" + user.getSiteId()
-						+ "] is out of range of satellite[" + satelliteId
-						+ "]!!!");
-			}
-
-			if (!outOfOrder) {
-
-				if (satellitePosition != null) {
-					hexFrame.setEclipsed(satellitePosition.getEclipsed());
-					hexFrame.setEclipseDepth(satellitePosition
-							.getEclipseDepth());
-					latitude = satellitePosition.getLatitude();
-					hexFrame.setLatitude(latitude);
-					longitude = satellitePosition.getLongitude();
-					hexFrame.setLongitude(longitude);
-				}
-
-				SatelliteStatusEntity satelliteStatus = satelliteStatusDao
-						.findBySatelliteId(satelliteId).get(0);
-				satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
-				satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
-				satelliteStatus.setEclipsed(realTime.isEclipsed());
-
-				if (satellitePosition != null) {
-					satelliteStatus.setEclipseDepth(Double
-							.parseDouble(satellitePosition.getEclipseDepth()));
-				}
-
-				satelliteStatusDao.save(satelliteStatus);
-			}
-
-			hexFrame.getUsers().add(user);
-
-			RealTimeEntity realTimeEntity;
-
-			if (realTime instanceof RealTimeFC2) {
-				realTimeEntity = new RealTimeEntity((RealTimeFC2) realTime,
-						satelliteTime);
-			} else {
-				realTimeEntity = new RealTimeEntity(realTime, satelliteTime);
-			}
-
-			if (!outOfOrder) {
-				final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);
-
-				if (dtmfId != null) {
-					final List<DTMFCommandEntity> commandEntities = dtmfCommandDao
-							.findById(dtmfId);
-					if (!commandEntities.isEmpty()) {
-						DTMFCommandEntity lastCommand = commandEntities.get(0);
-						Long dtmfValue = realTimeEntity.getLastCommand();
-						if (dtmfValue.longValue() != lastCommand.getValue()
-								.longValue()) {
-							DTMFCommandEntity newCommand = new DTMFCommandEntity(
-									(long) satelliteId, (long) sequenceNumber,
-									(long) frameType, new Timestamp(
-											now.getTime()), latitude,
-									longitude, checkStatus(dtmfValue),
-									dtmfValue);
-							dtmfCommandDao.save(newCommand);
-						}
-					}
-				} else {
-					Long dtmfValue = realTimeEntity.getLastCommand();
-					DTMFCommandEntity newCommand = new DTMFCommandEntity(
-							(long) satelliteId, (long) sequenceNumber,
-							(long) frameType, new Timestamp(now.getTime()),
-							latitude, longitude, checkStatus(dtmfValue),
-							dtmfValue);
-					dtmfCommandDao.save(newCommand);
-				}
-			}
-			
-			boolean valid = true;
-
-			if (satelliteId == 1) {
-				valid = (realTimeEntity.getC53() && realTimeEntity
-						.getC54());
-				hexFrame.setDigest(digest);
-			}
-		
-			hexFrame.setValid(valid);
-			hexFrameDao.save(hexFrame);
-			realTimeEntity.setValid(valid);
-			realTimeDao.save(realTimeEntity);
-
-			if (!outOfOrder) {
-				checkMinMax(satelliteId, realTimeEntity);
-			}
-
-			incrementUploadRanking(satelliteId, user.getSiteId(), now);
-
-		} else {
-
-			hexFrame = frames.get(0);
-
-			users = hexFrame.getUsers();
-
-			boolean userFrameAlreadRegistered = false;
-
-			for (UserEntity existingUser : users) {
-				final String message = String
-						.format("User %s attempted to add duplicate record for satId/seq/frame: %d, %d, %d",
-								existingUser.getSiteId(), satelliteId,
-								hexFrame.getSequenceNumber(),
-								hexFrame.getFrameType());
-				if (satelliteId != 1
-						&& (existingUser.getId().longValue() == user.getId()
-								.longValue())) {
-					userFrameAlreadRegistered = true;
-					LOG.error(message);
-
-					return new ResponseEntity<String>("OK", HttpStatus.OK);
-					
-				} else if ((existingUser.getId().longValue() == user.getId()
-						.longValue())
-						&& hexFrame.getDigest() != null
-						&& digest.equals(hexFrame.getDigest())) {
-					userFrameAlreadRegistered = true;
-					LOG.error(message);
-
-					return new ResponseEntity<String>("OK", HttpStatus.OK);
-				}
-			}
-
-			if (!userFrameAlreadRegistered) {
-
-				hexFrame.getUsers().add(user);
-
-				hexFrameDao.save(hexFrame);
-
-				incrementUploadRanking(satelliteId, user.getSiteId(), now);
-			}
-		}
-
-		return new ResponseEntity<String>("OK",
-				HttpStatus.OK);
-	}
-
-	/**
-	 * @param dtmfValue
-	 * @return
-	 */
-	private Boolean checkStatus(Long dtmfValue) {
-		switch (dtmfValue.intValue()) {
-		case 0x00:
-		case 0x02:
-		case 0x04:
-		case 0x08:
-		case 0x09:
-		case 0x0A:
-		case 0x0C:
-		case 0x0D:
-		case 0x0E:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1A:
-		case 0x1B:
-		case 0x1C:
-		case 0x1D:
-		case 0x1E:
-		case 0x1F:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	private void incrementUploadRanking(int satelliteId, String siteId, Date now) {
-
-		final Timestamp latestUploadDate = new Timestamp(now.getTime());
-
-		List<UserRankingEntity> userRankings = userRankingDao
-				.findBySatelliteIdAndSiteId(satelliteId, siteId);
-
-		UserRankingEntity userRanking;
-
-		if (userRankings.isEmpty()) {
-
-			userRanking = new UserRankingEntity((long) satelliteId, siteId, 1L,
-					latestUploadDate);
-		} else {
-			userRanking = userRankings.get(0);
-			userRanking.setLatestUploadDate(latestUploadDate);
-			Long number = userRanking.getNumber();
-			number++;
-			userRanking.setNumber(number);
-		}
-
-		userRankingDao.save(userRanking);
-
-	}
-
-	@RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public List<String> hexStrings(
-			@PathVariable(value = "siteId") String siteId,
-			@PathVariable(value = "satelliteId") long satelliteId,
-			@PathVariable(value = "startSequenceNumber") long startSequenceNumber,
-			@PathVariable(value = "endSequenceNumber") long endSequenceNumber,
-			@RequestParam(value = "digest") String digest) {
-
-		List<String> hexStrings = new ArrayList<String>();
-
-		return getHexStrings(siteId, satelliteId, startSequenceNumber,
-				endSequenceNumber, digest, hexStrings);
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-	private List<String> getHexStrings(String siteId, long satelliteId,
-			long startSequenceNumber, long endSequenceNumber, String digest,
-			List<String> hexStrings) {
-		// get the user from the repository
-		List<UserEntity> users = userDao.findBySiteId(siteId);
-
-		if (users.size() != 0) {
-
-			UserEntity user = users.get(0);
-
-			String authKey = userAuthKeys.get(siteId);
-			users.get(0).getAuthKey();
-
-			if (authKey == null) {
-				if (user != null) {
-					authKey = user.getAuthKey();
-					userAuthKeys.put(siteId, authKey);
-
-					Long value = satelliteId * startSequenceNumber
-							* endSequenceNumber;
-
-					try {
-
-						final String calculatedDigest = calculateDigest(
-								value.toString(), authKey, null);
-						final String calculatedDigestUTF8 = calculateDigest(
-								value.toString(), authKey, new Integer(8));
-						final String calculatedDigestUTF16 = calculateDigest(
-								value.toString(), authKey, new Integer(16));
-
-						if (null != digest
-								&& (digest.equals(calculatedDigest)
-										|| digest.equals(calculatedDigestUTF8) || digest
-											.equals(calculatedDigestUTF16))) {
-							return hexFrameDao
-									.getHexStringBetweenSequenceNumbers(
-											satelliteId, startSequenceNumber,
-											endSequenceNumber);
-						} else {
-							return hexStrings;
-						}
-					} catch (NoSuchAlgorithmException nsae) {
-						return hexStrings;
-					}
-
-				} else {
-					return hexStrings;
-				}
-			} else {
-				return hexStrings;
-			}
-		} else {
-			return hexStrings;
-		}
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-	private void checkMinMax(long satelliteId, RealTimeEntity realTimeEntity) {
-
-		final Long[] longValues = realTimeEntity.getLongValues();
-
-		for (int channel = 1; channel <= 43; channel++) {
-
-			boolean isDirty = false;
-
-			List<MinMaxEntity> channels = minMaxDao
-					.findBySatelliteIdAndChannel(satelliteId, channel);
-			if (channels.isEmpty()) {
-				LOG.error("Did not find any minmax data for channel: "
-						+ channel);
-				break;
-			}
-			MinMaxEntity minMaxEntity = channels.get(0);
-
-			Date refDate = minMaxEntity.getRefDate();
-
-			Date currentDate = clock.currentDate();
-
-			long ageInMillis = currentDate.getTime() - refDate.getTime();
-
-			if (ageInMillis > 7 * 24 * 60 * 60 * 1000) {
-				minMaxEntity.setEnabled(false);
-				minMaxDao.save(minMaxEntity);
-				minMaxEntity = new MinMaxEntity(satelliteId, (long) channel,
-						99999L, -99999L, currentDate, true);
-				isDirty = true;
-			}
-
-			Long channelValue = longValues[channel - 1];
-
-			switch (channel) {
-			default:
-				if (channelValue == null) {
-					break;
-				}
-				if (channelValue < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(channelValue);
-					isDirty = true;
-				} else if (channelValue > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(channelValue);
-					isDirty = true;
-				}
-				break;
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-				// Boost converter temp 1
-				if (channelValue == null || channelValue == 0) {
-					break;
-				}
-
-				if (channelValue >= 128) {
-					channelValue = ~channelValue ^ 255;
-				}
-
-				if (channelValue < minMaxEntity.getMinimum()) {
-					minMaxEntity.setMinimum(channelValue);
-					isDirty = true;
-				} else if (channelValue > minMaxEntity.getMaximum()) {
-					minMaxEntity.setMaximum(channelValue);
-					isDirty = true;
-				}
-				break;
-			}
-
-			if (isDirty) {
-				minMaxDao.save(minMaxEntity);
-			}
-		}
-
-	}
-
-	private static String calculateDigest(final String hexString,
-			final String authCode, final Integer utf)
-			throws NoSuchAlgorithmException {
-
-		String digest = null;
-
-		final MessageDigest md5 = MessageDigest.getInstance("MD5");
-
-		if (utf == null) {
-
-			md5.update(hexString.getBytes());
-			md5.update(":".getBytes());
-			digest = convertToHex(md5.digest(authCode.getBytes()));
-		} else if (utf.intValue() == 8) {
-			md5.update(hexString.getBytes(Charset.forName("UTF8")));
-			md5.update(":".getBytes(Charset.forName("UTF8")));
-			digest = convertToHex(md5.digest(authCode.getBytes(Charset
-					.forName("UTF8"))));
-		} else {
-			md5.update(hexString.getBytes(Charset.forName("UTF16")));
-			md5.update(":".getBytes(Charset.forName("UTF16")));
-			digest = convertToHex(md5.digest(authCode.getBytes(Charset
-					.forName("UTF16"))));
-		}
-
-		return digest;
-	}
-
-	private static String convertToHex(final byte[] data) {
-		final StringBuffer buf = new StringBuffer();
-		for (final byte element : data) {
-			int halfbyte = element >>> 4 & HEX_0X0F;
-			int twoHalfs = 0;
-			do {
-				if (0 <= halfbyte && halfbyte <= 9) {
-					buf.append((char) ('0' + halfbyte));
-				} else {
-					buf.append((char) ('a' + (halfbyte - 10)));
-				}
-				halfbyte = element & HEX_0X0F;
-			} while (twoHalfs++ < 1);
-		}
-		return buf.toString();
-	}
-
-	public static String convertHexBytePairToBinary(final String hexString) {
-		final StringBuffer sb = new StringBuffer();
-
-		for (int i = 0; i < hexString.length(); i += 2) {
-			final String hexByte = hexString.substring(i, i + 2);
-			final int hexValue = Integer.parseInt(hexByte, 16);
-			sb.append(StringUtils.leftPad(Integer.toBinaryString(hexValue), 8,
-					"0"));
-		}
-		return sb.toString();
-	}
-
-	class UserHexString {
-
-		private final UserEntity user;
-		private final String hexString;
-		private final Date createdDate;
-
-		public UserHexString(final UserEntity user, final String hexString,
-				final Date createdDate) {
-			this.user = user;
-			this.hexString = hexString;
-			this.createdDate = createdDate;
-		}
-
-		/**
-		 * @return the createdDate
-		 */
-		public final Date getCreatedDate() {
-			return createdDate;
-		}
-
-		public final String getHexString() {
-			return hexString;
-		}
-
-		public final UserEntity getUser() {
-			return user;
-		}
-
-	}
-
-	private static final int HEX_0X0F = 0x0F;
-	private static final Cache<String, String> userAuthKeys = new Cache<String, String>(
-			new UTCClock(), 50, 10);
-	private static final String HAD_INCORRECT_DIGEST = "] had incorrect digest";
-	private static final String USER_WITH_SITE_ID = "User with site id [";
-
-	private static final String NOT_FOUND = "] not found";
-
-	private String latitude;
-
-	private String longitude;
-
-	public void processSha2() {
-
-		do {
-			List<HexFrameEntity> hexFrames = getNullDigests();
-			if (hexFrames.size() == 0) {
-				break;
-			}
-			addDigests(hexFrames);
-		} while (true);
-
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-	private void addDigests(List<HexFrameEntity> hexFrames) {
-		for (HexFrameEntity hexFrameEntity : hexFrames) {
-			try {
-				MessageDigest md = MessageDigest.getInstance("SHA-256");
-				hexFrameEntity.setDigest(new String(md.digest(hexFrameEntity
-						.getHexString().getBytes())));
-				hexFrameDao.save(hexFrameEntity);
-			} catch (NoSuchAlgorithmException e) {
-				LOG.error(e.getMessage());
-			}
-		}
-	}
-
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-	private List<HexFrameEntity> getNullDigests() {
-		List<HexFrameEntity> hexFrames = hexFrameDao
-				.findBySatelliteIdAndDigest(1L, (String) null, new PageRequest(
-						0, 100));
-		return hexFrames;
-	}
-
-	private final String generateDigest(final String string) {
-
-		MessageDigest md;
-		try {
-			md = MessageDigest.getInstance("SHA-256");
-			md.update(string.getBytes());
-
-			byte byteData[] = md.digest();
-
-			// convert the byte to hex format method 1
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < byteData.length; i++) {
-				sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16)
-						.substring(1));
-			}
-
-			return sb.toString();
-		} catch (NoSuchAlgorithmException e) {
-			LOG.error(e.getMessage());
-			return "";
-		}
-
-	}
+                if (null != digest
+                        && (digest.equals(calculatedDigest)
+                                || digest.equals(calculatedDigestUTF8) || digest
+                                    .equals(calculatedDigestUTF16))) {
+
+                    hexString = StringUtils.deleteWhitespace(hexString);
+
+                    final Date now = new Date(5000 * (clock.currentDate().getTime() / 5000));
+
+                    return processHexFrame(new UserHexString(user,
+                            StringUtils.deleteWhitespace(hexString), now));
+                }
+                else {
+                    LOG.error(USER_WITH_SITE_ID + siteId + HAD_INCORRECT_DIGEST
+                            + ", received: " + digest + ", calculated: "
+                            + calculatedDigest);
+                    return new ResponseEntity<String>("UNAUTHORIZED",
+                            HttpStatus.UNAUTHORIZED);
+                }
+            }
+            catch (final Exception e) {
+                LOG.error(e.getMessage());
+                return new ResponseEntity<String>(e.getMessage(),
+                        HttpStatus.BAD_REQUEST);
+            }
+
+        }
+        else {
+            LOG.error("Site id: " + siteId + " not found in database");
+            return new ResponseEntity<String>("UNAUTHORIZED",
+                    HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    private ResponseEntity<String> processHexFrame(final UserHexString userHexString) {
+
+        final Map<Long, EpochEntity> epochMap = new HashMap<Long, EpochEntity>();
+
+        final Iterator<EpochEntity> iterator = epochDao.findAll().iterator();
+
+        while (iterator.hasNext()) {
+            final EpochEntity epoch = iterator.next();
+            epochMap.put(epoch.getSatelliteId(), epoch);
+        }
+
+        final String hexString = userHexString.getHexString();
+        final UserEntity user = userHexString.getUser();
+        final Date createdDate = userHexString.getCreatedDate();
+        final String digest = generateDigest(hexString);
+
+        final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
+
+        final int frameType = frameId & 63;
+        final int satelliteId = (frameId & (128 + 64)) >> 6;
+        final int sensorId = frameId % 2;
+        final String binaryString = DataProcessor.convertHexBytePairToBinary(hexString
+                .substring(2, hexString.length()));
+
+        RealTime realTime;
+
+        if (satelliteId == 1) {
+            realTime = new RealTimeFC2(satelliteId, frameType, sensorId, createdDate,
+                    binaryString);
+        }
+        else {
+            realTime = new RealTime(satelliteId, frameType, sensorId, createdDate,
+                    binaryString);
+        }
+
+        final long sequenceNumber = realTime.getSequenceNumber();
+
+        if (sequenceNumber != -1) {
+
+            if (satelliteId != 1) {
+
+                final Long maxSequenceNumber = hexFrameDao
+                        .getMaxSequenceNumber(satelliteId);
+
+                if (maxSequenceNumber != null
+                        && Math.abs(maxSequenceNumber - sequenceNumber) > TWO_DAYS_SEQ_COUNT) {
+                    final String message = String
+                            .format("User %s loading sequence number %d is out of bounds for satelliteId %d",
+                                    user.getSiteId(), sequenceNumber,
+                                    satelliteId);
+                    LOG.error(message);
+
+                    return new ResponseEntity<String>("OK", HttpStatus.OK);
+                }
+
+            }
+
+            final List<HexFrameEntity> frames = hexFrameDao
+                    .findBySatelliteIdAndSequenceNumberAndFrameType(
+                            satelliteId, sequenceNumber, frameType);
+
+            if (frames.size() > 0 && satelliteId == 1 && frameType == 40) {
+                return processFrameTypeForty(hexString, createdDate, sequenceNumber);
+            }
+            else {
+                return saveUpdateHexFrame(hexString, user, frameType, satelliteId,
+                        createdDate, realTime, sequenceNumber, frames,
+                        epochMap.get(new Long(satelliteId)), digest);
+            }
+        }
+
+        return new ResponseEntity<String>("OK", HttpStatus.OK);
+    }
+
+    private void sendNoShowEmail(final Timestamp lastUpdated) {
+        final Map<String, Object> emailTags = new HashMap<String, Object>();
+        emailTags.put("satelliteName", "FUNcube 1");
+        emailTags.put("lastUpdated", lastUpdated);
+        mailService.sendUsingTemplate("operations@funcube.net", emailTags,
+                "noshow");
+    }
+
+    private ResponseEntity<String> processFrameTypeForty(final String payload, final Date now,
+            final long sequenceNumber) {
+
+        frameTypeFortyDao.save(new FrameTypeFortyEntity(sequenceNumber, now,
+                payload));
+
+        return new ResponseEntity<String>("OK",
+                HttpStatus.OK);
+
+    }
+
+    private ResponseEntity<String> saveUpdateHexFrame(final String hexString,
+            final UserEntity user, final int frameType, final int satelliteId,
+            final Date now, final RealTime realTime, final long sequenceNumber,
+            final List<HexFrameEntity> frames, final EpochEntity epoch,
+            final String digest) {
+        HexFrameEntity hexFrame;
+        Set<UserEntity> users;
+
+        if (frames.size() == 0) {
+
+            Timestamp satelliteTime;
+
+            if (epoch == null || satelliteId == 1) {
+                satelliteTime = new Timestamp(now.getTime());
+            }
+            else {
+                satelliteTime = new Timestamp(
+                        epoch.getReferenceTime().getTime()
+                                + ((sequenceNumber - epoch.getSequenceNumber()) * 2 * 60 * 1000)
+                                + (frameType * 5 * 1000));
+            }
+
+            final long[] catalogNumbers = new long[] {39444, 40074, 39444, 39444};
+
+            boolean outOfOrder = false;
+
+            final List<HexFrameEntity> existingFrames = hexFrameDao
+                    .findBySatelliteIdAndSequenceNumber(satelliteId,
+                            sequenceNumber);
+
+            if (!existingFrames.isEmpty()) {
+                for (final HexFrameEntity existingFrame : existingFrames) {
+                    if (existingFrame.getCreatedDate().before(now)
+                            && existingFrame.getFrameType() > frameType) {
+                        outOfOrder = false;
+                        break;
+                    }
+                }
+            }
+
+            hexFrame = new HexFrameEntity((long)satelliteId, (long)frameType,
+                    sequenceNumber, hexString, now, true, satelliteTime);
+
+            hexFrame.setOutOfOrder(outOfOrder);
+
+            final GroundStationPosition groundStationPosition = new GroundStationPosition(
+                    Double.parseDouble(user.getLatitude()),
+                    Double.parseDouble(user.getLongitude()), 100.0);
+
+            final SatellitePosition satellitePosition = predictor.get(
+                    catalogNumbers[satelliteId], now, groundStationPosition);
+
+            if (satellitePosition != null && !satellitePosition.isAboveHorizon()) {
+                LOG.error("User [" + user.getSiteId()
+                        + "] is out of range of satellite[" + satelliteId
+                        + "]!!!");
+            }
+
+            if (!outOfOrder) {
+
+                if (satellitePosition != null) {
+                    hexFrame.setEclipsed(satellitePosition.getEclipsed());
+                    hexFrame.setEclipseDepth(satellitePosition
+                            .getEclipseDepth());
+                    latitude = satellitePosition.getLatitude();
+                    hexFrame.setLatitude(latitude);
+                    longitude = satellitePosition.getLongitude();
+                    hexFrame.setLongitude(longitude);
+                }
+
+                final SatelliteStatusEntity satelliteStatus = satelliteStatusDao
+                        .findBySatelliteId(satelliteId).get(0);
+                satelliteStatus.setSequenceNumber(realTime.getSequenceNumber());
+                satelliteStatus.setLastUpdated(new Timestamp(now.getTime()));
+                satelliteStatus.setEclipsed(realTime.isEclipsed());
+
+                if (satellitePosition != null) {
+                    satelliteStatus.setEclipseDepth(Double
+                            .parseDouble(satellitePosition.getEclipseDepth()));
+                }
+
+                satelliteStatusDao.save(satelliteStatus);
+            }
+
+            hexFrame.getUsers().add(user);
+
+            RealTimeEntity realTimeEntity;
+
+            if (realTime instanceof RealTimeFC2) {
+                realTimeEntity = new RealTimeEntity((RealTimeFC2)realTime,
+                        satelliteTime);
+            }
+            else {
+                realTimeEntity = new RealTimeEntity(realTime, satelliteTime);
+            }
+
+            if (!outOfOrder) {
+                final Long dtmfId = dtmfCommandDao.getMaxId(satelliteId);
+
+                if (dtmfId != null) {
+                    final List<DTMFCommandEntity> commandEntities = dtmfCommandDao
+                            .findById(dtmfId);
+                    if (!commandEntities.isEmpty()) {
+                        final DTMFCommandEntity lastCommand = commandEntities.get(0);
+                        final Long dtmfValue = realTimeEntity.getLastCommand();
+                        if (dtmfValue.longValue() != lastCommand.getValue()
+                                .longValue()) {
+                            final DTMFCommandEntity newCommand = new DTMFCommandEntity(
+                                    (long)satelliteId, sequenceNumber,
+                                    (long)frameType, new Timestamp(
+                                            now.getTime()), latitude,
+                                    longitude, checkStatus(dtmfValue),
+                                    dtmfValue);
+                            dtmfCommandDao.save(newCommand);
+                        }
+                    }
+                }
+                else {
+                    final Long dtmfValue = realTimeEntity.getLastCommand();
+                    final DTMFCommandEntity newCommand = new DTMFCommandEntity(
+                            (long)satelliteId, sequenceNumber,
+                            (long)frameType, new Timestamp(now.getTime()),
+                            latitude, longitude, checkStatus(dtmfValue),
+                            dtmfValue);
+                    dtmfCommandDao.save(newCommand);
+                }
+            }
+
+            boolean valid = true;
+
+            if (satelliteId == 1) {
+                valid = (realTimeEntity.getC53() && realTimeEntity
+                        .getC54());
+                hexFrame.setDigest(digest);
+            }
+
+            hexFrame.setValid(valid);
+            hexFrameDao.save(hexFrame);
+            realTimeEntity.setValid(valid);
+            realTimeDao.save(realTimeEntity);
+
+            if (!outOfOrder) {
+                checkMinMax(satelliteId, realTimeEntity);
+            }
+
+            incrementUploadRanking(satelliteId, user.getSiteId(), now);
+
+        }
+        else {
+
+            hexFrame = frames.get(0);
+
+            users = hexFrame.getUsers();
+
+            boolean userFrameAlreadRegistered = false;
+
+            for (final UserEntity existingUser : users) {
+                final String message = String
+                        .format("User %s attempted to add duplicate record for satId/seq/frame: %d, %d, %d",
+                                existingUser.getSiteId(), satelliteId,
+                                hexFrame.getSequenceNumber(),
+                                hexFrame.getFrameType());
+                if (satelliteId != 1
+                        && (existingUser.getId().longValue() == user.getId()
+                                .longValue())) {
+                    userFrameAlreadRegistered = true;
+                    LOG.error(message);
+
+                    return new ResponseEntity<String>("OK", HttpStatus.OK);
+
+                }
+                else if ((existingUser.getId().longValue() == user.getId()
+                        .longValue())
+                        && hexFrame.getDigest() != null
+                        && digest.equals(hexFrame.getDigest())) {
+                    userFrameAlreadRegistered = true;
+                    LOG.error(message);
+
+                    return new ResponseEntity<String>("OK", HttpStatus.OK);
+                }
+            }
+
+            if (!userFrameAlreadRegistered) {
+
+                hexFrame.getUsers().add(user);
+
+                hexFrameDao.save(hexFrame);
+
+                incrementUploadRanking(satelliteId, user.getSiteId(), now);
+            }
+        }
+
+        return new ResponseEntity<String>("OK",
+                HttpStatus.OK);
+    }
+
+    /**
+     * @param dtmfValue
+     * @return
+     */
+    private Boolean checkStatus(final Long dtmfValue) {
+        switch (dtmfValue.intValue()) {
+            case 0x00:
+            case 0x02:
+            case 0x04:
+            case 0x08:
+            case 0x09:
+            case 0x0A:
+            case 0x0C:
+            case 0x0D:
+            case 0x0E:
+            case 0x11:
+            case 0x12:
+            case 0x13:
+            case 0x14:
+            case 0x15:
+            case 0x16:
+            case 0x17:
+            case 0x18:
+            case 0x19:
+            case 0x1A:
+            case 0x1B:
+            case 0x1C:
+            case 0x1D:
+            case 0x1E:
+            case 0x1F:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void incrementUploadRanking(final int satelliteId, final String siteId, final Date now) {
+
+        final Timestamp latestUploadDate = new Timestamp(now.getTime());
+
+        final List<UserRankingEntity> userRankings = userRankingDao
+                .findBySatelliteIdAndSiteId(satelliteId, siteId);
+
+        UserRankingEntity userRanking;
+
+        if (userRankings.isEmpty()) {
+
+            userRanking = new UserRankingEntity((long)satelliteId, siteId, 1L,
+                    latestUploadDate, latestUploadDate);
+        }
+        else {
+            userRanking = userRankings.get(0);
+            userRanking.setLatestUploadDate(latestUploadDate);
+            Long number = userRanking.getNumber();
+            number++;
+            userRanking.setNumber(number);
+        }
+
+        userRankingDao.save(userRanking);
+
+    }
+
+    @RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public List<String> hexStrings(
+            @PathVariable(value = "siteId") final String siteId,
+            @PathVariable(value = "satelliteId") final long satelliteId,
+            @PathVariable(value = "startSequenceNumber") final long startSequenceNumber,
+            @PathVariable(value = "endSequenceNumber") final long endSequenceNumber,
+            @RequestParam(value = "digest") final String digest) {
+
+        final List<String> hexStrings = new ArrayList<String>();
+
+        return getHexStrings(siteId, satelliteId, startSequenceNumber,
+                endSequenceNumber, digest, hexStrings);
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private List<String> getHexStrings(final String siteId, final long satelliteId,
+            final long startSequenceNumber, final long endSequenceNumber, final String digest,
+            final List<String> hexStrings) {
+        // get the user from the repository
+        final List<UserEntity> users = userDao.findBySiteId(siteId);
+
+        if (users.size() != 0) {
+
+            final UserEntity user = users.get(0);
+
+            String authKey = userAuthKeys.get(siteId);
+            users.get(0).getAuthKey();
+
+            if (authKey == null) {
+                if (user != null) {
+                    authKey = user.getAuthKey();
+                    userAuthKeys.put(siteId, authKey);
+
+                    final Long value = satelliteId * startSequenceNumber
+                            * endSequenceNumber;
+
+                    try {
+
+                        final String calculatedDigest = DataProcessor.calculateDigest(
+                                value.toString(), authKey, null);
+                        final String calculatedDigestUTF8 = DataProcessor.calculateDigest(
+                                value.toString(), authKey, new Integer(8));
+                        final String calculatedDigestUTF16 = DataProcessor.calculateDigest(
+                                value.toString(), authKey, new Integer(16));
+
+                        if (null != digest
+                                && (digest.equals(calculatedDigest)
+                                        || digest.equals(calculatedDigestUTF8) || digest
+                                            .equals(calculatedDigestUTF16))) {
+                            return hexFrameDao
+                                    .getHexStringBetweenSequenceNumbers(
+                                            satelliteId, startSequenceNumber,
+                                            endSequenceNumber);
+                        }
+                        else {
+                            return hexStrings;
+                        }
+                    }
+                    catch (final NoSuchAlgorithmException nsae) {
+                        return hexStrings;
+                    }
+
+                }
+                else {
+                    return hexStrings;
+                }
+            }
+            else {
+                return hexStrings;
+            }
+        }
+        else {
+            return hexStrings;
+        }
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void checkMinMax(final long satelliteId, final RealTimeEntity realTimeEntity) {
+
+        final Long[] longValues = realTimeEntity.getLongValues();
+
+        for (int channel = 1; channel <= 43; channel++) {
+
+            boolean isDirty = false;
+
+            final List<MinMaxEntity> channels = minMaxDao
+                    .findBySatelliteIdAndChannel(satelliteId, channel);
+            if (channels.isEmpty()) {
+                LOG.error("Did not find any minmax data for channel: "
+                        + channel);
+                break;
+            }
+            MinMaxEntity minMaxEntity = channels.get(0);
+
+            final Date refDate = minMaxEntity.getRefDate();
+
+            final Date currentDate = clock.currentDate();
+
+            final long ageInMillis = currentDate.getTime() - refDate.getTime();
+
+            if (ageInMillis > 7 * 24 * 60 * 60 * 1000) {
+                minMaxEntity.setEnabled(false);
+                minMaxDao.save(minMaxEntity);
+                minMaxEntity = new MinMaxEntity(satelliteId, (long)channel,
+                        99999L, -99999L, currentDate, true);
+                isDirty = true;
+            }
+
+            Long channelValue = longValues[channel - 1];
+
+            switch (channel) {
+                default:
+                    if (channelValue == null) {
+                        break;
+                    }
+                    if (channelValue < minMaxEntity.getMinimum()) {
+                        minMaxEntity.setMinimum(channelValue);
+                        isDirty = true;
+                    }
+                    else if (channelValue > minMaxEntity.getMaximum()) {
+                        minMaxEntity.setMaximum(channelValue);
+                        isDirty = true;
+                    }
+                    break;
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                    // Boost converter temp 1
+                    if (channelValue == null || channelValue == 0) {
+                        break;
+                    }
+
+                    if (channelValue >= 128) {
+                        channelValue = ~channelValue ^ 255;
+                    }
+
+                    if (channelValue < minMaxEntity.getMinimum()) {
+                        minMaxEntity.setMinimum(channelValue);
+                        isDirty = true;
+                    }
+                    else if (channelValue > minMaxEntity.getMaximum()) {
+                        minMaxEntity.setMaximum(channelValue);
+                        isDirty = true;
+                    }
+                    break;
+            }
+
+            if (isDirty) {
+                minMaxDao.save(minMaxEntity);
+            }
+        }
+
+    }
+
+    private static String calculateDigest(final String hexString,
+            final String authCode, final Integer utf)
+            throws NoSuchAlgorithmException {
+
+        String digest = null;
+
+        final MessageDigest md5 = MessageDigest.getInstance("MD5");
+
+        if (utf == null) {
+
+            md5.update(hexString.getBytes());
+            md5.update(":".getBytes());
+            digest = DataProcessor.convertToHex(md5.digest(authCode.getBytes()));
+        }
+        else if (utf.intValue() == 8) {
+            md5.update(hexString.getBytes(Charset.forName("UTF8")));
+            md5.update(":".getBytes(Charset.forName("UTF8")));
+            digest = DataProcessor.convertToHex(md5.digest(authCode.getBytes(Charset
+                    .forName("UTF8"))));
+        }
+        else {
+            md5.update(hexString.getBytes(Charset.forName("UTF16")));
+            md5.update(":".getBytes(Charset.forName("UTF16")));
+            digest = DataProcessor.convertToHex(md5.digest(authCode.getBytes(Charset
+                    .forName("UTF16"))));
+        }
+
+        return digest;
+    }
+
+    private static String convertToHex(final byte[] data) {
+        final StringBuffer buf = new StringBuffer();
+        for (final byte element : data) {
+            int halfbyte = element >>> 4 & HEX_0X0F;
+            int twoHalfs = 0;
+            do {
+                if (0 <= halfbyte && halfbyte <= 9) {
+                    buf.append((char)('0' + halfbyte));
+                }
+                else {
+                    buf.append((char)('a' + (halfbyte - 10)));
+                }
+                halfbyte = element & HEX_0X0F;
+            }
+            while (twoHalfs++ < 1);
+        }
+        return buf.toString();
+    }
+
+    public static String convertHexBytePairToBinary(final String hexString) {
+        final StringBuffer sb = new StringBuffer();
+
+        for (int i = 0; i < hexString.length(); i += 2) {
+            final String hexByte = hexString.substring(i, i + 2);
+            final int hexValue = Integer.parseInt(hexByte, 16);
+            sb.append(StringUtils.leftPad(Integer.toBinaryString(hexValue), 8,
+                    "0"));
+        }
+        return sb.toString();
+    }
+
+    class UserHexString {
+
+        private final UserEntity user;
+        private final String hexString;
+        private final Date createdDate;
+
+        public UserHexString(final UserEntity user, final String hexString,
+                final Date createdDate) {
+            this.user = user;
+            this.hexString = hexString;
+            this.createdDate = createdDate;
+        }
+
+        /**
+         * @return the createdDate
+         */
+        public final Date getCreatedDate() {
+            return createdDate;
+        }
+
+        public final String getHexString() {
+            return hexString;
+        }
+
+        public final UserEntity getUser() {
+            return user;
+        }
+
+    }
+
+    private static final int HEX_0X0F = 0x0F;
+    private static final Cache<String, String> userAuthKeys = new Cache<String, String>(
+            new UTCClock(), 50, 10);
+    private static final String HAD_INCORRECT_DIGEST = "] had incorrect digest";
+    private static final String USER_WITH_SITE_ID = "User with site id [";
+
+    private static final String NOT_FOUND = "] not found";
+
+    private String latitude;
+
+    private String longitude;
+
+    public void processSha2() {
+
+        do {
+            final List<HexFrameEntity> hexFrames = getNullDigests();
+            if (hexFrames.size() == 0) {
+                break;
+            }
+            addDigests(hexFrames);
+        }
+        while (true);
+
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void addDigests(final List<HexFrameEntity> hexFrames) {
+        for (final HexFrameEntity hexFrameEntity : hexFrames) {
+            try {
+                final MessageDigest md = MessageDigest.getInstance("SHA-256");
+                hexFrameEntity.setDigest(new String(md.digest(hexFrameEntity
+                        .getHexString().getBytes())));
+                hexFrameDao.save(hexFrameEntity);
+            }
+            catch (final NoSuchAlgorithmException e) {
+                LOG.error(e.getMessage());
+            }
+        }
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    private List<HexFrameEntity> getNullDigests() {
+        final List<HexFrameEntity> hexFrames = hexFrameDao
+                .findBySatelliteIdAndDigest(1L, (String)null, new PageRequest(
+                        0, 100));
+        return hexFrames;
+    }
+
+    private String generateDigest(final String string) {
+
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+            md.update(string.getBytes());
+
+            final byte[] byteData = md.digest();
+
+            // convert the byte to hex format method 1
+            final StringBuffer sb = new StringBuffer();
+            for (final byte element : byteData) {
+                sb.append(Integer.toString((element & 0xff) + 0x100, 16)
+                        .substring(1));
+            }
+
+            return sb.toString();
+        }
+        catch (final NoSuchAlgorithmException e) {
+            LOG.error(e.getMessage());
+            return "";
+        }
+
+    }
 
 }

@@ -47,9 +47,13 @@ import uk.org.funcube.fcdw.service.PredictorService;
 @Configuration
 public class AppConfig extends WebMvcConfigurerAdapter {
 
-	@Override
+	public AppConfig() {
+        super();
+    }
+
+    @Override
 	public void configureDefaultServletHandling(
-			DefaultServletHandlerConfigurer configurer) {
+			final DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
 
@@ -100,7 +104,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public InternalResourceViewResolver configureInternalResourceViewResolver() {
-		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+		final InternalResourceViewResolver resolver = new InternalResourceViewResolver();
 		resolver.setPrefix("WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 		return resolver;
@@ -108,7 +112,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public UrlBasedViewResolver configureUrlBasedViewResolver() {
-		UrlBasedViewResolver resolver = new UrlBasedViewResolver();
+		final UrlBasedViewResolver resolver = new UrlBasedViewResolver();
 		resolver.setPrefix("WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 		resolver.setViewClass(org.springframework.web.servlet.view.JstlView.class);
@@ -123,7 +127,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/scripts/**").addResourceLocations(
 				"/scripts/");
 		registry.addResourceHandler("/css/**").addResourceLocations("/css/");

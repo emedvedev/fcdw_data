@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with The FUNcube Data Warehouse.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package uk.org.funcube.fcdw.config;
 
@@ -40,43 +40,43 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = "uk.org.funcube.fcdw.dao")
 public class PersistenceConfig {
 
-	@Bean
-	@Resource(name = "jdbc/funcube")
-	public DataSource dataSourceLookup() {
-		JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
-		dsLookup.setResourceRef(true);
-		DataSource dataSource = dsLookup.getDataSource("java:comp/env/jdbc/funcube");
-		return dataSource;
-	}
+    @Bean
+    @Resource(name = "jdbc/funcube")
+    public DataSource dataSourceLookup() {
+        JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
+        dsLookup.setResourceRef(true);
+        final DataSource dataSource = dsLookup.getDataSource("java:comp/env/jdbc/funcube");
+        return dataSource;
+    }
 
-	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-		em.setDataSource(dataSourceLookup());
-		em.setPackagesToScan(new String[] { "uk.org.funcube.fcdw.domain" });
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(dataSourceLookup());
+        em.setPackagesToScan(new String[] {"uk.org.funcube.fcdw.domain"});
 
-		JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-		em.setJpaVendorAdapter(vendorAdapter);
-		em.setJpaProperties(additionalProperties());
+        final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(vendorAdapter);
+        em.setJpaProperties(additionalProperties());
 
-		return em;
-	}
+        return em;
+    }
 
-	@Bean
-	public PlatformTransactionManager transactionManager() {
-		JpaTransactionManager transactionManager = new JpaTransactionManager();
-		transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
-		return transactionManager;
-	}
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        final JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        return transactionManager;
+    }
 
-	private Properties additionalProperties() {
-		return new Properties() {
-			private static final long serialVersionUID = -2580236965844364715L;
+    private Properties additionalProperties() {
+        return new Properties() {
+            private static final long serialVersionUID = -2580236965844364715L;
 
-			{
-				setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
-			}
-		};
-	}
+            {
+                setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+            }
+        };
+    }
 
 }

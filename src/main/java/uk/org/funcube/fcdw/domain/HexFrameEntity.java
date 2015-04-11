@@ -27,211 +27,211 @@ import org.hibernate.annotations.LazyCollectionOption;
 @Table(name = "HexFrame")
 public class HexFrameEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToMany
-	@LazyCollection(LazyCollectionOption.FALSE)
-	@JoinTable(name="HexFrameUser", 
-			joinColumns=@JoinColumn(name="hexFrameId"),
-			inverseJoinColumns=@JoinColumn(name="userId"))  
-	private Set<UserEntity> users = new HashSet<UserEntity>();
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinTable(name = "HexFrameUser",
+            joinColumns = @JoinColumn(name = "hexFrameId"),
+            inverseJoinColumns = @JoinColumn(name = "userId"))
+    private Set<UserEntity> users = new HashSet<UserEntity>();
 
-	private Long satelliteId;
-	private Long sequenceNumber;
-	private String hexString;
-	private Date createdDate;
-	private boolean valid;
-	private Long frameType;
-	private boolean wodProcessed;
-	private boolean fitterProcessed;
-	private boolean highPrecisionProcessed;
-	private Timestamp satelliteTime;
+    private Long satelliteId;
+    private Long sequenceNumber;
+    private String hexString;
+    private Date createdDate;
+    private boolean valid;
+    private Long frameType;
+    private boolean wodProcessed;
+    private boolean fitterProcessed;
+    private boolean highPrecisionProcessed;
+    private Timestamp satelliteTime;
 
-	private String eclipsed;
+    private String eclipsed;
 
-	private String eclipseDepth;
+    private String eclipseDepth;
 
-	private String latitude;
+    private String latitude;
 
-	private String longitude;
-	
-	private Boolean outOfOrder;
+    private String longitude;
 
-	private String digest;
-	
-	public HexFrameEntity() {
-	}
-	
-	public HexFrameEntity(
-			final Long satelliteId, final Long frameType, final Long sequenceNumber, 
-			final String hexString, final Date createdDate, final boolean valid,
-			final Timestamp satelliteTime) {
-		this.satelliteId = satelliteId;
-		this.frameType = frameType;
-		this.sequenceNumber = sequenceNumber;
-		this.hexString = hexString;
-		this.createdDate = createdDate;
-		this.valid = valid;
-		this.satelliteTime = satelliteTime;
-		this.outOfOrder = false;
-	}
+    private Boolean outOfOrder;
 
-	public Long getId() {
-		return id;
-	}
+    private String digest;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public HexFrameEntity() {
+    }
 
-	public Set<UserEntity> getUsers() {
-		return users;
-	}
+    public HexFrameEntity(
+            final Long satelliteId, final Long frameType, final Long sequenceNumber,
+            final String hexString, final Date createdDate, final boolean valid,
+            final Timestamp satelliteTime) {
+        this.satelliteId = satelliteId;
+        this.frameType = frameType;
+        this.sequenceNumber = sequenceNumber;
+        this.hexString = hexString;
+        this.createdDate = createdDate;
+        this.valid = valid;
+        this.satelliteTime = satelliteTime;
+        this.outOfOrder = false;
+    }
 
-	public void setUsers(Set<UserEntity> users) {
-		this.users = users;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Long getSatelliteId() {
-		return satelliteId;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setSatelliteId(Long satelliteId) {
-		this.satelliteId = satelliteId;
-	}
+    public Set<UserEntity> getUsers() {
+        return users;
+    }
 
-	public Long getSequenceNumber() {
-		return sequenceNumber;
-	}
+    public void setUsers(Set<UserEntity> users) {
+        this.users = users;
+    }
 
-	public void setSequenceNumber(Long sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
+    public Long getSatelliteId() {
+        return satelliteId;
+    }
 
-	public String getHexString() {
-		return hexString;
-	}
+    public void setSatelliteId(Long satelliteId) {
+        this.satelliteId = satelliteId;
+    }
 
-	public void setHexString(String hexString) {
-		this.hexString = hexString;
-	}
+    public Long getSequenceNumber() {
+        return sequenceNumber;
+    }
 
-	public Date getCreatedDate() {
-		return createdDate;
-	}
+    public void setSequenceNumber(Long sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
+    public String getHexString() {
+        return hexString;
+    }
 
-	public boolean isValid() {
-		return valid;
-	}
+    public void setHexString(String hexString) {
+        this.hexString = hexString;
+    }
 
-	public void setValid(boolean valid) {
-		this.valid = valid;
-	}
+    public Date getCreatedDate() {
+        return createdDate;
+    }
 
-	public Long getFrameType() {
-		return frameType;
-	}
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public void setFrameType(Long frameType) {
-		this.frameType = frameType;
-	}
+    public boolean isValid() {
+        return valid;
+    }
 
-	public boolean isWodProcessed() {
-		return wodProcessed;
-	}
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
 
-	public void setWodProcessed(boolean wodProcessed) {
-		this.wodProcessed = wodProcessed;
-	}
+    public Long getFrameType() {
+        return frameType;
+    }
 
-	public boolean isFitterProcessed() {
-		return fitterProcessed;
-	}
+    public void setFrameType(Long frameType) {
+        this.frameType = frameType;
+    }
 
-	public void setFitterProcessed(boolean fitterProcessed) {
-		this.fitterProcessed = fitterProcessed;
-	}
+    public boolean isWodProcessed() {
+        return wodProcessed;
+    }
 
-	public boolean isHighPrecisionProcessed() {
-		return highPrecisionProcessed;
-	}
+    public void setWodProcessed(boolean wodProcessed) {
+        this.wodProcessed = wodProcessed;
+    }
 
-	public void setHighPrecisionProcessed(boolean highPrecisionProcessed) {
-		this.highPrecisionProcessed = highPrecisionProcessed;
-	}
+    public boolean isFitterProcessed() {
+        return fitterProcessed;
+    }
 
-	public final Timestamp getSatelliteTime() {
-		return satelliteTime;
-	}
+    public void setFitterProcessed(boolean fitterProcessed) {
+        this.fitterProcessed = fitterProcessed;
+    }
 
-	public final void setSatelliteTime(Timestamp satelliteTime) {
-		this.satelliteTime = satelliteTime;
-	}
+    public boolean isHighPrecisionProcessed() {
+        return highPrecisionProcessed;
+    }
 
-	/**
-	 * @param eclipsed
-	 */
-	public void setEclipsed(String eclipsed) {
-		this.eclipsed = eclipsed;
-	}
+    public void setHighPrecisionProcessed(boolean highPrecisionProcessed) {
+        this.highPrecisionProcessed = highPrecisionProcessed;
+    }
 
-	/**
-	 * @param eclipseDepth
-	 */
-	public void setEclipseDepth(String eclipseDepth) {
-		this.eclipseDepth = eclipseDepth;
-	}
+    public final Timestamp getSatelliteTime() {
+        return satelliteTime;
+    }
 
-	/**
-	 * @param latitude
-	 */
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
-	}
+    public final void setSatelliteTime(Timestamp satelliteTime) {
+        this.satelliteTime = satelliteTime;
+    }
 
-	/**
-	 * @param longitude
-	 */
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
-	}
+    /**
+     * @param eclipsed
+     */
+    public void setEclipsed(String eclipsed) {
+        this.eclipsed = eclipsed;
+    }
 
-	public final String getEclipsed() {
-		return eclipsed;
-	}
+    /**
+     * @param eclipseDepth
+     */
+    public void setEclipseDepth(String eclipseDepth) {
+        this.eclipseDepth = eclipseDepth;
+    }
 
-	public final String getEclipseDepth() {
-		return eclipseDepth;
-	}
+    /**
+     * @param latitude
+     */
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
 
-	public final String getLatitude() {
-		return latitude;
-	}
+    /**
+     * @param longitude
+     */
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
 
-	public final String getLongitude() {
-		return longitude;
-	}
+    public final String getEclipsed() {
+        return eclipsed;
+    }
 
-	public final Boolean isOutOfOrder() {
-		return outOfOrder;
-	}
+    public final String getEclipseDepth() {
+        return eclipseDepth;
+    }
 
-	public final void setOutOfOrder(Boolean outOfOrder) {
-		this.outOfOrder = outOfOrder;
-	}
+    public final String getLatitude() {
+        return latitude;
+    }
 
-	public void setDigest(final String digest) {
-		this.digest = digest;
-	}
+    public final String getLongitude() {
+        return longitude;
+    }
 
-	public final String getDigest() {
-		return digest;
-	}
+    public final Boolean isOutOfOrder() {
+        return outOfOrder;
+    }
+
+    public final void setOutOfOrder(Boolean outOfOrder) {
+        this.outOfOrder = outOfOrder;
+    }
+
+    public void setDigest(final String digest) {
+        this.digest = digest;
+    }
+
+    public final String getDigest() {
+        return digest;
+    }
 
 }

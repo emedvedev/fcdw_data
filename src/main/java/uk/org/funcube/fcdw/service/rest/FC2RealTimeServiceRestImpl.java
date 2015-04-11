@@ -104,11 +104,14 @@ public class FC2RealTimeServiceRestImpl extends AbstractServiceRestImpl implemen
     	));
 	    try {
 			return objectMapper.writeValueAsString(new JSONPObject(callback, map));
-		} catch (JsonGenerationException e) {
+		} 
+	    catch (final JsonGenerationException e) {
 			return callback + "([error:" + e.getMessage() + "]);";
-		} catch (JsonMappingException e) {
+		} 
+	    catch (final JsonMappingException e) {
 			return callback + "([error:" + e.getMessage() + "]);";
-		} catch (IOException e) {
+		} 
+	    catch (final IOException e) {
 			return callback + "([error:" + e.getMessage() + "]);";
 		}
 	    

@@ -27,54 +27,57 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 public class VelocityTemplateEmailSender implements TemplateEmailSender {
 
-	private static final String EMAIL_CONTENT_ENCODING = "UTF-8";
+    private static final String EMAIL_CONTENT_ENCODING = "UTF-8";
 
-	private static final Logger LOGGER = Logger.getLogger(VelocityTemplateEmailSender.class);
+    private static final Logger LOGGER = Logger.getLogger(VelocityTemplateEmailSender.class);
 
-	private final VelocityEngine velocityEngine;
-	private final JavaMailSender mailSender;
+    private final VelocityEngine velocityEngine;
+    private final JavaMailSender mailSender;
 
-	public VelocityTemplateEmailSender(final VelocityEngine velocityEngine, final JavaMailSender mailSender) {
-		this.velocityEngine = velocityEngine;
-		this.mailSender = mailSender;
-	}
+    public VelocityTemplateEmailSender(final VelocityEngine velocityEngine, final JavaMailSender mailSender) {
+        this.velocityEngine = velocityEngine;
+        this.mailSender = mailSender;
+    }
 
-	@Override
-	public void sendEmailUsingTemplate(final String fromAddress, final String toAddress, final String[] bccAddresses, final String subject,
-			final String templateLocation, final Map<String, Object> model) {
+    @Override
+    public void sendEmailUsingTemplate(final String fromAddress, final String toAddress, final String[] bccAddresses,
+            final String subject,
+            final String templateLocation, final Map<String, Object> model) {
 
-		final Map<String, Object> augmentedModel = new HashMap<String, Object>(model);
-		augmentedModel.put("dateTool", new DateTool());
-		augmentedModel.put("numberTool", new NumberTool());
-		augmentedModel.put("mathTool", new MathTool());
+        final Map<String, Object> augmentedModel = new HashMap<String, Object>(model);
+        augmentedModel.put("dateTool", new DateTool());
+        augmentedModel.put("numberTool", new NumberTool());
+        augmentedModel.put("mathTool", new MathTool());
 
-		final Writer writer = new StringWriter();
-		VelocityEngineUtils.mergeTemplate(velocityEngine, templateLocation, augmentedModel, writer);
-		final String emailBody = writer.toString();
+        final Writer writer = new StringWriter();
+        VelocityEngineUtils.mergeTemplate(velocityEngine, templateLocation, augmentedModel, writer);
+        final String emailBody = writer.toString();
 
-		final MimeMessagePreparator prep = new MimeMessagePreparator() {
-			@Override
-			public void prepare(final MimeMessage mimeMessage) throws Exception {
-				final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, EMAIL_CONTENT_ENCODING);
-				message.setTo(toAddress);
-				message.setFrom(fromAddress);
-				message.setSubject(subject);
-				message.setText(emailBody);
+        final MimeMessagePreparator prep = new MimeMessagePreparator() {
+            @Override
+            public void prepare(final MimeMessage mimeMessage) throws Exception {
+                final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, EMAIL_CONTENT_ENCODING);
+                message.setTo(toAddress);
+                message.setFrom(fromAddress);
+                message.setSubject(subject);
+                message.setText(emailBody);
 
-				if (!ArrayUtils.isEmpty(bccAddresses)) {
-					message.setBcc(bccAddresses);
-				}
-			}
-		};
+                if (!ArrayUtils.isEmpty(bccAddresses)) {
+                    message.setBcc(bccAddresses);
+                }
+            }
+        };
 
-		try {
-			mailSender.send(prep);
-			LOGGER.debug(String.format("Sent %3$s email To: %1$s, Bcc: %2$s", toAddress, ArrayUtils.toString(bccAddresses, "None"),
-					templateLocation));
-		} catch (final MailException e) {
-			LOGGER.error("Could not send email " + subject, e);
-			throw e;
-		}
-	}
+        try {
+            mailSender.send(prep);
+            LOGGER.debug(String.format("Sent %3$s email To: %1$s, Bcc: %2$s", toAddress,
+                    ArrayUtils.toString(bccAddresses, "None"),
+                    templateLocation));
+        }
+        catch (final MailException e) {
+            LOGGER.error("Could not send email " + subject, e);
+            throw e;
+        }
+    }
 
 }

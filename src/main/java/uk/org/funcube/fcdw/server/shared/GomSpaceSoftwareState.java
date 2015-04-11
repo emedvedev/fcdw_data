@@ -108,10 +108,10 @@ public class GomSpaceSoftwareState extends SoftwareState {
 			boolean c11, boolean c12, boolean c13, boolean c14, boolean c15, boolean c16,
 			boolean c17, boolean c18, boolean c19, boolean c20,
 			boolean c21, boolean c22, boolean c23, boolean c24) {
-		super();
-		setC1(c1);setC2(c2);setC3(c3);setC4(c4);setC5(c5);setC6(c6);setC7(c7);setC8(c8);setC9(c9);setC10(c10);
-		setC11(c11);setC12(c12);setC13(c13);setC14(c14);setC15(c15);setC16(c16);setC17(c17);setC18(c18);setC19(c19);
-		setC20(c20);setC21(c21);setC22(c22);setC23(c23);setC24(c24);
+		super(); 
+		setC1(c1); setC2(c2); setC3(c3); setC4(c4); setC5(c5); setC6(c6); setC7(c7); setC8(c8); setC9(c9); setC10(c10); 
+		setC11(c11); setC12(c12); setC13(c13); setC14(c14); setC15(c15); setC16(c16); setC17(c17); setC18(c18); setC19(c19); 
+		setC20(c20); setC21(c21); setC22(c22); setC23(c23); setC24(c24); 
 	}
 	
 	public final Long commandCount() {

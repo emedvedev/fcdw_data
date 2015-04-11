@@ -9,5 +9,12 @@
 import java.io.Serializable;
 
 public class FitterMessageJsonOutput implements JsonOutput, Serializable {
+
+    public FitterMessageJsonOutput() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    private static final long serialVersionUID = 949945580387041711L;
 	
 }

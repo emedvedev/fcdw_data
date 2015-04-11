@@ -24,7 +24,7 @@ public class ClydeSpaceSoftwareState extends SoftwareState {
 
 		for (; pos < end; pos += 1) {
 			final boolean value = 
-					binaryDataString.substring(pos, pos + 1).equals("1");
+					"1".equals(binaryDataString.substring(pos, pos + 1));
 			switch (pos - START) {
 			case 0:
 				setC1(value);
@@ -73,11 +73,11 @@ public class ClydeSpaceSoftwareState extends SoftwareState {
 	}
 
 	public ClydeSpaceSoftwareState(
-			boolean c1, boolean c2, boolean c3, boolean c4, boolean c5, boolean c6,boolean c7, boolean c8, boolean c9, boolean c10,
+			boolean c1, boolean c2, boolean c3, boolean c4, boolean c5, boolean c6, boolean c7, boolean c8, boolean c9, boolean c10,
 			boolean c11, boolean c12, boolean c13, boolean c14) {
-		super();
-		setC1(c1);setC2(c2);setC3(c3);setC4(c4);setC5(c5);setC6(c6);setC7(c7);setC8(c8);setC9(c9);setC10(c10);
-		setC11(c11);setC12(c12);setC13(c13);;setC14(c14);
+		super(); 
+		setC1(c1); setC2(c2); setC3(c3); setC4(c4); setC5(c5); setC6(c6); setC7(c7); setC8(c8); setC9(c9); setC10(c10); 
+		setC11(c11); setC12(c12); setC13(c13); setC14(c14); 
 	}
 
 	public final boolean isBit0() {

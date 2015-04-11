@@ -16,7 +16,7 @@ public class FitterMessageWrapper extends AbstractWrappper implements Serializab
 	
 	private List<FitterMessageJsonOutput> json = new ArrayList<FitterMessageJsonOutput>();
 
-	public FitterMessageWrapper(Long sateliteId, List<FitterMessageJsonOutput> json) {
+	public FitterMessageWrapper(final Long sateliteId, final List<FitterMessageJsonOutput> json) {
 		super(sateliteId);
 		this.json = json;
 	}
@@ -25,7 +25,7 @@ public class FitterMessageWrapper extends AbstractWrappper implements Serializab
 		return json;
 	}
 
-	public final void setJson(List<FitterMessageJsonOutput> json) {
+	public final void setJson(final List<FitterMessageJsonOutput> json) {
 		this.json = json;
 	}
 

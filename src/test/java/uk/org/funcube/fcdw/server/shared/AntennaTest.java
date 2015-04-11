@@ -6,7 +6,6 @@
 
 package uk.org.funcube.fcdw.server.shared;
 
-import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -17,23 +16,27 @@ import org.junit.Test;
  */
 public class AntennaTest {
 
-	@Test
-	public final void testConstruction() {
-		Antenna antenna = new Antenna(100L, 101L, true, false, true, false);
-		Assert.assertEquals(100L, antenna.getAntennaTemp0().longValue());
-		Assert.assertEquals(101L, antenna.getAntennaTemp1().longValue());
-		Assert.assertTrue(antenna.isAntennaDeployment0());
-		Assert.assertFalse(antenna.isAntennaDeployment1());
-		Assert.assertTrue(antenna.isAntennaDeployment2());
-		Assert.assertFalse(antenna.isAntennaDeployment3());
+    public AntennaTest() {
+        super();
+    }
 
-		antenna = new Antenna(102L, 103L, false, true, false, true);
-		Assert.assertEquals(102L, antenna.getAntennaTemp0().longValue());
-		Assert.assertEquals(103L, antenna.getAntennaTemp1().longValue());
-		Assert.assertFalse(antenna.isAntennaDeployment0());
-		Assert.assertTrue(antenna.isAntennaDeployment1());
-		Assert.assertFalse(antenna.isAntennaDeployment2());
-		Assert.assertTrue(antenna.isAntennaDeployment3());
-	}
+    @Test
+    public final void testConstruction() {
+        Antenna antenna = new Antenna(100L, 101L, true, false, true, false);
+        Assert.assertEquals(100L, antenna.getAntennaTemp0().longValue());
+        Assert.assertEquals(101L, antenna.getAntennaTemp1().longValue());
+        Assert.assertTrue(antenna.isAntennaDeployment0());
+        Assert.assertFalse(antenna.isAntennaDeployment1());
+        Assert.assertTrue(antenna.isAntennaDeployment2());
+        Assert.assertFalse(antenna.isAntennaDeployment3());
+
+        antenna = new Antenna(102L, 103L, false, true, false, true);
+        Assert.assertEquals(102L, antenna.getAntennaTemp0().longValue());
+        Assert.assertEquals(103L, antenna.getAntennaTemp1().longValue());
+        Assert.assertFalse(antenna.isAntennaDeployment0());
+        Assert.assertTrue(antenna.isAntennaDeployment1());
+        Assert.assertFalse(antenna.isAntennaDeployment2());
+        Assert.assertTrue(antenna.isAntennaDeployment3());
+    }
 
 }

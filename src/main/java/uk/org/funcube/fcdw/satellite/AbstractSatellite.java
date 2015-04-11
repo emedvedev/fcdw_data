@@ -84,7 +84,7 @@ public abstract class AbstractSatellite implements Satellite, Serializable {
     private final Vector4 position = new Vector4();
     /** Velocity vector of the satellite. Used to store the velocity for later calculations. */
     private final Vector4 velocity = new Vector4();
-    /** Date/time at which the position and velocity were calculated */
+    /** Date/time at which the position and velocity were calculated. */
     private double julUTC;
     /** Satellite position. Used to store the SatPos for later calculations. */
     private SatPos satPos;

@@ -69,10 +69,10 @@ public class WholeOrbitDataServiceRestImpl extends AbstractServiceRestImpl imple
 		 */
 		
 		for (WholeOrbitDataEntity entity : oneHourWod) {
-			c1Values.add(String.format("%4.1f", scaleAndOffset(entity.getC1(), -0.024,75.244)));
-			c2Values.add(String.format("%4.1f", scaleAndOffset(entity.getC2(), -0.024,74.750)));
-			c3Values.add(String.format("%4.1f", scaleAndOffset(entity.getC3(), -0.024,75.039)));
-			c4Values.add(String.format("%4.1f", scaleAndOffset(entity.getC4(), -0.024,75.987)));
+			c1Values.add(String.format("%4.1f", scaleAndOffset(entity.getC1(), -0.024, 75.244)));
+			c2Values.add(String.format("%4.1f", scaleAndOffset(entity.getC2(), -0.024, 74.750)));
+			c3Values.add(String.format("%4.1f", scaleAndOffset(entity.getC3(), -0.024, 75.039)));
+			c4Values.add(String.format("%4.1f", scaleAndOffset(entity.getC4(), -0.024, 75.987)));
 			c5Values.add(String.format("%4.1f", scaleAndOffset(entity.getC5(), -0.2073, 158.239)));
 			c6Values.add(String.format("%4.1f", scaleAndOffset(entity.getC6(), -0.2083, 159.227)));
 			c7Values.add(String.format("%4.1f", scaleAndOffset(entity.getC7(), -0.2076, 158.656)));

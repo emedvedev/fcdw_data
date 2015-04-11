@@ -7,45 +7,45 @@
 package uk.org.funcube.fcdw.server.shared;
 
 /**
- * @author  g4dpz
+ * @author g4dpz
  */
 public class FC2AntsSummary {
-	
-	private String antennaTemperature;
-	private String antennaStatus0;
-	private String antennaStatus1;
-	private String antennaStatus2;
-	private String antennaStatus3;
 
-	public FC2AntsSummary(String antennaTemperature,
-			String antennaStatus0, String antennaStatus1,
-			String antennaStatus2, String antennaStatus3) {
-		super();
-		this.antennaTemperature = antennaTemperature;
-		this.antennaStatus0 = antennaStatus0;
-		this.antennaStatus1 = antennaStatus1;
-		this.antennaStatus2 = antennaStatus2;
-		this.antennaStatus3 = antennaStatus3;
-	}
+    private String antennaTemperature;
+    private String antennaStatus0;
+    private String antennaStatus1;
+    private String antennaStatus2;
+    private String antennaStatus3;
 
-	public final String getAntennaTemperature() {
-		return antennaTemperature;
-	}
+    public FC2AntsSummary(final String antennaTemperature,
+            final String antennaStatus0, final String antennaStatus1,
+            final String antennaStatus2, final String antennaStatus3) {
+        super();
+        this.antennaTemperature = antennaTemperature;
+        this.antennaStatus0 = antennaStatus0;
+        this.antennaStatus1 = antennaStatus1;
+        this.antennaStatus2 = antennaStatus2;
+        this.antennaStatus3 = antennaStatus3;
+    }
 
-	public final String getAntennaStatus0() {
-		return antennaStatus0;
-	}
+    public final String getAntennaTemperature() {
+        return antennaTemperature;
+    }
 
-	public final String getAntennaStatus1() {
-		return antennaStatus1;
-	}
+    public final String getAntennaStatus0() {
+        return antennaStatus0;
+    }
 
-	public final String getAntennaStatus2() {
-		return antennaStatus2;
-	}
+    public final String getAntennaStatus1() {
+        return antennaStatus1;
+    }
 
-	public final String getAntennaStatus3() {
-		return antennaStatus3;
-	}
-	
+    public final String getAntennaStatus2() {
+        return antennaStatus2;
+    }
+
+    public final String getAntennaStatus3() {
+        return antennaStatus3;
+    }
+
 }
