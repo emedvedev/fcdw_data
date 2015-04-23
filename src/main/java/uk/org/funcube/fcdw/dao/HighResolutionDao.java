@@ -28,4 +28,7 @@ public interface HighResolutionDao extends CrudRepository<HighResolutionEntity, 
 	
 	@Query("select hires from HighResolutionEntity hires where satelliteId = ?1 and satelliteTime > ?2 order by satelliteTime asc")
 	List<HighResolutionEntity> getSinceSatelliteTime(long satelliteId, Timestamp satelliteTime);
+
+	@Query("select hires from HighResolutionEntity hires where satelliteId = ?1 and createdDate >= ?2 order by satelliteTime asc")
+    List<HighResolutionEntity> getSinceCreatedDate(long satelliteId, Timestamp since);
 }
