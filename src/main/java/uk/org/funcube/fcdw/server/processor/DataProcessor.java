@@ -230,8 +230,20 @@ public class DataProcessor {
 
         final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
 
-        final int frameType = frameId & 63;
-        final int satelliteId = (frameId & (128 + 64)) >> 6;
+        int frameType = frameId & 63;
+        int satelliteId = (frameId & (128 + 64)) >> 6;
+        
+        // we now need to look elsewhere if the satellite ID == 3
+        if (satelliteId == 3) {
+            final int idTemp = Integer.parseInt(hexString.substring(2, 4), 16);
+            satelliteId = idTemp & 252;
+            final int ftTemp = idTemp & 3;
+            frameType = frameType + (ftTemp << 7);
+            
+            LOG.debug("Satellite ID offset detected, satId: " + satelliteId + ", frameType: " + frameType);
+            return new ResponseEntity<String>("OK", HttpStatus.OK);
+        }
+        
         final int sensorId = frameId % 2;
         final String binaryString = DataProcessor.convertHexBytePairToBinary(hexString
                 .substring(2, hexString.length()));
