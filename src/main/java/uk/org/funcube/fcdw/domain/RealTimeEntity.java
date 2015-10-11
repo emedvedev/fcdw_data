@@ -22,6 +22,7 @@ import uk.org.funcube.fcdw.server.shared.EPS;
 import uk.org.funcube.fcdw.server.shared.RF;
 import uk.org.funcube.fcdw.server.shared.RealTime;
 import uk.org.funcube.fcdw.server.shared.RealTimeFC2;
+import uk.org.funcube.fcdw.server.shared.RealTimeNayif1;
 import uk.org.funcube.fcdw.server.shared.SoftwareState;
 
 
@@ -298,6 +299,68 @@ public class RealTimeEntity {
         c78 = realTime.getDtmfLastCommand();
         c52 = realTime.getDtmfCommandSuccess();
 	}
+	
+
+    
+    public RealTimeEntity(RealTimeNayif1 realTime, Timestamp satelliteTime) {
+        this.satelliteTime = satelliteTime;
+        satelliteId = realTime.getSatelliteId();
+        sequenceNumber = realTime.getSequenceNumber();
+        frameType = realTime.getFrameType();
+        sensorId = realTime.getSensorId();
+        createdDate = realTime.getCreatedDate();
+        
+        c1 = realTime.getPanelVolts1();
+        c2 = realTime.getPanelVolts2();
+        c3 = realTime.getPanelVolts3();
+        c4 = realTime.getBatteryVolts();
+        c5 = realTime.getPanelCurr1();
+        c6 = realTime.getPanelCurr2();
+        c7 = realTime.getPanelCurr3();
+        c8 = realTime.getTotPhotoCurr();
+        c9 = realTime.getTotSystemCurr();
+        c10 = realTime.getRebootCount();
+        c11 = realTime.getEpsErrorCount();
+        c12 = realTime.getBoostTemp1();
+        c13 = realTime.getBoostTemp2();
+        c14 = realTime.getBoostTemp3();
+        c15 = realTime.getBatteryTemp();
+        c16 = realTime.getLatchUpCount5v();
+        c17 = realTime.getLatchUpCount3v3();
+        c18 = realTime.getLatchUpCount5vSW();
+        c19 = realTime.getResetCause();
+        c20 = realTime.getPptMode();
+        c21 = realTime.getImtqMode();
+        c22 = realTime.getImtqErrorCode();
+        c23 = realTime.getImtqConfigSet();
+        c24 = realTime.getImtqMcuTemp();
+        c25 = realTime.getSolXPlus();
+        c26 = realTime.getSolXMinus();
+        c27 = realTime.getSolYPlus();
+        c28 = realTime.getSolYMinus();
+        c29 = realTime.getSolZPlus();
+        c30 = realTime.getSolZMinus();
+        c31 = realTime.getBusVolts3v3();
+        c32 = realTime.getBusCurr3v3();
+        c33 = realTime.getBusVolts5();
+        c34 = realTime.getBusCurr5();
+        c35 = realTime.getRxDoppler();
+        c36 = realTime.getRxRSSI();
+        c37 = realTime.getRxTemp();
+        c38 = realTime.getRxCurr();
+        c39 = realTime.getTxBusCurr3v3();
+        c40 = realTime.getTxBusCurr5v();
+        c41 = realTime.getTxRevPwr();
+        c42 = realTime.getTxFwdPwr();
+        c43 = realTime.getTxTemp();
+        c72 = realTime.getTxCurr();
+        c73 = realTime.getAntTemp0();
+        c74 = realTime.getAntTemp1();
+        c75 = realTime.getAntDepl0();
+        c76 = realTime.getAntDepl1();
+        c77 = realTime.getAntDepl2();
+        c78 = realTime.getAntDepl3();
+    }
 
 	public final Long getId() {
 		return id;

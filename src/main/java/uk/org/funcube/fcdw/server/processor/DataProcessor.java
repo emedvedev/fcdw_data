@@ -70,6 +70,7 @@ import uk.org.funcube.fcdw.domain.UserRankingEntity;
 import uk.org.funcube.fcdw.satellite.GroundStationPosition;
 import uk.org.funcube.fcdw.server.shared.RealTime;
 import uk.org.funcube.fcdw.server.shared.RealTimeFC2;
+import uk.org.funcube.fcdw.server.shared.RealTimeNayif1;
 import uk.org.funcube.fcdw.server.shared.SatellitePosition;
 import uk.org.funcube.fcdw.server.util.Cache;
 import uk.org.funcube.fcdw.server.util.Clock;
@@ -125,6 +126,13 @@ public class DataProcessor {
 
     public DataProcessor() {
         super();
+    }
+
+    /**
+     * @param epochDaoMock
+     */
+    public DataProcessor(EpochDao epochDaoMock) {
+        epochDao = epochDaoMock;
     }
 
     @RequestMapping(value = "/{siteId}/", method = RequestMethod.POST)
@@ -212,7 +220,8 @@ public class DataProcessor {
         }
     }
 
-    private ResponseEntity<String> processHexFrame(final UserHexString userHexString) {
+    // we make this protected so that the test framework can get hold of it
+    protected ResponseEntity<String> processHexFrame(final UserHexString userHexString) {
 
         final Map<Long, EpochEntity> epochMap = new HashMap<Long, EpochEntity>();
 
@@ -239,31 +248,36 @@ public class DataProcessor {
             satelliteId = idTemp & 252;
             final int ftTemp = idTemp & 3;
             frameType = frameType + (ftTemp << 7);
-            
-            LOG.debug("Satellite ID offset detected, satId: " + satelliteId + ", frameType: " + frameType);
-            return new ResponseEntity<String>("OK", HttpStatus.OK);
         }
         
         final int sensorId = frameId % 2;
+        
         final String binaryString = DataProcessor.convertHexBytePairToBinary(hexString
-                .substring(2, hexString.length()));
+                .substring((satelliteId < 3) ? 2 : 4, hexString.length()));
 
         RealTime realTime;
 
-        if (satelliteId == 1) {
-            realTime = new RealTimeFC2(satelliteId, frameType, sensorId, createdDate,
-                    binaryString);
-        }
-        else {
-            realTime = new RealTime(satelliteId, frameType, sensorId, createdDate,
-                    binaryString);
+        switch(satelliteId) {
+            case 8: 
+                /* nayif-1 */
+                realTime = new RealTimeNayif1(satelliteId, frameType, createdDate,
+                        binaryString);
+                break;
+            case 1:
+                realTime = new RealTimeFC2(satelliteId, frameType, sensorId, createdDate,
+                        binaryString);
+                break;
+            default:
+                realTime = new RealTime(satelliteId, frameType, sensorId, createdDate,
+                        binaryString);
+                break;
         }
 
         final long sequenceNumber = realTime.getSequenceNumber();
 
         if (sequenceNumber != -1) {
 
-            if (satelliteId != 1) {
+            if (satelliteId != 1 && satelliteId != 8) {
 
                 final Long maxSequenceNumber = hexFrameDao
                         .getMaxSequenceNumber(satelliteId);
@@ -339,7 +353,7 @@ public class DataProcessor {
                                 + (frameType * 5 * 1000));
             }
 
-            final long[] catalogNumbers = new long[] {39444, 40074, 39444, 39444};
+            final long[] catalogNumbers = new long[] {39444, 40074, 39444, 39444, 39444, 40074, 39444, 39444, 39444};
 
             boolean outOfOrder = false;
 
@@ -409,6 +423,10 @@ public class DataProcessor {
                 realTimeEntity = new RealTimeEntity((RealTimeFC2)realTime,
                         satelliteTime);
             }
+            else if (realTime instanceof RealTimeNayif1) {
+                realTimeEntity = new RealTimeEntity((RealTimeNayif1)realTime,
+                        satelliteTime);
+            } 
             else {
                 realTimeEntity = new RealTimeEntity(realTime, satelliteTime);
             }
@@ -446,6 +464,7 @@ public class DataProcessor {
             }
 
             boolean valid = true;
+            
 
             if (satelliteId == 1) {
                 valid = (realTimeEntity.getC53() && realTimeEntity
@@ -790,36 +809,6 @@ public class DataProcessor {
                     "0"));
         }
         return sb.toString();
-    }
-
-    class UserHexString {
-
-        private final UserEntity user;
-        private final String hexString;
-        private final Date createdDate;
-
-        public UserHexString(final UserEntity user, final String hexString,
-                final Date createdDate) {
-            this.user = user;
-            this.hexString = hexString;
-            this.createdDate = createdDate;
-        }
-
-        /**
-         * @return the createdDate
-         */
-        public final Date getCreatedDate() {
-            return createdDate;
-        }
-
-        public final String getHexString() {
-            return hexString;
-        }
-
-        public final UserEntity getUser() {
-            return user;
-        }
-
     }
 
     private static final int HEX_0X0F = 0x0F;
