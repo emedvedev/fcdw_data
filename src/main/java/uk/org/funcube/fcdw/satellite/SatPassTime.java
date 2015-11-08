@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -77,7 +77,6 @@ public class SatPassTime implements Serializable {
     public SatPassTime(final Date startTime, final Date endTime, final Date tca, final String polePassed,
             final int aosAzimuth, final int losAzimuth,
             final double maxEl) {
-        // TODO Auto-generated constructor stub
         this.startTime = new Date(startTime.getTime());
         this.endTime = new Date(endTime.getTime());
         this.polePassed = polePassed;

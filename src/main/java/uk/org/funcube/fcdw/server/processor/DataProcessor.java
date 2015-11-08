@@ -128,16 +128,13 @@ public class DataProcessor {
         super();
     }
 
-    /**
-     * @param epochDaoMock
-     */
     public DataProcessor(EpochDao epochDaoMock) {
         epochDao = epochDaoMock;
     }
 
     @RequestMapping(value = "/{siteId}/", method = RequestMethod.POST)
     public ResponseEntity<String> uploadData(@PathVariable final String siteId,
-            @RequestParam(value = "digest") final String digest,
+            @RequestParam("digest") final String digest,
             @RequestBody final String body) {
 
         lock.lock();
@@ -182,9 +179,9 @@ public class DataProcessor {
                 final String calculatedDigest = DataProcessor.calculateDigest(hexString,
                         authKey, null);
                 final String calculatedDigestUTF8 = DataProcessor.calculateDigest(hexString,
-                        authKey, new Integer(8));
+                        authKey, Integer.valueOf(8));
                 final String calculatedDigestUTF16 = DataProcessor.calculateDigest(hexString,
-                        authKey, new Integer(16));
+                        authKey, Integer.valueOf(16));
 
                 if (null != digest
                         && (digest.equals(calculatedDigest)
@@ -220,7 +217,7 @@ public class DataProcessor {
         }
     }
 
-    // we make this protected so that the test framework can get hold of it
+    /** We make this protected so that the test framework can get hold of it. */
     protected ResponseEntity<String> processHexFrame(final UserHexString userHexString) {
 
         final Map<Long, EpochEntity> epochMap = new HashMap<Long, EpochEntity>();
@@ -240,7 +237,7 @@ public class DataProcessor {
         final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
 
         int frameType = frameId & 63;
-        int satelliteId = (frameId & (128 + 64)) >> 6;
+        int satelliteId = (frameId & 128 + 64) >> 6;
         
         // we now need to look elsewhere if the satellite ID == 3
         if (satelliteId == 3) {
@@ -305,7 +302,7 @@ public class DataProcessor {
             else {
                 return saveUpdateHexFrame(hexString, user, frameType, satelliteId,
                         createdDate, realTime, sequenceNumber, frames,
-                        epochMap.get(new Long(satelliteId)), digest);
+                        epochMap.get(Long.valueOf(satelliteId)), digest);
             }
         }
 
@@ -349,8 +346,8 @@ public class DataProcessor {
             else {
                 satelliteTime = new Timestamp(
                         epoch.getReferenceTime().getTime()
-                                + ((sequenceNumber - epoch.getSequenceNumber()) * 2 * 60 * 1000)
-                                + (frameType * 5 * 1000));
+                                + (sequenceNumber - epoch.getSequenceNumber()) * 2 * 60 * 1000
+                                + frameType * 5 * 1000);
             }
 
             final long[] catalogNumbers = new long[] {39444, 40074, 39444, 39444, 39444, 40074, 39444, 39444, 39444};
@@ -467,8 +464,8 @@ public class DataProcessor {
             
 
             if (satelliteId == 1) {
-                valid = (realTimeEntity.getC53() && realTimeEntity
-                        .getC54());
+                valid = realTimeEntity.getC53() && realTimeEntity
+                        .getC54();
                 hexFrame.setDigest(digest);
             }
 
@@ -499,16 +496,16 @@ public class DataProcessor {
                                 hexFrame.getSequenceNumber(),
                                 hexFrame.getFrameType());
                 if (satelliteId != 1
-                        && (existingUser.getId().longValue() == user.getId()
-                                .longValue())) {
+                        && existingUser.getId().longValue() == user.getId()
+                                .longValue()) {
                     userFrameAlreadRegistered = true;
                     LOG.error(message);
 
                     return new ResponseEntity<String>("OK", HttpStatus.OK);
 
                 }
-                else if ((existingUser.getId().longValue() == user.getId()
-                        .longValue())
+                else if (existingUser.getId().longValue() == user.getId()
+                        .longValue()
                         && hexFrame.getDigest() != null
                         && digest.equals(hexFrame.getDigest())) {
                     userFrameAlreadRegistered = true;
@@ -532,10 +529,6 @@ public class DataProcessor {
                 HttpStatus.OK);
     }
 
-    /**
-     * @param dtmfValue
-     * @return
-     */
     private Boolean checkStatus(final Long dtmfValue) {
         switch (dtmfValue.intValue()) {
             case 0x00:
@@ -597,11 +590,11 @@ public class DataProcessor {
     @RequestMapping(value = "/{siteId}/{satelliteId}/{startSequenceNumber}/{endSequenceNumber}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<String> hexStrings(
-            @PathVariable(value = "siteId") final String siteId,
-            @PathVariable(value = "satelliteId") final long satelliteId,
-            @PathVariable(value = "startSequenceNumber") final long startSequenceNumber,
-            @PathVariable(value = "endSequenceNumber") final long endSequenceNumber,
-            @RequestParam(value = "digest") final String digest) {
+            @PathVariable("siteId") final String siteId,
+            @PathVariable("satelliteId") final long satelliteId,
+            @PathVariable("startSequenceNumber") final long startSequenceNumber,
+            @PathVariable("endSequenceNumber") final long endSequenceNumber,
+            @RequestParam("digest") final String digest) {
 
         final List<String> hexStrings = new ArrayList<String>();
 
@@ -636,9 +629,9 @@ public class DataProcessor {
                         final String calculatedDigest = DataProcessor.calculateDigest(
                                 value.toString(), authKey, null);
                         final String calculatedDigestUTF8 = DataProcessor.calculateDigest(
-                                value.toString(), authKey, new Integer(8));
+                                value.toString(), authKey, Integer.valueOf(8));
                         final String calculatedDigestUTF16 = DataProcessor.calculateDigest(
-                                value.toString(), authKey, new Integer(16));
+                                value.toString(), authKey, Integer.valueOf(16));
 
                         if (null != digest
                                 && (digest.equals(calculatedDigest)
@@ -783,7 +776,7 @@ public class DataProcessor {
     private static String convertToHex(final byte[] data) {
         final StringBuffer buf = new StringBuffer();
         for (final byte element : data) {
-            int halfbyte = element >>> 4 & HEX_0X0F;
+            int halfbyte = (element >>> 4) & HEX_0X0F;
             int twoHalfs = 0;
             do {
                 if (0 <= halfbyte && halfbyte <= 9) {
@@ -853,10 +846,9 @@ public class DataProcessor {
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     private List<HexFrameEntity> getNullDigests() {
-        final List<HexFrameEntity> hexFrames = hexFrameDao
+        return hexFrameDao
                 .findBySatelliteIdAndDigest(1L, (String)null, new PageRequest(
                         0, 100));
-        return hexFrames;
     }
 
     private String generateDigest(final String string) {

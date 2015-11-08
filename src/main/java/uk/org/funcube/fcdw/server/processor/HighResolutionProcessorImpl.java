@@ -95,13 +95,9 @@ public class HighResolutionProcessorImpl extends AbstractProcessor implements Hi
                 }
                 frames = new ArrayList<String>();
                 processedHexFrames = new ArrayList<HexFrameEntity>();
-                frames.add(hexFrame.getHexString().substring(106, hexFrame.getHexString().length()));
-                processedHexFrames.add(hexFrame);
             }
-            else {
-                frames.add(hexFrame.getHexString().substring(106, hexFrame.getHexString().length()));
-                processedHexFrames.add(hexFrame);
-            }
+            frames.add(hexFrame.getHexString().substring(106, hexFrame.getHexString().length()));
+            processedHexFrames.add(hexFrame);
 
             oldId = sequenceNumber;
         }
@@ -126,7 +122,7 @@ public class HighResolutionProcessorImpl extends AbstractProcessor implements Hi
         // get the epoch satelliteTime
         Long epochTimeLong = epoch.getReferenceTime().getTime();
         // get current time
-        Long currentSequenceTimeLong = ((seqNo - epochSequenceNumber) * 2 * 60 * 1000) + epochTimeLong;
+        Long currentSequenceTimeLong = (seqNo - epochSequenceNumber) * 2 * 60 * 1000 + epochTimeLong;
 
         for (int i = 0; i < 60; i++) {
             switch (satelliteId) {
@@ -147,7 +143,7 @@ public class HighResolutionProcessorImpl extends AbstractProcessor implements Hi
                     break;
             }
 
-            Timestamp satelliteTime = new Timestamp(currentSequenceTimeLong + (i * 1000));
+            Timestamp satelliteTime = new Timestamp(currentSequenceTimeLong + i * 1000);
 
             hrEntity.setSatelliteTime(satelliteTime);
 

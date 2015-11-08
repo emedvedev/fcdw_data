@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
  
 @Controller
-@RequestMapping(value = "/wod")
+@RequestMapping("/wod")
 public class WodController extends DaoAwarController {
 	
-	@RequestMapping(value = "")
+	@RequestMapping("")
     public ModelAndView getFuncube() {
     	ModelAndView model = new ModelAndView("wod");
     	model.addObject("satelliteId", "2");
         return model;
     }
     
-    @RequestMapping(value = "/{satelliteId}")
+    @RequestMapping("/{satelliteId}")
     public ModelAndView getSatellite(@PathVariable("satelliteId") Long satelliteId) {
     	ModelAndView model = new ModelAndView("wod");
     	model.addObject("satelliteId", satelliteId.toString());

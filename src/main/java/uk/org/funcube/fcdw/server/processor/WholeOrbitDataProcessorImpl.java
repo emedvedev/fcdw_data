@@ -72,7 +72,7 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 
         Date receivedDate = null;
 
-        for (int index = 0; index < (size - 1); index++) {
+        for (int index = 0; index < size - 1; index++) {
 
             HexFrameEntity wodFrame = wodList.get(index);
 
@@ -130,9 +130,8 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     private List<HexFrameEntity> getUnprocessedWod(long satelliteId,
             Calendar cal) {
-        final List<HexFrameEntity> wodList = hexFrameDao.findUnprocessedWOD(
+        return hexFrameDao.findUnprocessedWOD(
                 satelliteId, cal.getTime());
-        return wodList;
     }
 
     private void extractAndSaveWod(final Long satelliteId, final long seqNo,
@@ -155,13 +154,13 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
         // get the epoch satelliteTime
         Long epochTimeLong = epoch.getReferenceTime().getTime();
         // get current time
-        Long currentSequenceTimeLong = ((seqNo - epochSequenceNumber) * 2 * 60 * 1000) + epochTimeLong;
+        Long currentSequenceTimeLong = (seqNo - epochSequenceNumber) * 2 * 60 * 1000 + epochTimeLong;
 
         for (int i = 0; i < 104; i++) {
 
-            final long frameNumber = (seqNo * 2) + i;
+            final long frameNumber = seqNo * 2 + i;
 
-            Timestamp satelliteTime = new Timestamp(currentSequenceTimeLong + (i * 60 * 1000));
+            Timestamp satelliteTime = new Timestamp(currentSequenceTimeLong + i * 60 * 1000);
 
             WholeOrbitDataEntity wod = null;
 
@@ -194,41 +193,32 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
                     break;
             }
 
-            if (wod != null) {
+            if (wod != null && wholeOrbitDataDao.findBySatelliteIdAndC1AndC2AndC3AndC4AndC5AndC6AndC7AndC8AndC9AndC10AndC11(
+                    satelliteId,
+                    wod.getC1(),
+                    wod.getC2(),
+                    wod.getC3(),
+                    wod.getC4(),
+                    wod.getC5(),
+                    wod.getC6(),
+                    wod.getC7(),
+                    wod.getC8(),
+                    wod.getC9(),
+                    wod.getC10(),
+                    wod.getC11()
+                    ).size() == 0) {
 
-                // LOG.debug("Finding: " + seqNo + ", " + i + ", " + frameNumber + ", " +
-                // satelliteTime);
+               // LOG.debug("Not Found");
 
-                if (wholeOrbitDataDao.findBySatelliteIdAndC1AndC2AndC3AndC4AndC5AndC6AndC7AndC8AndC9AndC10AndC11(
-                        satelliteId,
-                        wod.getC1(),
-                        wod.getC2(),
-                        wod.getC3(),
-                        wod.getC4(),
-                        wod.getC5(),
-                        wod.getC6(),
-                        wod.getC7(),
-                        wod.getC8(),
-                        wod.getC9(),
-                        wod.getC10(),
-                        wod.getC11()
-                        ).size() == 0) {
+               checkMinMax(satelliteId, wod);
+               wod.setSatelliteTime(satelliteTime);
+               wod.setValid(!outOfOrder);
+               // LOG.debug("Saving WOD with sequenceNumber, frameNumber: " +
+               // wod.getSequenceNumber() + ", " + wod.getFrameNumber());
+               wholeOrbitDataDao.save(wod);
 
-                    // LOG.debug("Not Found");
-
-                    checkMinMax(satelliteId, wod);
-                    wod.setSatelliteTime(satelliteTime);
-                    wod.setValid(!outOfOrder);
-                    // LOG.debug("Saving WOD with sequenceNumber, frameNumber: " +
-                    // wod.getSequenceNumber() + ", " + wod.getFrameNumber());
-                    wholeOrbitDataDao.save(wod);
-
-                    start += 46;
-                    end += 46;
-                }
-                else {
-                    // LOG.debug("Found");
-                }
+               start += 46;
+               end += 46;
             }
 
             // move the frame time forward a minute
@@ -250,9 +240,6 @@ public class WholeOrbitDataProcessorImpl extends AbstractProcessor implements Wh
 
     private static final SimpleTimeZone TZ = new SimpleTimeZone(0, "UTC");
 
-    /**
-     * @param wodEntity
-     */
     private void checkMinMax(long satelliteId, WholeOrbitDataEntity wodEntity) {
 
         for (int channel = 1; channel <= 14; channel++) {

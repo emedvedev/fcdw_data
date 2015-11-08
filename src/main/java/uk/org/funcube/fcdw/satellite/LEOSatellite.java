@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -40,7 +40,7 @@ package uk.org.funcube.fcdw.satellite;
 import java.io.Serializable;
 
 /**
- * 
+ *. 
  * @author g4dpz
  * 
  */
@@ -194,9 +194,6 @@ public class LEOSatellite extends AbstractSatellite implements Serializable {
         super.calculatePositionAndVelocity(rk, uk, xnodek, xinck, rdotk, rfdotk);
     }
 
-    /**
-     * 
-     */
     private void sgp4Init() {
 
         /* Recover original mean motion (xnodp) and */
@@ -226,7 +223,7 @@ public class LEOSatellite extends AbstractSatellite implements Serializable {
         /* anomaly. Also, the c3 term, the delta omega term, and */
         /* the delta m term are dropped. */
 
-        sgp4Simple = (aodp * (1.0 - eo)) < (220 / EARTH_RADIUS_KM + 1.0);
+        sgp4Simple = aodp * (1.0 - eo) < 220 / EARTH_RADIUS_KM + 1.0;
 
         /* For perigees below 156 km, the */
         /* values of S and QOMS2T are altered. */

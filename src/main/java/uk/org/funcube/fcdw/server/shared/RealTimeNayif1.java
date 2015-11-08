@@ -35,7 +35,7 @@ public class RealTimeNayif1 extends RealTime {
 
     private long imtqMode;
     private long imtqErrorCode;
-    private long imtqConfigSet;
+    private boolean imtqConfigSet;
     private long imtqMcuTemp;
 
     private long solXPlus;
@@ -63,10 +63,44 @@ public class RealTimeNayif1 extends RealTime {
     private long antTemp0;
     private long antTemp1;
 
-    private long antDepl0;
-    private long antDepl1;
-    private long antDepl2;
-    private long antDepl3;
+    private boolean antDepl0;
+    private boolean antDepl1;
+    private boolean antDepl2;
+    private boolean antDepl3;
+
+    private long channelCurren5V;
+
+    private long imtqUptime;
+
+    private long dtmfCmdCount;
+
+    private long dtmfLastCmd;
+
+    private boolean dtmfCmdSuccess;
+
+    private boolean dataValidASIB;
+
+    private boolean dataValidEPS;
+
+    private boolean dataValidPA;
+
+    private boolean dataValidRF;
+
+    private boolean dataValidiMTQ;
+
+    private boolean dataValidAntsBusB;
+
+    private boolean dataValidAntsBusA;
+
+    private boolean inEclipseMode;
+
+    private boolean inSafeMode;
+
+    private boolean hardwareABFOnOff;
+
+    private boolean softwareABFOnOff;
+
+    private boolean deploymentWait;
 
     public RealTimeNayif1() {
     }
@@ -81,157 +115,70 @@ public class RealTimeNayif1 extends RealTime {
 
     private void parseBinary(String binaryString) {
         
-        /*
-        14  Photo voltage 1
-        14  Photo voltage 2
-        14  Photo voltage 3
-        14  Battery voltage
-        */
-        panelVolts1 = get14BitsAsULong(binaryString);
-        panelVolts2 = get14BitsAsULong(binaryString);
-        panelVolts3 = get14BitsAsULong(binaryString);
-        batteryVolts = get14BitsAsULong(binaryString);
-        
-        /*
-        10  Photo current 1
-        10  Photo current 2
-        10  Photo current 3
-        10  Total photo current
-        10  Total system current
-
-        */
-        panelCurr1 = get10BitsAsULong(binaryString);
-        panelCurr2 = get10BitsAsULong(binaryString);
-        panelCurr3 = get10BitsAsULong(binaryString);
-        totPhotoCurr = get10BitsAsULong(binaryString);
-        totSystemCurr = get10BitsAsULong(binaryString);
-        
-        /*
-        8   Reboot count
-        8   EPS software errors
-        8   Boost converter temp 1
-        8   Boost converter temp 2
-        8   Boost converter temp 3
-        8   Battery temp
-        8   Latch up count 5v1
-        8   Latch up count 3.3v1
-        8   Latch up count 5v SW1
-        8   Reset cause
-        8   Power point tracking mode
-        */
-        
-        rebootCount = get8BitsAsULong(binaryString);
-        epsErrorCount = get8BitsAsULong(binaryString);
-        boostTemp1 = get8BitsAsULong(binaryString);
-        boostTemp2 = get8BitsAsULong(binaryString);
-        boostTemp3 = get8BitsAsULong(binaryString);
-        batteryTemp = get8BitsAsULong(binaryString);
-        latchUpCount5v = get8BitsAsULong(binaryString);
-        latchUpCount3v3 = get8BitsAsULong(binaryString);
-        latchUpCount5vSW = get8BitsAsULong(binaryString);
-        resetCause = get8BitsAsULong(binaryString);
-        pptMode = get8BitsAsULong(binaryString);
-        
-        /*
-        2   iMTQ mode
-        3   iMTQ error code
-        1   iMTQ configuration set flag
-        8   iMTQ MCU temperature
-         */
-        imtqMode = get2BitsAsULong(binaryString);
-        imtqErrorCode = get3BitsAsULong(binaryString);
-        imtqConfigSet = get1BitsAsULong(binaryString);
-        imtqMcuTemp = get8BitsAsULong(binaryString);
-            
-        /*
-        10  Sun Sensor X+
-        10  Sun Sensor X-
-        10  Sun Sensor Y+
-        10  Sun Sensor Y-
-        10  Sun Sensor Z+
-        10  Sun Sensor Z-
-        */
-        solXPlus = get10BitsAsULong(binaryString);
-        solXMinus = get10BitsAsULong(binaryString);
-        solYPlus = get10BitsAsULong(binaryString);
-        solYMinus = get10BitsAsULong(binaryString);
-        solZPlus = get10BitsAsULong(binaryString);
-        solZMinus = get10BitsAsULong(binaryString);
-        
-        /*
-        10  3.3 bus voltage
-        10  3.3 bus current
-        10  5.0 bus current
-        10  5.0 bus voltage 
-        */
-
-        busVolts3v3 = get10BitsAsULong(binaryString);
-        busCurr3v3 = get10BitsAsULong(binaryString);
-        busVolts5 = get10BitsAsULong(binaryString);
-        busCurr5 = get10BitsAsULong(binaryString);
-        
-        /*
-        8   Receiver Doppler
-        8   Receiver RSSI
-        8   Temperature
-        8   Receive current
-        8   Transmit current 3.3V bus
-        8   Transmit current 5.0V bus
-        8   Reverse power
-        8   Forward power
-        8   Board temperature
-        8   Board current
-        8   Antenna temp 0
-        8   Antenna temp 1
-        */
-        
-        rxDoppler = get8BitsAsULong(binaryString);
-        rxRSSI = get8BitsAsULong(binaryString);
-        rxTemp = get8BitsAsULong(binaryString);
-        rxCurr = get8BitsAsULong(binaryString);
-        txBusCurr3v3 = get8BitsAsULong(binaryString);
-        txBusCurr5v = get8BitsAsULong(binaryString);
-        txRevPwr = get8BitsAsULong(binaryString);
-        txFwdPwr = get8BitsAsULong(binaryString);
-        txTemp = get8BitsAsULong(binaryString);
-        txCurr = get8BitsAsULong(binaryString);
-        antTemp0 = get8BitsAsULong(binaryString);
-        antTemp1 = get8BitsAsULong(binaryString);
-        
-        /*
-        1   Antenna deployment 0
-        1   Antenna deployment 1
-        1   Antenna deployment 2
-        1   Antenna deployment 3
-        */
-        antDepl0 = get1BitsAsULong(binaryString);
-        antDepl1 = get1BitsAsULong(binaryString);
-        antDepl2 = get1BitsAsULong(binaryString);
-        antDepl3 = get1BitsAsULong(binaryString);
-        
-        /*
-        24  Sequence number
-        */
-        super.setSequenceNumber(get24BitsAsULong(binaryString));
-        /*
-        6   DTMF command count
-        5   DTMF last command
-        1   DTMF command success
-        1   Data valid ASIB
-        1   Data valid EPS
-        1   Data valid PA
-        1   Data valid RF
-        1   Data valid iMTQ
-        1   Data valid ANTS bus-B
-        1   Data valid ANTS bus-A
-        1   In eclipse mode
-        1   In safe mode
-        1   Hardware ABF On/Off
-        1   Software ABF On/Off
-        1   Deployment wait at next boot
-        */
-
-        
+        panelVolts1 = getBitsAsULong(14, binaryString);
+        panelVolts2 = getBitsAsULong(14, binaryString);
+        panelVolts3 = getBitsAsULong(14, binaryString);
+        batteryVolts = getBitsAsULong(14, binaryString);
+        panelCurr1 = getBitsAsULong(10, binaryString);
+        panelCurr2 = getBitsAsULong(10, binaryString);
+        panelCurr3 = getBitsAsULong(10, binaryString);
+        totPhotoCurr = getBitsAsULong(10, binaryString);
+        totSystemCurr = getBitsAsULong(10, binaryString);
+        rebootCount = getBitsAsULong(8, binaryString);
+        boostTemp1 = getBitsAsULong(8, binaryString);
+        boostTemp2 = getBitsAsULong(8, binaryString);
+        boostTemp3 = getBitsAsULong(8, binaryString);
+        batteryTemp = getBitsAsULong(8, binaryString);
+        latchUpCount5v = getBitsAsULong(8, binaryString);
+        channelCurren5V = getBitsAsULong(8, binaryString);
+        resetCause = getBitsAsULong(4, binaryString);
+        pptMode = getBitsAsULong(4, binaryString);
+        imtqMode = getBitsAsULong(2, binaryString);
+        imtqErrorCode = getBitsAsULong(3, binaryString);
+        imtqConfigSet = getBooleanBit(binaryString);
+        imtqMcuTemp = getBitsAsULong(8, binaryString);
+        solXPlus = getBitsAsULong(10, binaryString);
+        solXMinus = getBitsAsULong(10, binaryString);
+        solYPlus = getBitsAsULong(10, binaryString);
+        solYMinus = getBitsAsULong(10, binaryString);
+        solZPlus = getBitsAsULong(10, binaryString);
+        solZMinus = getBitsAsULong(10, binaryString);
+        busVolts3v3 = getBitsAsULong(10, binaryString);
+        imtqUptime = getBitsAsULong(20, binaryString);
+        busVolts5 = getBitsAsULong(10, binaryString);
+        rxDoppler = getBitsAsULong(8, binaryString);
+        rxRSSI = getBitsAsULong(8, binaryString);
+        rxTemp = getBitsAsULong(8, binaryString);
+        rxCurr = getBitsAsULong(8, binaryString);
+        txBusCurr3v3 = getBitsAsULong(8, binaryString);
+        txBusCurr5v = getBitsAsULong(8, binaryString);
+        txRevPwr = getBitsAsULong(8, binaryString);
+        txFwdPwr = getBitsAsULong(8, binaryString);
+        txTemp = getBitsAsULong(8, binaryString);
+        txCurr = getBitsAsULong(8, binaryString);
+        antTemp0 = getBitsAsULong(8, binaryString);
+        antTemp1 = getBitsAsULong(8, binaryString);
+        antDepl0 = getBooleanBit(binaryString);
+        antDepl1 = getBooleanBit(binaryString);
+        antDepl2 = getBooleanBit(binaryString);
+        antDepl3 = getBooleanBit(binaryString);
+        final long sequenceNumber = getBitsAsULong(24, binaryString);
+        super.setSequenceNumber(sequenceNumber);
+        dtmfCmdCount = getBitsAsULong(6, binaryString);
+        dtmfLastCmd = getBitsAsULong(5, binaryString);
+        dtmfCmdSuccess = getBooleanBit(binaryString);
+        dataValidASIB = getBooleanBit(binaryString);
+        dataValidEPS = getBooleanBit(binaryString);
+        dataValidPA = getBooleanBit(binaryString);
+        dataValidRF = getBooleanBit(binaryString);
+        dataValidiMTQ = getBooleanBit(binaryString);
+        dataValidAntsBusB = getBooleanBit(binaryString);
+        dataValidAntsBusA = getBooleanBit(binaryString);
+        inEclipseMode = getBooleanBit(binaryString);
+        inSafeMode = getBooleanBit(binaryString);
+        hardwareABFOnOff = getBooleanBit(binaryString);
+        softwareABFOnOff = getBooleanBit(binaryString);
+        deploymentWait = getBooleanBit(binaryString);
     }
     
     @Override
@@ -415,11 +362,11 @@ public class RealTimeNayif1 extends RealTime {
         this.imtqErrorCode = imtqErrorCode;
     }
 
-    public final long getImtqConfigSet() {
+    public final boolean getImtqConfigSet() {
         return imtqConfigSet;
     }
 
-    public final void setImtqConfigSet(long imtqConfigSet) {
+    public final void setImtqConfigSet(boolean imtqConfigSet) {
         this.imtqConfigSet = imtqConfigSet;
     }
 
@@ -607,78 +554,184 @@ public class RealTimeNayif1 extends RealTime {
         this.antTemp1 = antTemp1;
     }
 
-    public final long getAntDepl0() {
+    public final boolean getAntDepl0() {
         return antDepl0;
     }
 
-    public final void setAntDepl0(long antDepl0) {
+    public final void setAntDepl0(boolean antDepl0) {
         this.antDepl0 = antDepl0;
     }
 
-    public final long getAntDepl1() {
+    public final boolean getAntDepl1() {
         return antDepl1;
     }
 
-    public final void setAntDepl1(long antDepl1) {
+    public final void setAntDepl1(boolean antDepl1) {
         this.antDepl1 = antDepl1;
     }
 
-    public final long getAntDepl2() {
+    public final boolean getAntDepl2() {
         return antDepl2;
     }
 
-    public final void setAntDepl2(long antDepl2) {
+    public final void setAntDepl2(boolean antDepl2) {
         this.antDepl2 = antDepl2;
     }
 
-    public final long getAntDepl3() {
+    public final boolean getAntDepl3() {
         return antDepl3;
     }
 
-    public final void setAntDepl3(long antDepl3) {
+    public final void setAntDepl3(boolean antDepl3) {
         this.antDepl3 = antDepl3;
     }
-
-    private long get1BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 1), 2);
+    
+    private long getBitsAsULong(int length, String binaryString) {
+        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + length), 2);
+        stringPos += length;
+        return value;
+    }
+    
+    private boolean getBooleanBit(String binaryString) {
+        final boolean value = (binaryString.substring(stringPos, stringPos + 1).equals("1"));
         stringPos += 1;
         return value;
     }
 
-    private long get2BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 2), 2);
-        stringPos += 2;
-        return value;
+    public final long getChannelCurren5V() {
+        return channelCurren5V;
     }
 
-    private long get3BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 3), 2);
-        stringPos += 3;
-        return value;
+    public final void setChannelCurren5V(long channelCurren5V) {
+        this.channelCurren5V = channelCurren5V;
     }
 
-    private long get8BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 8), 2);
-        stringPos += 8;
-        return value;
+    public final long getImtqUptime() {
+        return imtqUptime;
     }
 
-    private long get10BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 10), 2);
-        stringPos += 10;
-        return value;
-    }
-    
-    private long get14BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 14), 2);
-        stringPos += 14;
-        return value;
+    public final void setImtqUptime(long imtqUptime) {
+        this.imtqUptime = imtqUptime;
     }
 
-    private long get24BitsAsULong(String binaryString) {
-        final long value = Long.parseLong(binaryString.substring(stringPos, stringPos + 24), 2);
-        stringPos += 24;
-        return value;
+    public final long getDtmfCmdCount() {
+        return dtmfCmdCount;
+    }
+
+    public final void setDtmfCmdCount(long dtmfCmdCount) {
+        this.dtmfCmdCount = dtmfCmdCount;
+    }
+
+    public final long getDtmfLastCmd() {
+        return dtmfLastCmd;
+    }
+
+    public final void setDtmfLastCmd(long dtmfLastCmd) {
+        this.dtmfLastCmd = dtmfLastCmd;
+    }
+
+    public final boolean getDtmfCmdSuccess() {
+        return dtmfCmdSuccess;
+    }
+
+    public final void setDtmfCmdSuccess(boolean dtmfCmdSuccess) {
+        this.dtmfCmdSuccess = dtmfCmdSuccess;
+    }
+
+    public final boolean getDataValidASIB() {
+        return dataValidASIB;
+    }
+
+    public final void setDataValidASIB(boolean dataValidASIB) {
+        this.dataValidASIB = dataValidASIB;
+    }
+
+    public final boolean getDataValidEPS() {
+        return dataValidEPS;
+    }
+
+    public final void setDataValidEPS(boolean dataValidEPS) {
+        this.dataValidEPS = dataValidEPS;
+    }
+
+    public final boolean getDataValidPA() {
+        return dataValidPA;
+    }
+
+    public final void setDataValidPA(boolean dataValidPA) {
+        this.dataValidPA = dataValidPA;
+    }
+
+    public final boolean getDataValidRF() {
+        return dataValidRF;
+    }
+
+    public final void setDataValidRF(boolean dataValidRF) {
+        this.dataValidRF = dataValidRF;
+    }
+
+    public final boolean getDataValidiMTQ() {
+        return dataValidiMTQ;
+    }
+
+    public final void setDataValidiMTQ(boolean dataValidiMTQ) {
+        this.dataValidiMTQ = dataValidiMTQ;
+    }
+
+    public final boolean getDataValidAntsBusB() {
+        return dataValidAntsBusB;
+    }
+
+    public final void setDataValidAntsBusB(boolean dataValidAntsBusB) {
+        this.dataValidAntsBusB = dataValidAntsBusB;
+    }
+
+    public final boolean getDataValidAntsBusA() {
+        return dataValidAntsBusA;
+    }
+
+    public final void setDataValidAntsBusA(boolean dataValidAntsBusA) {
+        this.dataValidAntsBusA = dataValidAntsBusA;
+    }
+
+    public final boolean getInEclipseMode() {
+        return inEclipseMode;
+    }
+
+    public final void setInEclipseMode(boolean inEclipseMode) {
+        this.inEclipseMode = inEclipseMode;
+    }
+
+    public final boolean getInSafeMode() {
+        return inSafeMode;
+    }
+
+    public final void setInSafeMode(boolean inSafeMode) {
+        this.inSafeMode = inSafeMode;
+    }
+
+    public final boolean getHardwareABFOnOff() {
+        return hardwareABFOnOff;
+    }
+
+    public final void setHardwareABFOnOff(boolean hardwareABFOnOff) {
+        this.hardwareABFOnOff = hardwareABFOnOff;
+    }
+
+    public final boolean getSoftwareABFOnOff() {
+        return softwareABFOnOff;
+    }
+
+    public final void setSoftwareABFOnOff(boolean softwareABFOnOff) {
+        this.softwareABFOnOff = softwareABFOnOff;
+    }
+
+    public final boolean getDeploymentWait() {
+        return deploymentWait;
+    }
+
+    public final void setDeploymentWait(boolean deploymentWait) {
+        this.deploymentWait = deploymentWait;
     }
 
 }

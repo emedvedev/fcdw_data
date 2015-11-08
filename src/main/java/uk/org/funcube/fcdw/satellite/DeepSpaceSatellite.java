@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -180,9 +180,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
         super.calculatePositionAndVelocity(rk, uk, xnodek, xinck, rdotk, rfdotk);
     }
 
-    /**
-     * 
-     */
     private void initSDP4() {
         double temp1;
         double temp2;
@@ -260,9 +257,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
         deep.init(getTLE());
     }
 
-    /**
-     * 
-     */
     private void recoverMeanMotionAndSemiMajorAxis() {
         final double a1 = Math.pow(XKE / getTLE().getXno(), TWO_THIRDS);
         dsv.cosio = Math.cos(getTLE().getXincl());
@@ -283,7 +277,7 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
 
     final class DeepSpaceCalculator implements Serializable {
         /* This function is used by SDP4 to add lunar and solar */
-        /* perturbation effects to deep-space orbit objects. */
+        /** Perturbation effects to deep-space orbit objects. */
 
         private static final long serialVersionUID = -1154274461279090353L;
         static final double ZSINIS = 3.9785416E-1;
@@ -552,8 +546,8 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             resonance = false;
             synchronous = false;
 
-            if (!((xnq < 0.0052359877) && (xnq > 0.0034906585))) {
-                if ((xnq < 0.00826) || (xnq > 0.00924)) {
+            if (xnq >= 0.0052359877 || xnq <= 0.0034906585) {
+                if (xnq < 0.00826 || xnq > 0.00924) {
                     return;
                 }
 
@@ -579,9 +573,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
 
         }
 
-        /**
-         * @param tle
-         */
         private void calculateResonance(final TLE tle) {
             resonance = true;
             eoc = eq * dsv.eosq;
@@ -687,9 +678,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             bfact = bfact + ssl + ssh + ssh;
         }
 
-        /**
-         * 
-         */
         private void doSolarTerms() {
             savtsn = 1E20;
             zcosg = 1.945905E-1;
@@ -725,9 +713,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             ssh = ssh + sh / dsv.sinio;
         }
 
-        /**
-         * 
-         */
         private void calculateLunarTerms() {
             sse = se;
             ssi = si;
@@ -758,9 +743,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             lunarTermsDone = true;
         }
 
-        /**
-         * 
-         */
         private void calculateSolarTerms() {
             a1 = zcosg * zcosh + zsing * zcosi * zsinh;
             a3 = -zsing * zcosh + zcosg * zcosi * zsinh;
@@ -828,9 +810,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             xh3 = -2 * s2 * (z23 - z21);
         }
 
-        /**
-         * 
-         */
         private void initLunarSolarTerms() {
             day = dsv.ds50 + 18261.5;
 
@@ -927,13 +906,10 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             }
         }
 
-        /**
-         * 
-         */
         private void processEpochRestartLoop() {
-            if ((atime == 0)
-                    || ((dsv.t >= 0) && (atime < 0))
-                    || ((dsv.t < 0) && (atime >= 0))) {
+            if (atime == 0
+                    || (dsv.t >= 0 && atime < 0)
+                    || (dsv.t < 0 && atime >= 0)) {
                 /* Epoch restart */
 
                 calclateDelt();
@@ -958,9 +934,6 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
             }
         }
 
-        /**
-         * 
-         */
         private void processNotEpochRestartLoop() {
             do {
                 if (Math.abs(dsv.t - atime) >= stepp) {
@@ -1186,7 +1159,7 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
         private double xnodot;
         private double xnodp;
 
-        /* Used by dpsec and dpper parts of Deep() */
+        /** Used by dpsec and dpper parts of Deep(). */
         private double xll;
         private double omgadf;
         private double xnode;
@@ -1195,7 +1168,7 @@ public class DeepSpaceSatellite extends AbstractSatellite implements Serializabl
         private double xn;
         private double t;
 
-        /* Used by thetg and Deep() */
+        /** Used by thetg and Deep(). */
         private double ds50;
 
         /**

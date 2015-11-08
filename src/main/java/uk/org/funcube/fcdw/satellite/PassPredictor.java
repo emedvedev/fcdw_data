@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -123,7 +123,7 @@ public class PassPredictor {
         cal.setTimeInMillis(date.getTime());
         final SatPos satPos = getSatPos(cal.getTime());
         final double rangeRate = satPos.getRangeRate();
-        return (long)((double)freq * (SPEED_OF_LIGHT - rangeRate * 1000.0) / SPEED_OF_LIGHT);
+        return (long)(freq * (SPEED_OF_LIGHT - rangeRate * 1000.0) / SPEED_OF_LIGHT);
     }
 
     private SatPos getSatPos(final Date time) throws InvalidTleException,
@@ -140,7 +140,7 @@ public class PassPredictor {
         cal.setTimeInMillis(date.getTime());
         final SatPos satPos = getSatPos(cal.getTime());
         final double rangeRate = satPos.getRangeRate();
-        return (long)((double)freq * (SPEED_OF_LIGHT + rangeRate * 1000.0) / SPEED_OF_LIGHT);
+        return (long)(freq * (SPEED_OF_LIGHT + rangeRate * 1000.0) / SPEED_OF_LIGHT);
     }
 
     public SatPassTime nextSatPass(final Date date) throws InvalidTleException, SatNotFoundException {
@@ -221,7 +221,7 @@ public class PassPredictor {
             satPos = getPosition(cal, 30);
             final Date now = cal.getTime();
             final String currPolePassed = getPolePassed(prevPos, satPos);
-            if (!currPolePassed.equals(DEADSPOT_NONE)) {
+            if (!DEADSPOT_NONE.equals(currPolePassed)) {
                 polePassed = currPolePassed;
             }
             log.debug("Current pole passed: " + polePassed);
@@ -258,19 +258,11 @@ public class PassPredictor {
 
     }
 
-    /**
-     * @param cal
-     * @param offSet
-     * @return
-     * @throws InvalidTleException
-     * @throws SatNotFoundException
-     */
     private SatPos getPosition(final Calendar cal, final int offSet)
             throws InvalidTleException, SatNotFoundException {
         SatPos satPos;
         cal.add(Calendar.SECOND, offSet);
-        satPos = getSatPos(cal.getTime());
-        return satPos;
+        return getSatPos(cal.getTime());
     }
 
     /**
@@ -295,7 +287,7 @@ public class PassPredictor {
         final List<SatPassTime> passes = new ArrayList<SatPassTime>();
 
         Date trackStartDate = start;
-        final Date trackEndDate = new Date(start.getTime() + (hoursAhead * 60L * 60L * 1000L));
+        final Date trackEndDate = new Date(start.getTime() + hoursAhead * 60L * 60L * 1000L);
 
         Date lastAOS;
 
@@ -308,7 +300,7 @@ public class PassPredictor {
             final SatPassTime pass = nextSatPass(trackStartDate, this.windBackTime);
             lastAOS = pass.getStartTime();
             passes.add(pass);
-            trackStartDate = new Date(pass.getEndTime().getTime() + (threeQuarterOrbitMinutes() * 60L * 1000L));
+            trackStartDate = new Date(pass.getEndTime().getTime() + threeQuarterOrbitMinutes() * 60L * 1000L);
             count++;
         }
         while (lastAOS.compareTo(trackEndDate) < 0);
@@ -358,24 +350,18 @@ public class PassPredictor {
             if (az1 > 350 && az2 < 10) {
                 polePassed = NORTH;
             }
-            else {
-                // we may be moving from 190 or greateer thru south
-                if (az1 > 180 && az2 < 180) {
-                    polePassed = SOUTH;
-                }
+            else // we may be moving from 190 or greateer thru south
+            if (az1 > 180 && az2 < 180) {
+                polePassed = SOUTH;
             }
         }
-        else {
-            // we may be moving from 10 or less through north
-            if (az1 < 10 && az2 > 350) {
-                polePassed = NORTH;
-            }
-            else {
-                // we may be moving from 170 or more through south
-                if (az1 < 180 && az2 > 180) {
-                    polePassed = SOUTH;
-                }
-            }
+        else // we may be moving from 10 or less through north
+        if (az1 < 10 && az2 > 350) {
+            polePassed = NORTH;
+        }
+        else // we may be moving from 170 or more through south
+        if (az1 < 180 && az2 > 180) {
+            polePassed = SOUTH;
         }
 
         return polePassed;
@@ -399,8 +385,8 @@ public class PassPredictor {
             final int minutesAfter)
             throws InvalidTleException, SatNotFoundException {
 
-        Date trackDate = new Date(referenceDate.getTime() - (minutesBefore * 60L * 1000L));
-        final Date endDateDate = new Date(referenceDate.getTime() + (minutesAfter * 60L * 1000L));
+        Date trackDate = new Date(referenceDate.getTime() - minutesBefore * 60L * 1000L);
+        final Date endDateDate = new Date(referenceDate.getTime() + minutesAfter * 60L * 1000L);
 
         final List<SatPos> positions = new ArrayList<SatPos>();
 
@@ -408,7 +394,7 @@ public class PassPredictor {
 
             positions.add(getSatPos(trackDate));
 
-            trackDate = new Date(trackDate.getTime() + (incrementSeconds * 1000));
+            trackDate = new Date(trackDate.getTime() + incrementSeconds * 1000);
         }
 
         return positions;

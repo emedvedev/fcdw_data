@@ -75,10 +75,6 @@ public class DataProcessorTest {
         
     }
 
-    /**
-     * @param nAYIF1_HEX2
-     * @return
-     */
     private String swapBytes(final String origHex) {
         final char[] temp = new char[origHex.length()];
         int i = 0;

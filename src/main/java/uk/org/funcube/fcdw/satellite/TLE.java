@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -124,33 +124,6 @@ public class TLE implements Serializable {
         this.createddate = tle.createddate;
     }
 
-    /**
-	 * @param catnum
-	 * @param name
-	 * @param setnum
-	 * @param year
-	 * @param refepoch
-	 * @param incl
-	 * @param raan
-	 * @param eccn
-	 * @param argper
-	 * @param meanan
-	 * @param meanmo
-	 * @param drag
-	 * @param nddot6
-	 * @param bstar
-	 * @param orbitnum
-	 * @param epoch
-	 * @param xndt2o
-	 * @param xincl
-	 * @param xnodeo
-	 * @param eo
-	 * @param omegao
-	 * @param xmo
-	 * @param xno
-	 * @param deepspace
-	 * @param createddate
-	 */
 	public TLE(long catnum, String name, int setnum, int year, double refepoch,
 			double incl, double raan, double eccn, double argper,
 			double meanan, double meanmo, double drag, double nddot6,
@@ -236,7 +209,7 @@ public class TLE implements Serializable {
         orbitnum = Integer.parseInt(StringUtils.strip(tle[2].substring(63, 68)));
 
         /* reassign the values to thse which get used in calculations */
-        epoch = (1000.0 * getYear()) + getRefepoch();
+        epoch = 1000.0 * getYear() + getRefepoch();
 
         xndt2o = drag;
 
@@ -265,9 +238,6 @@ public class TLE implements Serializable {
         preProcessTLESet();
     }
 
-    /**
-     * 
-     */
     private synchronized void preProcessTLESet() {
         double temp;
         temp = TWO_PI / MINS_PERDAY / MINS_PERDAY;

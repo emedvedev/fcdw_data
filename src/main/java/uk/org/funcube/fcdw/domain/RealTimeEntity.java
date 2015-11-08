@@ -122,6 +122,8 @@ public class RealTimeEntity {
 	private Long c76;
 	private Long c77;
 	private Long c78;
+    private Long c79;
+    private Long c80;
 	
 	@Transient
 	public final Long[] getLongValues() {
@@ -332,34 +334,49 @@ public class RealTimeEntity {
         c20 = realTime.getPptMode();
         c21 = realTime.getImtqMode();
         c22 = realTime.getImtqErrorCode();
-        c23 = realTime.getImtqConfigSet();
-        c24 = realTime.getImtqMcuTemp();
-        c25 = realTime.getSolXPlus();
-        c26 = realTime.getSolXMinus();
-        c27 = realTime.getSolYPlus();
-        c28 = realTime.getSolYMinus();
-        c29 = realTime.getSolZPlus();
-        c30 = realTime.getSolZMinus();
-        c31 = realTime.getBusVolts3v3();
-        c32 = realTime.getBusCurr3v3();
-        c33 = realTime.getBusVolts5();
-        c34 = realTime.getBusCurr5();
-        c35 = realTime.getRxDoppler();
-        c36 = realTime.getRxRSSI();
-        c37 = realTime.getRxTemp();
-        c38 = realTime.getRxCurr();
-        c39 = realTime.getTxBusCurr3v3();
-        c40 = realTime.getTxBusCurr5v();
-        c41 = realTime.getTxRevPwr();
-        c42 = realTime.getTxFwdPwr();
-        c43 = realTime.getTxTemp();
+        c44 = realTime.getImtqConfigSet();
+        c23 = realTime.getImtqMcuTemp();
+        c24 = realTime.getSolXPlus();
+        c25 = realTime.getSolXMinus();
+        c26 = realTime.getSolYPlus();
+        c27 = realTime.getSolYMinus();
+        c28 = realTime.getSolZPlus();
+        c29 = realTime.getSolZMinus();
+        c30 = realTime.getBusVolts3v3();
+        c31 = realTime.getBusCurr3v3();
+        c32 = realTime.getBusVolts5();
+        c33 = realTime.getBusCurr5();
+        c34 = realTime.getRxDoppler();
+        c35 = realTime.getRxRSSI();
+        c36 = realTime.getRxTemp();
+        c37 = realTime.getRxCurr();
+        c38 = realTime.getTxBusCurr3v3();
+        c39 = realTime.getTxBusCurr5v();
+        c40 = realTime.getTxRevPwr();
+        c41 = realTime.getTxFwdPwr();
+        c42 = realTime.getTxTemp();
         c72 = realTime.getTxCurr();
         c73 = realTime.getAntTemp0();
         c74 = realTime.getAntTemp1();
-        c75 = realTime.getAntDepl0();
-        c76 = realTime.getAntDepl1();
-        c77 = realTime.getAntDepl2();
-        c78 = realTime.getAntDepl3();
+        c44 = realTime.getAntDepl0();
+        c45 = realTime.getAntDepl1();
+        c46 = realTime.getAntDepl2();
+        c47 = realTime.getAntDepl3();
+        c75 = realTime.getDtmfCmdCount();
+        c76 = realTime.getDtmfLastCmd();
+        c48 = realTime.getDtmfCmdSuccess();
+        c49 = realTime.getDataValidASIB();
+        c50 = realTime.getDataValidEPS();
+        c51 = realTime.getDataValidPA();
+        c52 = realTime.getDataValidRF();
+        c53 = realTime.getDataValidiMTQ();
+        c54 = realTime.getDataValidAntsBusB();
+        c55 = realTime.getDataValidAntsBusA();
+        c56 = realTime.getInEclipseMode();
+        c57 = realTime.getInSafeMode();
+        c58 = realTime.getHardwareABFOnOff();
+        c59 = realTime.getSoftwareABFOnOff();
+        c60 = realTime.getDeploymentWait();
     }
 
 	public final Long getId() {
@@ -1065,6 +1082,22 @@ public class RealTimeEntity {
 	public final void setValid(boolean valid) {
 		this.valid = valid;
 	}
+
+    public final Long getC79() {
+        return c79;
+    }
+
+    public final void setC79(Long c79) {
+        this.c79 = c79;
+    }
+
+    public final Long getC80() {
+        return c80;
+    }
+
+    public final void setC80(Long c80) {
+        this.c80 = c80;
+    }
 	
 
 }

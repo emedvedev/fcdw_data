@@ -45,8 +45,7 @@ public class PersistenceConfig {
     public DataSource dataSourceLookup() {
         JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
         dsLookup.setResourceRef(true);
-        final DataSource dataSource = dsLookup.getDataSource("java:comp/env/jdbc/funcube");
-        return dataSource;
+        return dsLookup.getDataSource("java:comp/env/jdbc/funcube");
     }
 
     @Bean

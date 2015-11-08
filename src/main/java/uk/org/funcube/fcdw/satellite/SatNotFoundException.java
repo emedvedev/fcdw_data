@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -44,31 +44,18 @@ public class SatNotFoundException extends PredictionException {
 
     private static final long serialVersionUID = 3389434245667560642L;
 
-    /**
-	 * 
-	 */
     public SatNotFoundException() {
         super();
     }
 
-    /**
-     * @param message
-     */
     public SatNotFoundException(final String message) {
         super(message);
     }
 
-    /**
-     * @param cause
-     */
     public SatNotFoundException(final Throwable cause) {
         super(cause);
     }
 
-    /**
-     * @param message
-     * @param cause
-     */
     public SatNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
     }

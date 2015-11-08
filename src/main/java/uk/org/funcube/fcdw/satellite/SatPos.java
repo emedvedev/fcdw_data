@@ -1,4 +1,4 @@
-/**
+/*
     predict4java: An SDP4 / SGP4 library for satellite orbit predictions
 
     Copyright (C)  2004-2010  David A. B. Johnson, G4DPZ.
@@ -41,7 +41,7 @@ import java.text.NumberFormat;
 import java.util.Date;
 
 /**
- * 
+ *. 
  * @author g4dpz
  * 
  */
@@ -49,11 +49,11 @@ public class SatPos {
     private static final String NL = "\n";
     private static final String DEG_CR = " deg.\n";
 
-    /* WGS 84 Earth radius km */
+    /** WGS 84 Earth radius km. */
     private static final double EARTH_RADIUS = 6.378137E3;
     private static final double R0 = 6378.16;
 
-    // the internal representation will be in radians
+    /** The internal representation will be in radians. */
     private double azimuth;
     private double elevation;
     private double latitude;
@@ -311,10 +311,8 @@ public class SatPos {
                 + "Longitude: " + numberFormat.format(longitude / (Math.PI * 2.0) * 360) + DEG_CR;
 
         numberFormat.setMaximumFractionDigits(0);
-        returnString = returnString
+        return returnString
                 + "Range: " + numberFormat.format(range) + " Km";
-
-        return returnString;
 
     }
 
@@ -335,7 +333,7 @@ public class SatPos {
         eclipsed = other.eclipsed;
     }
 
-    /*
+    /**
      * Gets the range circle as an array of integers representing pairs of latitude and longitude.
      */
     public final double[][] getRangeCircle() {
@@ -363,26 +361,24 @@ public class SatPos {
             final double azimuth = (double)(azi / 360.0) * 2.0 * Math.PI;
             double rangelat = Math.asin(Math.sin(latitude) * Math.cos(beta) + Math.cos(azimuth) * Math.sin(beta)
                     * Math.cos(latitude));
-            final double num = Math.cos(beta) - (Math.sin(latitude) * Math.sin(rangelat));
+            final double num = Math.cos(beta) - Math.sin(latitude) * Math.sin(rangelat);
             final double den = Math.cos(latitude) * Math.cos(rangelat);
             double rangelong;
 
-            if (azi == 0 && (beta > ((Math.PI / 2.0) - latitude))) {
+            if (azi == 0 && beta > Math.PI / 2.0 - latitude) {
                 rangelong = longitude + Math.PI;
             }
-            else if (azi == 180 && (beta > ((Math.PI / 2.0) - latitude))) {
+            else if (azi == 180 && beta > Math.PI / 2.0 - latitude) {
                 rangelong = longitude + Math.PI;
             }
             else if (Math.abs(num / den) > 1.0) {
                 rangelong = longitude;
             }
+            else if (180 - azi >= 0) {
+                rangelong = longitude - Math.acos(num / den);
+            }
             else {
-                if ((180 - azi) >= 0) {
-                    rangelong = longitude - Math.acos(num / den);
-                }
-                else {
-                    rangelong = longitude + Math.acos(num / den);
-                }
+                rangelong = longitude + Math.acos(num / den);
             }
 
             while (rangelong < 0.0) {
@@ -402,7 +398,6 @@ public class SatPos {
 //            else if (rangelong > 180.0) {
 //                rangelong = 360.0 - rangelong;
 //            }
-//
 //            if (rangelat < 90.0) {
 //                rangelat = -rangelat;
 //            }

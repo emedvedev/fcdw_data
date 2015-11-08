@@ -38,9 +38,6 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
     protected final SimpleDateFormat SDTF = new SimpleDateFormat(DATE_TIME_FORMAT);
     protected final SimpleDateFormat SDF = new SimpleDateFormat(DATE_FORMAT);
 
-    /**
-     * 
-     */
     private static final String ONE = "1";
 
     private static Logger LOG = Logger.getLogger(FitterMessageProcessorImpl.class.getName());
@@ -137,10 +134,6 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
 
     }
 
-    /**
-     * @param frameType
-     * @return
-     */
     private String getSlotFromFrameType(final int frameType) {
 
         String slot = "FM";
@@ -149,17 +142,17 @@ public class FitterMessageProcessorImpl implements FitterMessageProcessor {
             case 13:
             case 14:
             case 15:
-                slot += (frameType - 12);
+                slot += frameType - 12;
                 break;
             case 17:
             case 18:
             case 19:
-                slot += (frameType - 13);
+                slot += frameType - 13;
                 break;
             case 21:
             case 22:
             case 23:
-                slot += (frameType - 14);
+                slot += frameType - 14;
                 break;
         }
 
