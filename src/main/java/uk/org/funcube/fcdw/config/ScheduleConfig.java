@@ -89,6 +89,7 @@ public class ScheduleConfig {
         // wholeOrbitDataProcessor.process(1L);
         wholeOrbitDataProcessor.process(2L);
         // wholeOrbitDataProcessor.process(3L);
+        wholeOrbitDataProcessor.process(8L);
     }
 
     @Scheduled(initialDelay = 90000, fixedRate = 120000)
@@ -97,6 +98,7 @@ public class ScheduleConfig {
         fitterMessageProcessor.process(1L);
         fitterMessageProcessor.process(2L);
         fitterMessageProcessor.process(3L);
+        fitterMessageProcessor.process(8L);
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
@@ -105,6 +107,7 @@ public class ScheduleConfig {
         fitterMessageProcessor.truncate(1L);
         fitterMessageProcessor.truncate(2L);
         fitterMessageProcessor.truncate(3L);
+        fitterMessageProcessor.truncate(8L);
     }
 
     @Scheduled(cron = "0 0 */2 * * ?")

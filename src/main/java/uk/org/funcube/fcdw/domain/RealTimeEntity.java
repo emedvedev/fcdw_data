@@ -43,6 +43,7 @@ public class RealTimeEntity {
 	private long lastCommand;
 	private Timestamp satelliteTime;
 	private boolean valid;
+	private String satelliteName;
 
 	private Long c1;
 	private Long c2;
@@ -1097,6 +1098,14 @@ public class RealTimeEntity {
 
     public final void setC80(Long c80) {
         this.c80 = c80;
+    }
+
+    public final String getSatelliteName() {
+        return satelliteName;
+    }
+
+    public void setSatelliteName(String satelliteName) {
+        this.satelliteName = satelliteName;
     }
 	
 

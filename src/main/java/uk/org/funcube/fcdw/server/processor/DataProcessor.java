@@ -313,7 +313,7 @@ public class DataProcessor {
         final Map<String, Object> emailTags = new HashMap<String, Object>();
         emailTags.put("satelliteName", "FUNcube 1");
         emailTags.put("lastUpdated", lastUpdated);
-        mailService.sendUsingTemplate("operations@funcube.net", emailTags,
+        mailService.sendUsingTemplate("operations@funcube.org.uk", emailTags,
                 "noshow");
     }
 
@@ -419,13 +419,16 @@ public class DataProcessor {
             if (realTime instanceof RealTimeFC2) {
                 realTimeEntity = new RealTimeEntity((RealTimeFC2)realTime,
                         satelliteTime);
+                realTimeEntity.setSatelliteName("FC2");
             }
             else if (realTime instanceof RealTimeNayif1) {
                 realTimeEntity = new RealTimeEntity((RealTimeNayif1)realTime,
                         satelliteTime);
+                realTimeEntity.setSatelliteName("Nayif-1");
             } 
             else {
                 realTimeEntity = new RealTimeEntity(realTime, satelliteTime);
+                realTimeEntity.setSatelliteName("FC1");
             }
 
             if (!outOfOrder) {
