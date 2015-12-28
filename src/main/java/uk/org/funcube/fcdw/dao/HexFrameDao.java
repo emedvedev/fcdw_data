@@ -9,14 +9,15 @@ package uk.org.funcube.fcdw.dao;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import uk.org.funcube.fcdw.domain.HexFrameEntity;
 
 
-public interface HexFrameDao extends CrudRepository<HexFrameEntity, Long> {
+public interface HexFrameDao extends PagingAndSortingRepository<HexFrameEntity, Long> {
 
 	@Query("select hfe from HexFrameEntity hfe where hfe.satelliteId = ?1 and hfe.sequenceNumber = ?2 and hfe.frameType = ?3")
 	List<HexFrameEntity> findBySatelliteIdAndSequenceNumberAndFrameType(long satelliteId, long sequenceNumber, long frameType);
@@ -61,6 +62,9 @@ public interface HexFrameDao extends CrudRepository<HexFrameEntity, Long> {
 	@Query
 	List<HexFrameEntity> findBySatelliteIdAndSequenceNumberAndDigest(
 			long satelliteId, long sequenceNumber, String digest);
+	
+	@Query
+	Page<HexFrameEntity> findBySatelliteIdAndRealtimeProcessed(long satelliteId, boolean realtimeProcessed, Pageable pageable);
 	
 
 }

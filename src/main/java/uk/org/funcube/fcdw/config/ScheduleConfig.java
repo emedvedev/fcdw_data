@@ -78,6 +78,11 @@ public class ScheduleConfig {
         tleProcessor.process();
     }
 
+    @Scheduled(initialDelay = 300000, fixedRate = 86400000)
+    public void realtimeFixProcessorTask() {
+        dataProcessor.fixRealTime(2L);
+    }
+
     @Scheduled(initialDelay = 30000, fixedRate = 86400000)
     public void sha2ProcessorTask() {
         // dataProcessor.processSha2();

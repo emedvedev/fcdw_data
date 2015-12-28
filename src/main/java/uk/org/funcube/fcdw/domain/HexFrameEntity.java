@@ -47,6 +47,7 @@ public class HexFrameEntity {
     private boolean wodProcessed;
     private boolean fitterProcessed;
     private boolean highPrecisionProcessed;
+    private boolean realtimeProcessed;
     private Timestamp satelliteTime;
 
     private String eclipsed;
@@ -232,6 +233,14 @@ public class HexFrameEntity {
 
     public final String getDigest() {
         return digest;
+    }
+
+    public final boolean isRealtimeProcessed() {
+        return realtimeProcessed;
+    }
+
+    public final void setRealtimeProcessed(boolean realtimeProcessed) {
+        this.realtimeProcessed = realtimeProcessed;
     }
 
 }

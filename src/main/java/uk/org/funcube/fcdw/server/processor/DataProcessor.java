@@ -36,6 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -233,6 +234,7 @@ public class DataProcessor {
         final UserEntity user = userHexString.getUser();
         final Date createdDate = userHexString.getCreatedDate();
         final String digest = generateDigest(hexString);
+        
 
         final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
 
@@ -473,9 +475,11 @@ public class DataProcessor {
             }
 
             hexFrame.setValid(valid);
-            hexFrameDao.save(hexFrame);
+            hexFrame = hexFrameDao.save(hexFrame);
             realTimeEntity.setValid(valid);
             realTimeDao.save(realTimeEntity);
+            hexFrame.setRealtimeProcessed(true);
+            hexFrameDao.save(hexFrame);
 
             if (!outOfOrder) {
                 checkMinMax(satelliteId, realTimeEntity);
@@ -877,6 +881,100 @@ public class DataProcessor {
             return "";
         }
 
+    }
+
+    /**
+     * @param l
+     */
+    public void fixRealTime(long satelliteId) {
+        
+        LOG.debug("fixRealTime called for satellite id: " + satelliteId);
+        
+        boolean data = true;
+        int pageCount = 0;
+        
+        do {
+            Page<HexFrameEntity> page = hexFrameDao.findBySatelliteIdAndRealtimeProcessed(satelliteId, false, new PageRequest(pageCount, 1000));
+            data = page.hasContent();
+            if (data) {
+                LOG.debug(page.getNumberOfElements() + " elements found");
+                Iterator<HexFrameEntity> iterator = page.iterator();
+                while (iterator.hasNext()) {
+                    HexFrameEntity hexFrameEntity = iterator.next();
+                    processRealTime(hexFrameEntity);
+                }
+                pageCount++;
+            }
+        } while (data);
+        
+    }
+
+    /**
+     * @param hexFrameEntity
+     */
+    @Transactional(readOnly = false)
+    private void processRealTime(HexFrameEntity hexFrameEntity) {
+        
+        final String hexString = hexFrameEntity.getHexString();
+        
+        final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
+
+        int frameType = frameId & 63;
+        int satelliteId = (frameId & 128 + 64) >> 6;
+        
+        // we now need to look elsewhere if the satellite ID == 3
+        if (satelliteId == 3) {
+            final int idTemp = Integer.parseInt(hexString.substring(2, 4), 16);
+            satelliteId = idTemp & 252;
+            final int ftTemp = idTemp & 3;
+            frameType = frameType + (ftTemp << 7);
+        }
+        
+        final int sensorId = frameId % 2;
+        
+        final String binaryString = DataProcessor.convertHexBytePairToBinary(hexString
+                .substring((satelliteId < 3) ? 2 : 4, hexString.length()));
+        
+        RealTime realTime;
+
+        switch(satelliteId) {
+            case 8: 
+                /* nayif-1 */
+                realTime = new RealTimeNayif1(satelliteId, frameType, hexFrameEntity.getCreatedDate(),
+                        binaryString);
+                break;
+            case 1:
+                realTime = new RealTimeFC2(satelliteId, frameType, sensorId, hexFrameEntity.getCreatedDate(),
+                        binaryString);
+                break;
+            default:
+                realTime = new RealTime(satelliteId, frameType, sensorId, hexFrameEntity.getCreatedDate(),
+                        binaryString);
+                break;
+        }
+
+        
+        RealTimeEntity realTimeEntity;
+        
+        if (realTime instanceof RealTimeFC2) {
+            realTimeEntity = new RealTimeEntity((RealTimeFC2)realTime,
+                    hexFrameEntity.getSatelliteTime());
+            realTimeEntity.setSatelliteName("FC2");
+        }
+        else if (realTime instanceof RealTimeNayif1) {
+            realTimeEntity = new RealTimeEntity((RealTimeNayif1)realTime,
+                    hexFrameEntity.getSatelliteTime());
+            realTimeEntity.setSatelliteName("Nayif-1");
+        } 
+        else {
+            realTimeEntity = new RealTimeEntity(realTime, hexFrameEntity.getSatelliteTime());
+            realTimeEntity.setSatelliteName("FC1");
+        }
+        
+        realTimeDao.save(realTimeEntity);
+        hexFrameEntity.setRealtimeProcessed(true);
+        hexFrameDao.save(hexFrameEntity);
+        
     }
 
 }

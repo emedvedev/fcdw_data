@@ -44,6 +44,8 @@ public class RealTimeEntity {
 	private Timestamp satelliteTime;
 	private boolean valid;
 	private String satelliteName;
+	private String latitude;
+	private String longitude;
 
 	private Long c1;
 	private Long c2;
@@ -1106,6 +1108,22 @@ public class RealTimeEntity {
 
     public void setSatelliteName(String satelliteName) {
         this.satelliteName = satelliteName;
+    }
+
+    public final String getLatitude() {
+        return latitude;
+    }
+
+    public final void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public final String getLongitude() {
+        return longitude;
+    }
+
+    public final void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 	
 
