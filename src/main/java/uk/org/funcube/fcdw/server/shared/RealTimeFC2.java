@@ -258,8 +258,6 @@ public class RealTimeFC2 extends RealTime {
         // end of ukcube data ours is last 36 bits
         stringPos += 20;
 
-        LOG.debug("Reading seqNo from stringPos: " + stringPos);
-
         setSequenceNumber(get24BitsAsULong(binaryString));
         setDtmfCommandCount(get6BitsAsULong(binaryString));
         setDtmfLastCommand(get5BitsAsULong(binaryString));
