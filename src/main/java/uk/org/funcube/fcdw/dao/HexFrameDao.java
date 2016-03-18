@@ -65,6 +65,12 @@ public interface HexFrameDao extends PagingAndSortingRepository<HexFrameEntity, 
 	
 	@Query
 	Page<HexFrameEntity> findBySatelliteIdAndRealtimeProcessed(long satelliteId, boolean realtimeProcessed, Pageable pageable);
+
+    @Query
+	List<HexFrameEntity> findBySatelliteIdAndDigest(long satelliteId, String digest);
+    
+    @Query("SELECT hf from HexFrameEntity hf where hf.satelliteId = ?1 and hf.digest is null")
+    Page<HexFrameEntity> findNullDigests(long satelliteId, Pageable pageable);
 	
 
 }

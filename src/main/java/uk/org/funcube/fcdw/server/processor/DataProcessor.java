@@ -294,9 +294,16 @@ public class DataProcessor {
 
             }
 
-            final List<HexFrameEntity> frames = hexFrameDao
-                    .findBySatelliteIdAndSequenceNumberAndFrameType(
-                            satelliteId, sequenceNumber, frameType);
+            List<HexFrameEntity> frames;
+            
+            if (satelliteId != 1) {
+                frames = hexFrameDao
+                        .findBySatelliteIdAndSequenceNumberAndFrameType(
+                                satelliteId, sequenceNumber, frameType);
+            }
+            else {
+                frames = hexFrameDao.findBySatelliteIdAndDigest(satelliteId, digest);
+            }
 
             if (frames.size() > 0 && satelliteId == 1 && frameType == 40) {
                 return processFrameTypeForty(hexString, createdDate, sequenceNumber);
@@ -482,7 +489,18 @@ public class DataProcessor {
             hexFrameDao.save(hexFrame);
 
             if (!outOfOrder) {
-                checkMinMax(satelliteId, realTimeEntity);
+                switch (satelliteId) {
+                    case 2:
+                        checkMinMaxFC1(satelliteId, realTimeEntity);
+                        break;
+                    case 1:
+                        if (realTimeEntity.isValid()) {
+                            checkMinMaxUKube(satelliteId, realTimeEntity);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
 
             incrementUploadRanking(satelliteId, user.getSiteId(), now);
@@ -672,7 +690,7 @@ public class DataProcessor {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-    private void checkMinMax(final long satelliteId, final RealTimeEntity realTimeEntity) {
+    private void checkMinMaxFC1(final long satelliteId, final RealTimeEntity realTimeEntity) {
 
         final Long[] longValues = realTimeEntity.getLongValues();
 
@@ -744,6 +762,133 @@ public class DataProcessor {
             }
 
             if (isDirty) {
+                minMaxDao.save(minMaxEntity);
+            }
+        }
+
+    }
+    
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void checkMinMaxUKube(final long satelliteId, final RealTimeEntity realTimeEntity) {
+        
+        LOG.debug("Adding MinMax for FC2");
+        
+        if (!realTimeEntity.isValid()) {
+            return;
+        }
+
+        final Long[] longValues = realTimeEntity.getLongValues();
+
+        for (int channel = 1; channel <= 43; channel++) {
+
+            boolean isDirty = false;
+
+            final List<MinMaxEntity> channels = minMaxDao
+                    .findBySatelliteIdAndChannel(satelliteId, channel);
+            if (channels.isEmpty()) {
+                LOG.error("Did not find any minmax data for channel: "
+                        + channel);
+                break;
+            }
+            MinMaxEntity minMaxEntity = channels.get(0);
+
+            final Date refDate = minMaxEntity.getRefDate();
+
+            final Date currentDate = clock.currentDate();
+
+            final long ageInMillis = currentDate.getTime() - refDate.getTime();
+
+            if (ageInMillis > 7 * 24 * 60 * 60 * 1000) {
+                minMaxEntity.setEnabled(false);
+                minMaxDao.save(minMaxEntity);
+                minMaxEntity = new MinMaxEntity(satelliteId, (long)channel,
+                        99999L, -99999L, currentDate, true);
+                isDirty = true;
+            }
+
+            Long channelValue = longValues[channel - 1];
+            
+            if (channelValue == 0) {
+                continue;
+            }
+
+            switch (channel) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                    if (channelValue == null) {
+                        break;
+                    }
+                    if (channelValue < minMaxEntity.getMinimum()) {
+                        minMaxEntity.setMinimum(channelValue);
+                        isDirty = true;
+                    }
+                    else if (channelValue > minMaxEntity.getMaximum()) {
+                        minMaxEntity.setMaximum(channelValue);
+                        isDirty = true;
+                    }
+                    break;
+
+                case 13:
+                case 16:
+                case 19:
+                    if (channelValue == null || channelValue < 1 || channelValue > 228) {
+                        break;
+                    }
+                    if (channelValue < minMaxEntity.getMinimum()) {
+                        minMaxEntity.setMinimum(channelValue);
+                        isDirty = true;
+                    }
+                    else if (channelValue > minMaxEntity.getMaximum()) {
+                        minMaxEntity.setMaximum(channelValue);
+                        isDirty = true;
+                    }
+                    break;
+                case 14:
+                case 15:
+                case 17:
+                case 18:
+                case 20:
+                case 21:
+                    if (channelValue == null) {
+                        break;
+                    }
+                    if (channelValue < minMaxEntity.getMinimum()) {
+                        minMaxEntity.setMinimum(channelValue);
+                        isDirty = true;
+                    }
+                    else if (channelValue > minMaxEntity.getMaximum()) {
+                        minMaxEntity.setMaximum(channelValue);
+                        isDirty = true;
+                    }
+                    break;
+                    
+                default:
+                    if (channelValue == null) {
+                        break;
+                    }
+                    if (channelValue < minMaxEntity.getMinimum()) {
+                        minMaxEntity.setMinimum(channelValue);
+                        isDirty = true;
+                    }
+                    else if (channelValue > minMaxEntity.getMaximum()) {
+                        minMaxEntity.setMaximum(channelValue);
+                        isDirty = true;
+                    }
+                    break;
+            }
+
+            if (isDirty) {
+                LOG.debug("Saving UKcube MinMax for channel: " + channel + " Min: " + minMaxEntity.getMinimum() + " Max: " + minMaxEntity.getMaximum());
                 minMaxDao.save(minMaxEntity);
             }
         }
@@ -970,9 +1115,46 @@ public class DataProcessor {
             realTimeEntity = new RealTimeEntity(realTime, hexFrameEntity.getSatelliteTime());
             realTimeEntity.setSatelliteName("FC1");
         }
+
+        realTimeEntity.setLatitude(latitude);
+        realTimeEntity.setLongitude(longitude);
         
         realTimeDao.save(realTimeEntity);
         hexFrameEntity.setRealtimeProcessed(true);
+        hexFrameDao.save(hexFrameEntity);
+        
+    }
+    
+    public void fixDigests(long satelliteId) {
+        
+        LOG.debug("fixDigests called for satellite id: " + satelliteId);
+        
+        boolean data = true;
+        int pageCount = 0;
+        
+        do {
+            Page<HexFrameEntity> page = hexFrameDao.findNullDigests(satelliteId, new PageRequest(pageCount, 1000));
+            data = page.hasContent();
+            if (data) {
+                LOG.debug(page.getNumberOfElements() + " elements found");
+                Iterator<HexFrameEntity> iterator = page.iterator();
+                while (iterator.hasNext()) {
+                    HexFrameEntity hexFrameEntity = iterator.next();
+                    updateDigest(hexFrameEntity);
+                }
+                pageCount++;
+            }
+        } while (data);
+        
+    }
+
+    /**
+     * @param hexFrameEntity
+     */
+    @Transactional(readOnly = false)
+    private void updateDigest(HexFrameEntity hexFrameEntity) {
+        
+        hexFrameEntity.setDigest(generateDigest(hexFrameEntity.getHexString()));
         hexFrameDao.save(hexFrameEntity);
         
     }

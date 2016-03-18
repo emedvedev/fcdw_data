@@ -82,6 +82,11 @@ public class ScheduleConfig {
     public void realtimeFixProcessorTask() {
         dataProcessor.fixRealTime(2L);
     }
+    
+    @Scheduled(initialDelay = 60000, fixedRate = 86400000)
+    public void fixHexFrameDigestTask() {
+        dataProcessor.fixDigests(1L);
+    }
 
     @Scheduled(initialDelay = 30000, fixedRate = 86400000)
     public void sha2ProcessorTask() {
