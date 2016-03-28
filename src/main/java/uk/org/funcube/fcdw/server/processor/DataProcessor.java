@@ -771,8 +771,6 @@ public class DataProcessor {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     private void checkMinMaxUKube(final long satelliteId, final RealTimeEntity realTimeEntity) {
         
-        LOG.debug("Adding MinMax for FC2");
-        
         if (!realTimeEntity.isValid()) {
             return;
         }
@@ -813,53 +811,15 @@ public class DataProcessor {
             }
 
             switch (channel) {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                    if (channelValue == null) {
-                        break;
-                    }
-                    if (channelValue < minMaxEntity.getMinimum()) {
-                        minMaxEntity.setMinimum(channelValue);
-                        isDirty = true;
-                    }
-                    else if (channelValue > minMaxEntity.getMaximum()) {
-                        minMaxEntity.setMaximum(channelValue);
-                        isDirty = true;
-                    }
-                    break;
-
+                
                 case 13:
                 case 16:
                 case 19:
-                    if (channelValue == null || channelValue < 1 || channelValue > 228) {
+                    if (channelValue == null) {
+                        isDirty = true;
                         break;
                     }
-                    if (channelValue < minMaxEntity.getMinimum()) {
-                        minMaxEntity.setMinimum(channelValue);
-                        isDirty = true;
-                    }
-                    else if (channelValue > minMaxEntity.getMaximum()) {
-                        minMaxEntity.setMaximum(channelValue);
-                        isDirty = true;
-                    }
-                    break;
-                case 14:
-                case 15:
-                case 17:
-                case 18:
-                case 20:
-                case 21:
-                    if (channelValue == null) {
+                    if (channelValue < 1 || channelValue > 228) {
                         break;
                     }
                     if (channelValue < minMaxEntity.getMinimum()) {
@@ -874,6 +834,7 @@ public class DataProcessor {
                     
                 default:
                     if (channelValue == null) {
+                        isDirty = true;
                         break;
                     }
                     if (channelValue < minMaxEntity.getMinimum()) {

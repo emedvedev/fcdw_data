@@ -38,8 +38,6 @@ public class FC2WODEntity extends WholeOrbitDataEntity {
 		setFrameNumber(frameNumber);
 		setCreatedDate(createdDate);
 		
-		LOG.debug("WOD binary string length: " + binaryDataString.length() + ", bytes: " + binaryDataString.length() / 8);
-		
 //		WOMaterialScience1 = new MultiplierOffsetTelemetryValue(-0.024, 75.244,this.Get12bitsAsInt(rawStream)); // black structure
 		setC1(parseBinary(binaryDataString, 0, 12));
 //        WOMaterialScience2 = new MultiplierOffsetTelemetryValue(-0.024, 74.750, this.Get12bitsAsInt(rawStream)); // silver structure
