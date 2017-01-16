@@ -19,6 +19,10 @@
 
 package uk.org.funcube.fcdw.server.processor;
 
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,6 +42,7 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -157,7 +162,14 @@ public class DataProcessor {
 
         if (users.size() != 0) {
 
-            String hexString = StringUtils.substringBetween(body, "=", "&");
+        	String hexString = "";
+            if (body.contains("&")) {
+            	hexString = StringUtils.substringBetween(body, "=", "&");
+            }
+            else {
+            	hexString = body.substring(body.indexOf("=") + 1);
+            }
+        	
             hexString = hexString.replace("+", " ");
 
             String authKey = userAuthKeys.get(siteId);
@@ -194,7 +206,7 @@ public class DataProcessor {
                     final Date now = new Date(5000 * (clock.currentDate().getTime() / 5000));
 
                     return processHexFrame(new UserHexString(user,
-                            StringUtils.deleteWhitespace(hexString), now));
+                            StringUtils.deleteWhitespace(hexString), now), digest);
                 }
                 else {
                     LOG.error(USER_WITH_SITE_ID + siteId + HAD_INCORRECT_DIGEST
@@ -218,8 +230,9 @@ public class DataProcessor {
         }
     }
 
-    /** We make this protected so that the test framework can get hold of it. */
-    protected ResponseEntity<String> processHexFrame(final UserHexString userHexString) {
+    /** We make this protected so that the test framework can get hold of it. 
+     * @param digest */
+    protected ResponseEntity<String> processHexFrame(final UserHexString userHexString, String digest) {
 
         final Map<Long, EpochEntity> epochMap = new HashMap<Long, EpochEntity>();
 
@@ -233,7 +246,6 @@ public class DataProcessor {
         final String hexString = userHexString.getHexString();
         final UserEntity user = userHexString.getUser();
         final Date createdDate = userHexString.getCreatedDate();
-        final String digest = generateDigest(hexString);
         
 
         final int frameId = Integer.parseInt(hexString.substring(0, 2), 16);
@@ -243,10 +255,36 @@ public class DataProcessor {
         
         // we now need to look elsewhere if the satellite ID == 3
         if (satelliteId == 3) {
-            final int idTemp = Integer.parseInt(hexString.substring(2, 4), 16);
-            satelliteId = idTemp & 252;
-            final int ftTemp = idTemp & 3;
-            frameType = frameType + (ftTemp << 7);
+        	String newLine = "";
+            int i = 0;
+            for (;i < hexString.length() -2; i+=2) {
+                newLine += String.format("%s ", hexString.substring(i, i+2));
+            }
+            newLine += String.format("%s ", hexString.substring(i, i+2));
+            newLine = "data=" + newLine;
+            
+            final String siteId = userHexString.getUser().getSiteId();
+			String baseUrl = "http://data.amsat-uk.org/api/data/hex/" 
+            		+ siteId + "/?digest=" + digest;
+
+            try {
+				URL obj = new URL(baseUrl);
+	            HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+	            conn.setRequestMethod("POST");
+	            conn.setRequestProperty("Content-Type", "application/text");
+	            conn.setDoInput(true);
+	            conn.setDoOutput(true);
+	            conn.getOutputStream().write(newLine.getBytes("UTF-8"));
+	
+	            int responseCode = conn.getResponseCode();
+	            conn.disconnect();
+	            System.out.println("Response to call from GS: " + siteId + " was: " + responseCode);
+	        	final HttpStatus httpStatus = HttpStatus.valueOf(responseCode);
+				return new ResponseEntity<>(httpStatus.name(), httpStatus);
+            }
+            catch (Exception e) {
+            	return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
+            }
         }
         
         final int sensorId = frameId % 2;
