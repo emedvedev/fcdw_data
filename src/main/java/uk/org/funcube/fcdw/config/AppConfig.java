@@ -1,18 +1,18 @@
 /*
 	This file is part of the FUNcube Data Warehouse
 
-    The FUNcube Data Warehouse is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
+	The FUNcube Data Warehouse is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 2 of the License, or
+	(at your option) any later version.
 
-    The FUNcube Data Warehouse is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	The FUNcube Data Warehouse is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with The FUNcube Data Warehouse.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with The FUNcube Data Warehouse.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 package uk.org.funcube.fcdw.config;
@@ -49,10 +49,10 @@ import uk.org.funcube.fcdw.service.PredictorService;
 public class AppConfig extends WebMvcConfigurerAdapter {
 
 	public AppConfig() {
-        super();
-    }
+		super();
+	}
 
-    @Override
+	@Override
 	public void configureDefaultServletHandling(
 			final DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
@@ -77,32 +77,32 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	FitterMessageProcessor fitterMessageProcessor() {
 		return new FitterMessageProcessorImpl();
 	}
-	
+
 	@Bean
 	WodCsvExtractor wodCsvExtractor() {
 		return new WodCsvExtractor();
 	}
-	
+
 	@Bean
 	HighResCsvExtractor highResCsvExtractor() {
 		return new HighResCsvExtractor();
 	}
-    
-    @Bean
-    HighRes24CsvExtractor highRes24CsvExtractor() {
-        return new HighRes24CsvExtractor();
-    }
-	
+
+	@Bean
+	HighRes24CsvExtractor highRes24CsvExtractor() {
+		return new HighRes24CsvExtractor();
+	}
+
 	@Bean
 	RealTimeCsvExtractor realTimeCsvExtractor() {
 		return new RealTimeCsvExtractor();
 	}
-	
+
 	@Bean
 	TleProcessor tleProcessor() {
 		return new TleProcessor();
 	}
-	
+
 	@Bean
 	PredictorService predictorService() {
 		return new PredictorService();
